@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vitrine de Motos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--r:#c80000;--r2:#a00000;--g:#25ae88;--bg:#fff;--cd:#f8f8f8;--bd:#e6e6e6;--tx:#2b2b33;--mu:#8b8b96}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--tx);background:var(--bg)}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 90px}
+.cover{height:110px;background:linear-gradient(135deg,#c80000,#e8452f 60%,#7a0000)}
+.prof{display:flex;justify-content:space-between;align-items:flex-end;margin-top:-52px}
+.ava{width:104px;height:104px;border-radius:50%;border:4px solid #fff;object-fit:cover;background:#ddd;display:grid;place-items:center;font-size:40px;font-weight:800;color:#fff;background:var(--r)}
+.ava.s{width:56px;height:56px;border-width:2px;font-size:20px}
+.logo{height:76px;max-width:130px;object-fit:contain;background:#fff;border-radius:8px;padding:4px}
+h1{margin:14px 0 2px;font-size:26px;font-weight:800}h2{font-size:22px;font-weight:800;margin:26px 0 12px}h3{margin:0;font-size:18px;font-weight:800}
+.mu,small{color:var(--mu)}.row{display:flex;gap:10px;margin:14px 0}
+.btn{display:block;width:100%;padding:15px;border-radius:999px;border:1px solid var(--bd);background:var(--cd);font:600 15px Inter,sans-serif;color:var(--tx);text-align:center;text-decoration:none;cursor:pointer;margin-top:10px}
+.btn.red{background:var(--r);color:#fff;border-color:var(--r)}.btn.red:hover{background:var(--r2)}
+.btn.wa{background:var(--g);color:#fff;border-color:var(--g)}.btn.or{background:#c96d22;color:#fff;border-color:#c96d22}
+.row .btn{width:auto;margin:0;padding:13px 22px}
+.card{border:1px solid var(--bd);border-radius:22px;padding:18px;margin-bottom:16px}
+.card img{width:100%;height:200px;object-fit:contain;margin:8px 0 12px}
+.foot{text-align:center;font-size:12px;margin-top:30px}.foot a{color:var(--mu)}
+.bubble{position:fixed;right:14px;bottom:16px;background:var(--g);color:#fff;border-radius:999px;padding:8px 18px 8px 8px;display:flex;gap:10px;align-items:center;font-weight:600;text-decoration:none;box-shadow:0 6px 20px #0003;z-index:5}
+.bubble .ava{width:44px;height:44px;border-width:2px;font-size:16px}
+#modal{position:fixed;inset:0;background:#0007;display:none;z-index:10;overflow:auto}
+.sheet{background:#fff;max-width:560px;min-height:100%;margin:0 auto;padding:16px 18px 40px}
+.mh,.mt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mh{padding-bottom:12px;border-bottom:1px solid var(--bd)}.mt{padding:6px 0;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.mt h2{margin:10px 0;font-size:21px}.mt b{font-size:26px;color:var(--r);padding:0 7px;cursor:pointer}.mt b:last-child{color:var(--mu)}
+.mp{display:flex;gap:10px;align-items:center}.wab{background:var(--g);color:#fff;border-radius:999px;padding:12px 18px;text-decoration:none;font-weight:700}
+.gal #gm{width:100%;height:260px;object-fit:contain}.th{display:flex;gap:8px;overflow:auto;padding:6px 0}
+.th img{width:70px;height:54px;object-fit:contain;border:2px solid var(--bd);border-radius:8px;cursor:pointer}
+.vid{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;margin-top:8px}
+.desc{white-space:pre-wrap;line-height:1.6;margin-top:18px}
+.pl label{display:block;padding:9px 0;font-size:18px;cursor:pointer}.pl input{accent-color:var(--r);margin-right:10px;transform:scale(1.4)}
+input,select,textarea{width:100%;padding:15px;border:1px solid var(--bd);border-radius:12px;font:16px Inter,sans-serif;margin-top:10px;background:#fff}
+textarea{min-height:150px}label.l{display:block;font-size:13px;color:var(--mu);margin-top:12px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:999px;z-index:30;display:none}
+.card{position:relative}.row .btn{flex:1;padding:13px 12px}
+.chips{display:flex;gap:8px;overflow:auto;padding:12px 0 6px}.chip{flex:none;padding:9px 16px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 14px Inter,sans-serif;cursor:pointer}.chip.on{background:var(--r);color:#fff;border-color:var(--r)}
+.selo{position:absolute;top:14px;right:14px;background:var(--r);color:#fff;font:700 12px Inter,sans-serif;padding:5px 11px;border-radius:999px}
+.par{margin:2px 0 8px;font-size:14px}.par b{color:var(--r);font-size:18px}
+.lb{position:fixed;inset:0;background:#000e;z-index:20;display:grid;place-items:center}.lb img{max-width:96vw;max-height:90vh}
+.sk{height:260px;border-radius:22px;background:linear-gradient(90deg,#f0f0f0,#fafafa,#f0f0f0);margin-bottom:16px}
+.stk{position:sticky;bottom:0;background:#fff;padding:10px 0 4px;margin-top:14px}#modal{overscroll-behavior:contain}
+details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:12px 0;font-size:14px;line-height:1.5}summary{font-weight:700;cursor:pointer}
+/* admin */
+.ad{max-width:760px;margin:0 auto;padding:18px}.tabs{display:flex;gap:8px;margin:14px 0}.tabs .btn{margin:0;padding:11px}.tabs .on{background:var(--r);color:#fff}
+.it{display:flex;gap:12px;align-items:center;border:1px solid var(--bd);border-radius:14px;padding:10px;margin-top:10px}
+.it img{width:70px;height:54px;object-fit:contain}.it .g{flex:1}.it button,.sm{border:1px solid var(--bd);background:var(--cd);border-radius:10px;padding:8px 12px;cursor:pointer;font:600 13px Inter}
+.ph{display:grid;grid-template-columns:repeat(auto-fill,90px);gap:8px;margin-top:10px}.ph div{position:relative}.ph img{width:90px;height:70px;object-fit:contain;border:1px solid var(--bd);border-radius:8px}
+.ph i{position:absolute;top:-6px;right:-6px;background:var(--r);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;font-style:normal;cursor:pointer}
+.pr{display:flex;gap:8px}.pr input{margin-top:8px}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="modal"></div><div id="toast"></div>
+<script>
+/* ===== CONFIGURE AQUI (Supabase > Project Settings > API) ===== */
+const SUPABASE_URL='COLE_AQUI_A_URL_DO_PROJETO';
+const SUPABASE_KEY='COLE_AQUI_A_ANON_KEY';
+/* =============================================================== */
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+let V={nome:'Vendedor',whatsapp:'5568984041407'},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='perfil';
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2800)};
+const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
+const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
+const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
+const img0=m=>(m.fotos||[])[0]||'';
+
+async function init(){
+  if(!M.length)$('#app').innerHTML='<div class="cover"></div><div class="wrap" style="padding-top:70px"><div class="sk"></div><div class="sk"></div></div>';
+  const [v,m]=await Promise.all([sb.from('vendedor').select().eq('id',1).maybeSingle(),sb.from('motos').select().order('ordem').order('created_at')]);
+  if(v.data)V=v.data;M=m.data||[];route();
+}
+addEventListener('hashchange',route);
+async function route(){
+  $('#modal').style.display='none';
+  if(location.hash==='#admin'){const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
+}
+
+/* ================= CLIENTE ================= */
+function home(){
+  A=M.filter(m=>m.ativo);document.title=V.nome+' | Motos';
+  K=['Todas',...new Set(A.map(m=>m.categoria).filter(Boolean))];
+  $('#app').innerHTML=`<div class="cover"></div><div class="wrap">
+  <div class="prof">${av(V.foto_url)}${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}">`:''}</div>
+  <h1>${esc(V.nome)} <span style="color:#1d9bf0">✔</span></h1><p class="mu">${esc(V.bio)}</p>
+  <div class="row"><a class="btn red" target="_blank" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}">Fale comigo</a>
+  ${V.instagram?`<a class="btn red" target="_blank" href="https://instagram.com/${esc(V.instagram)}">Instagram</a>`:''}</div>
+  <h2>Escolha sua moto</h2><input id="q" placeholder="🔍 Buscar moto" value="${esc(Q)}" oninput="Q=this.value;lista()" style="margin:0">
+  <div class="chips">${K.map((c,i)=>`<button class="chip ${c===C?'on':''}" onclick="C=K[${i}];home()">${esc(c)}</button>`).join('')}</div>
+  <div id="ls"></div><p class="foot"><a href="#admin">Área do vendedor</a></p></div>
+  <a class="bubble" target="_blank" href="${wa('Olá! Vim pelo seu site.')}">${av(V.foto_url)}Estou online. Fale agora!</a>`;
+  lista();
+}
+function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
+function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
+function openM(i,v){
+  cur=i;G=0;const m=L[i],f=m.fotos||[],pr=minP(m);let b='';
+  if(v==='det')b=`<div class="gal"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}">
+    ${f.length>1?`<div class="th">${f.map((u,k)=>`<img src="${esc(u)}" onclick="G=${k};gal(0)">`).join('')}</div>`:''}${vid(m.video_url)}</div>
+    ${m.preco>0?`<div class="par">À vista <b>${brl(m.preco)}</b></div>`:''}${pr?`<div class="par">Consórcio a partir de <b>${brl(pr.valor)}</b>/mês (${pr.parcelas}x)</div>`:''}
+    <div class="row" style="flex-wrap:wrap"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button><button class="btn" onclick="shareM()">Compartilhar</button></div>
+    <div class="desc">${esc(m.descricao)}</div>
+    <div class="stk"><a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+'.')}">Conversar com vendedor</a></div>`;
+  if(v==='con'){const p=m.planos||[];b=`<h3>Tabela de consórcio</h3><img src="${esc(f[0]||'')}" style="width:100%;height:230px;object-fit:contain">
+    <h3 style="text-align:center">Com emplacamento</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
+    <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
+    <details><summary>Como funciona o consórcio?</summary>Você entra em um grupo, paga parcelas mensais sem juros (há taxa de administração) e a moto é liberada por sorteio ou lance. Fale com o vendedor para tirar dúvidas.</details>
+    <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
+  if(v==='fin')b=`<h3>Financiamento</h3><p class="mu">Preencha o formulário para que o vendedor traga as melhores cotações do mercado.</p>
+    <details><summary>Como funciona?</summary>O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.</details>
+    <input id="f_ent" placeholder="Valor de entrada" inputmode="numeric" oninput="msk(this,'rs')"><input id="f_nas" placeholder="Data de nascimento" inputmode="numeric" oninput="msk(this,'dt')">
+    <input id="f_cpf" placeholder="CPF" inputmode="numeric" oninput="msk(this,'cpf')"><input id="f_nom" placeholder="Nome" autocomplete="name"><input id="f_tel" placeholder="Telefone" inputmode="tel" oninput="msk(this,'tel')">
+    <select id="f_hab"><option>Possui habilitação? Sim</option><option>Possui habilitação? Não</option></select>
+    <p class="mu" style="font-size:12px">Ao enviar, seus dados vão apenas para o vendedor, para a cotação.</p>
+    <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
+  const mo=$('#modal');if(mo.style.display!=='block')history.pushState({m:1},'');
+  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${av(V.foto_url,'s')}<div><b>${esc(V.nome)}</b><br><small>${tel()}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
+  <div class="mt"><h2>${esc(m.nome)}</h2><span><b onclick="nav(-1)">‹</b><b onclick="nav(1)">›</b><b onclick="closeM()">✕</b></span></div>${b}</div>`;
+  mo.style.display='block';mo.scrollTop=0;
+  const g=$('#gm');if(g){let x0=0;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)gal(d<0?1:-1)}}
+}
+const nav=d=>openM((cur+d+L.length)%L.length,'det');
+const closeM=()=>history.state&&history.state.m?history.back():$('#modal').style.display='none';
+async function lead(tipo,x={}){const m=L[cur];try{await sb.from('leads').insert({tipo,moto_id:m.id,moto_nome:m.nome,...x})}catch(e){}}
+function conWa(rep){
+  const m=L[cur],r=document.querySelector('input[name=pl]:checked'),p=r&&(m.planos||[])[r.value];
+  const t=rep?`Olá! Quero um repasse de consórcio da ${m.nome}.`:`Olá! Tenho interesse no consórcio da ${m.nome}${p?` em ${p.parcelas}x de ${brl(p.valor)}`:''}.`;
+  lead('consorcio',{detalhes:t});window.open(wa(t),'_blank');
+}
+async function finSend(){
+  const g=i=>$('#'+i).value.trim(),m=L[cur];
+  if(!g('f_nom')||!g('f_tel'))return toast('Preencha nome e telefone');
+  const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value};
+  await lead('financiamento',d);
+  const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\n${d.habilitacao}`;
+  window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
+}
+
+/* ================= ADMIN ================= */
+function login(){
+  $('#app').innerHTML=`<div class="ad" style="max-width:380px"><h1>Área do vendedor</h1><input id="em" type="email" placeholder="E-mail"><input id="se" type="password" placeholder="Senha">
+  <button class="btn red" onclick="doLogin()">Entrar</button><p class="foot"><a href="#">← Voltar ao site</a></p></div>`;
+}
+async function doLogin(){
+  const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#se').value});
+  if(error)return toast('E-mail ou senha incorretos');await init();adm();
+}
+async function out(){await sb.auth.signOut();location.hash='';home()}
+async function up(file){
+  const p=`${Date.now()}-${Math.random().toString(36).slice(2,7)}-${file.name.replace(/[^\w.]/g,'_')}`;
+  const{error}=await sb.storage.from('midia').upload(p,file);if(error)throw error;
+  return sb.storage.from('midia').getPublicUrl(p).data.publicUrl;
+}
+function adm(t){
+  if(t)T=t;
+  const tabs=['perfil','motos','leads'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',leads:'Contatos'}[k]}</button>`).join('');
+  $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
+  <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
+  ({perfil:pPerfil,motos:pMotos,leads:pLeads})[T]();
+}
+function pPerfil(){
+  $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:10px">${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}">`:''}<div><label class="l">Logo da empresa</label><input type="file" accept="image/*" onchange="upV('logo_url',this)"></div></div>
+  <label class="l">Nome do vendedor</label><input id="v_n" value="${esc(V.nome)}">
+  <label class="l">Frase / bio</label><input id="v_b" value="${esc(V.bio)}">
+  <label class="l">WhatsApp (55 + DDD + número, só números)</label><input id="v_w" value="${esc(V.whatsapp)}" inputmode="numeric">
+  <label class="l">Instagram (sem @)</label><input id="v_i" value="${esc(V.instagram)}">
+  <button class="btn red" onclick="saveV()">Salvar perfil</button>`;
+}
+async function upV(k,el){
+  try{toast('Enviando...');V[k]=await up(el.files[0]);await sb.from('vendedor').upsert({id:1,...V});toast('Salvo!');pPerfil()}catch(e){toast('Erro: '+e.message)}
+}
+async function saveV(){
+  V={...V,nome:$('#v_n').value,bio:$('#v_b').value,whatsapp:$('#v_w').value.replace(/\D/g,''),instagram:$('#v_i').value.replace('@','')};
+  const{error}=await sb.from('vendedor').upsert({id:1,...V});toast(error?'Erro: '+error.message:'Perfil salvo!');
+}
+function pMotos(){
+  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button>`+M.map(m=>`<div class="it"><img src="${esc(img0(m))}"><div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta)'}</small></div>
+  <button onclick="edit('${m.id}')">Editar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('');
+}
+function edit(id){
+  E=id?JSON.parse(JSON.stringify(M.find(m=>m.id===id))):{nome:'',modelo:'',categoria:'Street',descricao:'',fotos:[],video_url:'',planos:[],ordem:M.length,ativo:true};
+  fm();
+}
+function fm(){
+  const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
+  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Modelo / versão')}${f('selo','Selo no card (opcional)','Ex: Novo, Oferta, Mais vendida')}<label class="l">Preço à vista (opcional)</label><input type="number" step="0.01" value="${E.preco||''}" oninput="E.preco=+this.value||null">
+  <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Scooter','Esportiva'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
+  <label class="l">Descrição / ficha técnica (cole aqui o texto que copiou do Google)</label>
+  <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
+  <button class="sm" style="margin-top:8px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button>
+  <label class="l">Fotos (a primeira é a capa)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
+  <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
+  <label class="l">Vídeo: link do YouTube ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value">
+  <input type="file" accept="video/*" onchange="upVid(this)">
+  <label class="l">Planos de consórcio (parcelas e valor)</label>
+  ${E.planos.map((p,i)=>`<div class="pr"><input type="number" value="${p.parcelas}" placeholder="Parcelas" oninput="E.planos[${i}].parcelas=+this.value"><input type="number" step="0.01" value="${p.valor}" placeholder="Valor R$" oninput="E.planos[${i}].valor=+this.value"><button class="sm" onclick="E.planos.splice(${i},1);fm()">×</button></div>`).join('')}
+  <button class="sm" style="margin-top:8px" onclick="E.planos.push({parcelas:80,valor:0});fm()">+ Adicionar plano</button>
+  <label class="l"><input type="checkbox" style="width:auto" ${E.ativo?'checked':''} onchange="E.ativo=this.checked"> Mostrar no site</label>
+  <button class="btn red" onclick="saveM()">Salvar moto</button>`;
+}
+async function upF(el){try{toast('Enviando fotos...');for(const f of el.files)E.fotos.push(await up(f));fm()}catch(e){toast('Erro: '+e.message)}}
+async function upVid(el){try{toast('Enviando vídeo...');E.video_url=await up(el.files[0]);fm();toast('Vídeo enviado')}catch(e){toast('Erro: '+e.message)}}
+async function saveM(){
+  if(!E.nome.trim())return toast('Informe o nome da moto');
+  const{error}=await sb.from('motos').upsert(E);if(error)return toast('Erro: '+error.message);
+  toast('Moto salva!');await init();adm('motos');
+}
+async function del(id){if(!confirm('Excluir esta moto?'))return;await sb.from('motos').delete().eq('id',id);await init();adm('motos')}
+async function pLeads(){
+  const{data}=await sb.from('leads').select().order('created_at',{ascending:false}).limit(100);
+  $('#pn').innerHTML=(data||[]).map(l=>`<div class="it"><div class="g"><b>${esc(l.nome||'Cliente')}</b> · ${esc(l.tipo)}<br><small>${esc(l.moto_nome||'')} · ${new Date(l.created_at).toLocaleString('pt-BR')}</small>
+  <br><small>${esc(l.telefone||'')} ${esc(l.cpf?'CPF '+l.cpf:'')} ${esc(l.entrada?'Entrada '+l.entrada:'')}</small></div><button onclick="delL('${l.id}')">Excluir</button></div>`).join('')||'<p class="mu">Nenhum contato ainda.</p>';
+}
+async function delL(id){await sb.from('leads').delete().eq('id',id);pLeads()}
+const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0];
+function lista(){
+  const q=Q.toLowerCase();
+  L=A.filter(m=>(C==='Todas'||m.categoria===C)&&((m.nome||'')+' '+(m.modelo||'')).toLowerCase().includes(q));
+  $('#ls').innerHTML=L.map((m,i)=>{const p=minP(m);return `<div class="card">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}<h3>${esc(m.nome)}</h3><small>${esc(m.categoria)}</small>
+   <img src="${esc(img0(m))}" alt="${esc(m.nome)}" loading="lazy" onerror="this.style.visibility='hidden'">
+   ${p?`<div class="par">Consórcio a partir de <b>${brl(p.valor)}</b>/mês (${p.parcelas}x)</div>`:''}
+   <button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button><button class="btn" onclick="openM(${i},'con')">Planos de consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div>`}).join('')||'<p class="mu">Nenhuma moto encontrada.</p>';
+}
+function msk(e,t){let v=e.value.replace(/\D/g,'');
+  if(t==='cpf')v=v.slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  if(t==='tel')v=v.slice(0,11).replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{1,4})$/,'$1-$2');
+  if(t==='dt')v=v.slice(0,8).replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2})(\d)/,'$1/$2');
+  if(t==='rs')v=v?brl(v/100):'';
+  e.value=v}
+function gal(d){const f=L[cur].fotos||[];if(!f.length)return;G=(G+d+f.length)%f.length;$('#gm').src=f[G]}
+function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${esc(u)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+function shareM(){const m=L[cur],u=location.origin+location.pathname+'#moto='+m.id;
+  if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
+  else navigator.clipboard.writeText(u).then(()=>toast('Link copiado!'))}
+addEventListener('popstate',()=>{$('#modal').style.display='none'});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+init();
+</script>
+</body>
+</html>
