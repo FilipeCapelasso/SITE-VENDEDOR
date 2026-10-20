@@ -69,8 +69,8 @@ details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:1
 <div id="app"></div><div id="modal"></div><div id="toast"></div>
 <script>
 /* ===== CONFIGURE AQUI (Supabase > Project Settings > API) ===== */
-const SUPABASE_URL='https://qrmwgqkiwoenlkfzjazs.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybXdncWtpd29lbmxrZnpqYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDc3OTIsImV4cCI6MjEwNjM4Mzc5Mn0.lhgkQS_WcB55uG0SKk0ngQgpc9oruFRt2H2D8orjNnc';
+const SUPABASE_URL='COLE_AQUI_A_URL_DO_PROJETO';
+const SUPABASE_KEY='COLE_AQUI_A_ANON_KEY';
 /* =============================================================== */
 const SU=SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,'');
 const DEMO=!(/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SU)&&SUPABASE_KEY.trim().length>30&&!SUPABASE_KEY.startsWith('COLE_'));
@@ -203,10 +203,22 @@ async function saveV(){
   V={...V,nome:$('#v_n').value,bio:$('#v_b').value,whatsapp:$('#v_w').value.replace(/\D/g,''),instagram:$('#v_i').value.replace('@','')};
   const{error}=await sb.from('vendedor').upsert({id:1,...V});toast(error?'Erro: '+error.message:'Perfil salvo!');
 }
+const CAT=[['POP 110I ES +10%','Street'],['BIZ 125 ES','Street'],['ELITE 125','Street'],['BIZ 125 EX','Street'],['CG 160 START','Street'],['PCX CBS','Street'],['CG 160 FAN','Street'],['CG 160 TITAN','Street'],['PCX ABS','Street'],['NXR160 BROS CBS','Adventure'],['NXR160 BROS ABS','Adventure'],['CRF 300F','Off Road'],['XRE 190','Adventure'],['HONDA ADV','Adventure'],['CB300F TWISTER ABS','Street'],['XR 300L TORNADO','Adventure'],['SAHARA 300','Adventure'],['SAHARA 300 ADV','Adventure'],['CB 500 HORNET','Street'],['NX 500','Adventure'],['CB1000 HORNET ABS (70% DO VALOR)','Street'],['CB 750 HORNET','Street'],['TRX 420FM (4X4)','Off Road'],['NC 750X ABS MT','Adventure'],['CB 650R E-CLUTCH','Street'],['CRF 1100L AFRICA TWIN MT (70% DO VALOR)','Adventure'],['XL 750 TRANSALP','Big Trail']];
 function pMotos(){
-  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button>`+M.map(m=>`<div class="it"><img src="${esc(img0(m))}"><div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta)'}</small></div>
-  <button onclick="edit('${m.id}')">Editar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('');
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0]));
+  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button>`+M.map(m=>`<div class="it">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small></div>
+  <button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
+  (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
+  <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
 }
+async function addCat(i){const c=CAT[i];
+  const{data,error}=await sb.from('motos').insert({nome:c[0],categoria:c[1],ativo:false,ordem:M.length}).select().single();
+  if(error)return toast('Erro: '+error.message);M.push(data);edit(data.id)}
+async function addAll(){
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),rows=CAT.filter(c=>!tem.has(c[0])).map((c,k)=>({nome:c[0],categoria:c[1],ativo:false,ordem:M.length+k}));
+  const{data,error}=await sb.from('motos').insert(rows).select();
+  if(error)return toast('Erro: '+error.message);M.push(...data);toast(data.length+' motos adicionadas!');pMotos()}
+async function tog(id){const m=M.find(x=>x.id===id);m.ativo=!m.ativo;await sb.from('motos').update({ativo:m.ativo}).eq('id',id);pMotos()}
 function edit(id){
   E=id?JSON.parse(JSON.stringify(M.find(m=>m.id===id))):{nome:'',modelo:'',categoria:'Street',descricao:'',fotos:[],video_url:'',planos:[],ordem:M.length,ativo:true};
   fm();
@@ -214,12 +226,12 @@ function edit(id){
 function fm(){
   const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
   $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}
-  <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Scooter','Esportiva'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
+  <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Big Trail','Scooter','Esportiva'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
   <label class="l">Ficha técnica: clique em pesquisar, copie do Google e cole aqui (uma linha por item, ex: Cilindrada: 109,5 cc)</label>
   <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
   <button class="sm" style="margin-top:8px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button>
-  <label class="l">Fotos (a primeira é a capa)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
-  <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
+  <label class="l">Fotos (a primeira é a capa; toque numa foto para torná-la capa, × remove)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
+  <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}" onclick="E.fotos.unshift(E.fotos.splice(${i},1)[0]);fm()"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
   <label class="l">Vídeo: link do YouTube ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value">
   <input type="file" accept="video/*" onchange="upVid(this)">
   <label class="l">Planos de consórcio (parcelas e valor)</label>
