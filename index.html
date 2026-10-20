@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Vitrine de Motos</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#14141a">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--r:#c80000;--r2:#a00000;--g:#25ae88;--bg:#fff;--cd:#f8f8f8;--bd:#e6e6e6;--tx:#2b2b33;--mu:#8b8b96}
@@ -63,6 +64,71 @@ details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:1
 .ph{display:grid;grid-template-columns:repeat(auto-fill,90px);gap:8px;margin-top:10px}.ph div{position:relative}.ph img{width:90px;height:70px;object-fit:contain;border:1px solid var(--bd);border-radius:8px}
 .ph i{position:absolute;top:-6px;right:-6px;background:var(--r);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;font-style:normal;cursor:pointer}
 .pr{display:flex;gap:8px}.pr input{margin-top:8px}
+
+/* ===== VISUAL PREMIUM ===== */
+:root{--ink:#14141a;--pg:#f3f3f5;--ease:cubic-bezier(.2,.8,.2,1)}
+body{background:var(--pg);-webkit-font-smoothing:antialiased}
+.btn{transition:transform .25s var(--ease),background .25s,box-shadow .25s,color .25s}.btn:active{transform:scale(.97)}
+@keyframes up{from{opacity:0;translate:0 28px}}
+@keyframes sweep{to{clip-path:inset(0)}}
+.hero{position:relative;overflow:hidden;background:var(--ink);color:#fff;padding:clamp(56px,9vw,120px) clamp(16px,3vw,48px) clamp(44px,6vw,80px)}
+.hero.sk0{height:300px}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 72%,var(--r) 72.2%,#e8452f 84%,transparent 84.2%),linear-gradient(115deg,transparent 87%,#ffffff1a 87.2%,#ffffff1a 89%,transparent 89.2%);clip-path:inset(0 100% 0 0);animation:sweep 1.3s var(--ease) .1s forwards}
+.hero.st::before,.hero.st .hin>*{animation:none;clip-path:none}
+.hin{position:relative;max-width:1480px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;gap:28px;flex-wrap:wrap}
+.hin>*{animation:up .9s var(--ease) both}.hin>:nth-child(2){animation-delay:.25s}
+.hp{display:flex;gap:24px;align-items:center}
+.hero .ava{width:116px;height:116px;border:4px solid #ffffff30;box-shadow:0 0 0 7px #c8000040}
+.hero h1{font:800 clamp(46px,7vw,96px)/.95 'Barlow Condensed',Inter,sans-serif;margin:0;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.hero h1 svg{width:.38em;height:.38em;flex:none}
+.hero p{margin:12px 0 0;color:#b9b9c6;font-size:clamp(15px,1.6vw,19px);max-width:540px;line-height:1.5}
+.hc{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.hero .btn{margin:0;width:auto;padding:15px 28px;display:inline-flex;gap:9px;align-items:center}
+.hero .btn.red{box-shadow:0 12px 32px #c8000070}.hero .btn:hover{transform:translateY(-3px)}
+.hero .btn.gh{background:#ffffff14;border-color:#ffffff30;color:#fff;backdrop-filter:blur(6px)}
+.hero .logo{height:64px}
+.wrap{max-width:1560px;margin:0 auto;padding:0 clamp(16px,3vw,48px) 110px}
+.bar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:46px 0 6px}
+.bar h2{margin:0;font:800 clamp(32px,3.6vw,48px)/1 'Barlow Condensed',Inter,sans-serif;text-transform:uppercase}
+.cnt{color:var(--mu);font-size:14px}
+.tools{position:sticky;top:0;z-index:6;display:flex;gap:14px;align-items:center;padding:12px 0;margin-bottom:14px;background:#f3f3f5ee;backdrop-filter:blur(14px)}
+.tools input{margin:0;max-width:340px;border-radius:999px;padding:13px 20px;transition:box-shadow .3s,border-color .3s}
+.tools input:focus{outline:0;border-color:var(--r);box-shadow:0 0 0 4px #c8000020}
+.tools .chips{padding:0;flex:1}.chip{transition:all .3s var(--ease)}.chip:hover{transform:translateY(-2px);border-color:var(--r)}
+#ls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(14px,1.6vw,26px)}
+.card{margin:0;padding:0;border:0;border-radius:26px;background:#fff;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px #0000000d,0 10px 26px -14px #0003;transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .25s ease-out,box-shadow .4s}
+.card:hover{box-shadow:0 34px 60px -24px #c8000066,0 8px 20px -10px #0003}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),#c8000012,transparent 60%)}
+.card:hover::after{opacity:1}
+.rv{opacity:0}.rv.in{animation:up .8s var(--ease) calc(var(--i,0)*90ms) both}
+.pimg{background:radial-gradient(circle at 50% 70%,#fff,#ececf0);padding:20px 12px 8px;position:relative}
+.pimg::after{content:"";position:absolute;left:20%;right:20%;bottom:12px;height:14px;background:radial-gradient(#0003,transparent 70%);filter:blur(4px);transition:all .5s var(--ease)}
+.card .pimg img{width:100%;height:210px;margin:0;object-fit:contain;position:relative;z-index:1;transition:transform .6s var(--ease)}
+.card:hover .pimg img{transform:scale(1.09) translateY(-6px)}.card:hover .pimg::after{transform:scaleX(.8);opacity:.6}
+.ci{padding:16px 20px 4px}.ci small{font-weight:600;color:var(--r);font-size:12.5px}
+.card h3{font:800 27px/1.05 'Barlow Condensed',Inter,sans-serif;text-transform:uppercase;margin:3px 0 8px}
+.par{margin:0;min-height:22px;font-size:13px;color:var(--mu)}.par b{color:var(--ink);font-size:15px}
+.cb{padding:12px 16px 18px;margin-top:auto}
+.cb .btn.red{margin:0}.cb .btn.red:hover{transform:translateY(-2px);box-shadow:0 12px 26px -8px #c80000aa}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.two .btn{margin:0;padding:12px 6px;font-size:13.5px}
+.two .btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.selo{z-index:2;box-shadow:0 6px 14px #c8000055}
+.sk{height:390px;margin:0;border-radius:26px;background:linear-gradient(100deg,#ececf0 30%,#f8f8fa 50%,#ececf0 70%);background-size:300% 100%;animation:sh 1.4s infinite linear}@keyframes sh{to{background-position:-300% 0}}
+.foot{padding-top:44px}
+.bubble{box-shadow:0 12px 30px #25ae8866;animation:up .8s var(--ease) 1.2s both;transition:transform .3s var(--ease)}.bubble:hover{transform:translateY(-4px) scale(1.03)}
+.bubble::before{content:"";position:absolute;inset:0;border-radius:inherit;border:2px solid var(--g);animation:ping 2.4s ease-out infinite}
+@keyframes ping{to{transform:scale(1.35);opacity:0}}
+#modal{background:#0b0b10a8;backdrop-filter:blur(8px)}
+.sheet{animation:pop .45s var(--ease)}@keyframes pop{from{opacity:0;transform:translateY(30px) scale(.97)}}
+.mt h2{font:800 32px 'Barlow Condensed',Inter,sans-serif;text-transform:uppercase}
+.gal #gm{animation:fd .35s}@keyframes fd{from{opacity:0;scale:.96}}
+.th img{transition:all .25s}.th img:hover{border-color:var(--r);transform:translateY(-2px)}
+@media(min-width:720px){.sheet{max-width:1000px;border-radius:26px}.gal #gm{height:420px}.gal .th{max-height:430px}}
+@media(max-width:1199px){#ls{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:899px){#ls{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.tools{flex-direction:column;align-items:stretch}.tools input{max-width:none}.hp{flex-direction:column;align-items:flex-start}.hero::before{opacity:.45}}
+@media(max-width:539px){#ls{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important;transition:none!important}.rv{opacity:1}.hero::before{clip-path:none}}
 </style>
 </head>
 <body>
@@ -84,6 +150,12 @@ const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
 const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
 const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
 const img0=m=>(m.fotos||[])[0]||'';
+let HA=false;
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.1});
+const reveal=()=>document.querySelectorAll('.rv:not(.in)').forEach(e=>io.observe(e));
+function tilt(e,el){if(matchMedia('(hover:none)').matches)return;const r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  el.style.setProperty('--rx',(-y*6)+'deg');el.style.setProperty('--ry',(x*8)+'deg');el.style.setProperty('--mx',(x+.5)*100+'%');el.style.setProperty('--my',(y+.5)*100+'%')}
+function untilt(el){el.style.setProperty('--rx','0deg');el.style.setProperty('--ry','0deg')}
 
 const ph=(t,c)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='600' height='400' fill='#f3f3f3'/><circle cx='170' cy='280' r='70' fill='#333'/><circle cx='430' cy='280' r='70' fill='#333'/><path d='M170 280 L260 170 L380 170 L430 280 L330 230 Z' fill='${c}'/><text x='300' y='60' font-size='34' font-family='Arial' font-weight='700' text-anchor='middle' fill='#555'>${t}</text></svg>`);
 const DEMO_M=[
@@ -93,7 +165,7 @@ const DEMO_M=[
 async function init(){
   if(DEMO){V={nome:'Shayron',bio:'Conectando você à sua próxima moto com as melhores condições!',whatsapp:'5568984041407',instagram:'shayrondahonda'};M=DEMO_M;
     document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;top:0;left:0;right:0;background:#222;color:#fff;font:600 12px Inter,sans-serif;text-align:center;padding:5px;z-index:40">MODO DEMONSTRAÇÃO – configure o Supabase no início do arquivo</div>');return route()}
-  if(!M.length)$('#app').innerHTML='<div class="cover"></div><div class="wrap" style="padding-top:70px"><div class="sk"></div><div class="sk"></div></div>';
+  if(!M.length)$('#app').innerHTML='<div class="hero sk0"></div><div class="wrap"><div id="ls" style="margin-top:40px">'+'<div class="sk"></div>'.repeat(8)+'</div></div>';
   const [v,m]=await Promise.all([sb.from('vendedor').select().eq('id',1).maybeSingle(),sb.from('motos').select().order('ordem').order('created_at')]);
   if(v.data)V=v.data;M=m.data||[];route();
 }
@@ -107,16 +179,14 @@ async function route(){
 function home(){
   A=M.filter(m=>m.ativo);document.title=V.nome+' | Motos';
   K=['Todas',...new Set(A.map(m=>m.categoria).filter(Boolean))];
-  $('#app').innerHTML=`<div class="cover"></div><div class="wrap">
-  <div class="prof">${av(V.foto_url)}${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}">`:''}</div>
-  <h1>${esc(V.nome)} <span style="color:#1d9bf0">✔</span></h1><p class="mu">${esc(V.bio)}</p>
-  <div class="row"><a class="btn red" target="_blank" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}">Fale comigo</a>
-  ${V.instagram?`<a class="btn red" target="_blank" href="https://instagram.com/${esc(V.instagram)}">Instagram</a>`:''}</div>
-  <h2>Escolha sua moto</h2><input id="q" placeholder="🔍 Buscar moto" value="${esc(Q)}" oninput="Q=this.value;lista()" style="margin:0">
-  <div class="chips">${K.map((c,i)=>`<button class="chip ${c===C?'on':''}" onclick="C=K[${i}];home()">${esc(c)}</button>`).join('')}</div>
-  <div id="ls"></div><p class="foot"><a href="#admin">Área do vendedor</a></p></div>
+  $('#app').innerHTML=`<header class="hero ${HA?'st':''}"><div class="hin"><div class="hp">${av(V.foto_url)}<div><h1>${esc(V.nome)}<svg viewBox="0 0 24 24"><path fill="#1d9bf0" d="M12 1.5l2.6 2 3.2-.2 1.2 3 2.7 1.8-.8 3.1.8 3.1-2.7 1.8-1.2 3-3.2-.2-2.6 2-2.6-2-3.2.2-1.2-3-2.7-1.8.8-3.1-.8-3.1 2.7-1.8 1.2-3 3.2.2z"/><path fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M8 12.3l2.8 2.8L16.2 9"/></svg></h1><p>${esc(V.bio)}</p></div></div>
+  <div class="hc">${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}" alt="">`:''}<a class="btn red" target="_blank" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}">Fale comigo</a>
+  ${V.instagram?`<a class="btn gh" target="_blank" href="https://instagram.com/${esc(V.instagram)}"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor"/></svg>Instagram</a>`:''}</div></div></header>
+  <main class="wrap"><div class="bar"><h2>Escolha sua moto</h2><span class="cnt" id="cnt"></span></div>
+  <div class="tools"><input id="q" placeholder="Buscar moto" value="${esc(Q)}" oninput="Q=this.value;lista()"><div class="chips">${K.map((c,i)=>`<button class="chip ${c===C?'on':''}" onclick="C=K[${i}];home()">${esc(c)}</button>`).join('')}</div></div>
+  <div id="ls"></div><p class="foot"><a href="#admin">Área do vendedor</a></p></main>
   <a class="bubble" target="_blank" href="${wa('Olá! Vim pelo seu site.')}">${av(V.foto_url)}Estou online. Fale agora!</a>`;
-  lista();
+  HA=true;lista();
 }
 function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
 function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
@@ -264,10 +334,11 @@ const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0
 function lista(){
   const q=Q.toLowerCase();
   L=A.filter(m=>(C==='Todas'||m.categoria===C)&&((m.nome||'')+' '+(m.modelo||'')).toLowerCase().includes(q));
-  $('#ls').innerHTML=L.map((m,i)=>{const p=minP(m);return `<div class="card">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}<h3>${esc(m.nome)}</h3><small>${esc(m.categoria)}</small>
-   <img src="${esc(img0(m))}" alt="${esc(m.nome)}" loading="lazy" onerror="this.style.visibility='hidden'">
-   
-   <button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button><button class="btn" onclick="openM(${i},'con')">Planos de consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div>`}).join('')||'<p class="mu">Nenhuma moto encontrada.</p>';
+  $('#ls').innerHTML=L.map((m,i)=>{const p=minP(m);return `<article class="card rv" style="--i:${i%4}" onmousemove="tilt(event,this)" onmouseleave="untilt(this)">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
+   <div class="pimg"><img src="${esc(img0(m))}" alt="${esc(m.nome)}" loading="lazy" onerror="this.style.visibility='hidden'"></div>
+   <div class="ci"><small>${esc(m.categoria)}</small><h3>${esc(m.nome)}</h3><p class="par">${p?`consórcio a partir de <b>${p.parcelas}x ${brl(p.valor)}</b>`:''}</p></div>
+   <div class="cb"><button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button><div class="two"><button class="btn" onclick="openM(${i},'con')">Consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div></div></article>`}).join('')||'<p class="mu" style="grid-column:1/-1">Nenhuma moto encontrada.</p>';
+  $('#cnt').textContent=L.length+(L.length===1?' moto':' motos');reveal();
 }
 function msk(e,t){let v=e.value.replace(/\D/g,'');
   if(t==='cpf')v=v.slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
