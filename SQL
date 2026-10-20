@@ -1,96 +1,438 @@
--- =====================================================
--- VITRINE DE MOTOS DO VENDEDOR - Supabase (rode tudo no SQL Editor)
--- =====================================================
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d0d12">
+<title>Vitrine de Motos Honda</title>
+<meta name="description" content="Escolha sua moto Honda com consórcio ou financiamento e fale direto com o vendedor pelo WhatsApp.">
+<meta property="og:type" content="website"><meta property="og:title" content="Vitrine de Motos Honda"><meta property="og:description" content="Consórcio e financiamento de motos Honda com atendimento direto pelo WhatsApp.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%8F%8D%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://qrmwgqkiwoenlkfzjazs.supabase.co" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--r:#c80000;--r2:#a00000;--g:#25ae88;--bg:#fff;--cd:#f8f8f8;--bd:#e6e6e6;--tx:#2b2b33;--mu:#8b8b96}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--tx);background:var(--bg)}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 90px}
+.cover{height:110px;background:linear-gradient(135deg,#c80000,#e8452f 60%,#7a0000)}
+.prof{display:flex;justify-content:space-between;align-items:flex-end;margin-top:-52px}
+.ava{width:104px;height:104px;border-radius:50%;border:4px solid #fff;object-fit:cover;background:#ddd;display:grid;place-items:center;font-size:40px;font-weight:800;color:#fff;background:var(--r)}
+.ava.s{width:56px;height:56px;border-width:2px;font-size:20px}
+.logo{height:76px;max-width:130px;object-fit:contain;background:#fff;border-radius:8px;padding:4px}
+h1{margin:14px 0 2px;font-size:26px;font-weight:800}h2{font-size:22px;font-weight:800;margin:26px 0 12px}h3{margin:0;font-size:18px;font-weight:800}
+.mu,small{color:var(--mu)}.row{display:flex;gap:10px;margin:14px 0}
+.btn{display:block;width:100%;padding:15px;border-radius:999px;border:1px solid var(--bd);background:var(--cd);font:600 15px Inter,sans-serif;color:var(--tx);text-align:center;text-decoration:none;cursor:pointer;margin-top:10px}
+.btn.red{background:var(--r);color:#fff;border-color:var(--r)}.btn.red:hover{background:var(--r2)}
+.btn.wa{background:var(--g);color:#fff;border-color:var(--g)}.btn.or{background:#c96d22;color:#fff;border-color:#c96d22}
+.row .btn{width:auto;margin:0;padding:13px 22px}
+.card{border:1px solid var(--bd);border-radius:22px;padding:18px;margin-bottom:16px}
+.card img{width:100%;height:200px;object-fit:contain;margin:8px 0 12px}
+.foot{text-align:center;font-size:12px;margin-top:30px}.foot a{color:var(--mu)}
+.bubble{position:fixed;right:14px;bottom:16px;background:var(--g);color:#fff;border-radius:999px;padding:8px 18px 8px 8px;display:flex;gap:10px;align-items:center;font-weight:600;text-decoration:none;box-shadow:0 6px 20px #0003;z-index:5}
+.bubble .ava{width:44px;height:44px;border-width:2px;font-size:16px}
+#modal{position:fixed;inset:0;background:#0007;display:none;z-index:10;overflow:auto}
+.sheet{background:#fff;max-width:560px;min-height:100%;margin:0 auto;padding:16px 18px 40px}
+.mh,.mt{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mh{padding-bottom:12px;border-bottom:1px solid var(--bd)}.mt{padding:6px 0;border-bottom:1px solid var(--bd);margin-bottom:12px}
+.mt h2{margin:10px 0;font-size:21px}.mt b{font-size:26px;color:var(--r);padding:0 7px;cursor:pointer}.mt b:last-child{color:var(--mu)}
+.mp{display:flex;gap:10px;align-items:center}.wab{background:var(--g);color:#fff;border-radius:999px;padding:12px 18px;text-decoration:none;font-weight:700}
+.gal #gm{width:100%;height:260px;object-fit:contain}.th{display:flex;gap:8px;overflow:auto;padding:6px 0}
+.th img{width:70px;height:54px;object-fit:contain;border:2px solid var(--bd);border-radius:8px;cursor:pointer}
+.vid{width:100%;aspect-ratio:16/9;border:0;border-radius:14px;background:#000;margin-top:8px}
+.desc{white-space:pre-wrap;line-height:1.6;margin-top:18px}
+.pl label{display:block;padding:9px 0;font-size:18px;cursor:pointer}.pl input{accent-color:var(--r);margin-right:10px;transform:scale(1.4)}
+input,select,textarea{width:100%;padding:15px;border:1px solid var(--bd);border-radius:12px;font:16px Inter,sans-serif;margin-top:10px;background:#fff}
+textarea{min-height:150px}label.l{display:block;font-size:13px;color:var(--mu);margin-top:12px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:12px 20px;border-radius:999px;z-index:30;display:none}
+.card{position:relative}.row .btn{flex:1;padding:13px 12px}
+.chips{display:flex;gap:8px;overflow:auto;padding:12px 0 6px}.chip{flex:none;padding:9px 16px;border-radius:999px;border:1px solid var(--bd);background:#fff;font:600 14px Inter,sans-serif;cursor:pointer}.chip.on{background:var(--r);color:#fff;border-color:var(--r)}
+.selo{position:absolute;top:14px;right:14px;background:var(--r);color:#fff;font:700 12px Inter,sans-serif;padding:5px 11px;border-radius:999px}
+.par{margin:2px 0 8px;font-size:14px}.par b{color:var(--r);font-size:18px}
+.lb{position:fixed;inset:0;background:#000e;z-index:20;display:grid;place-items:center}.lb img{max-width:96vw;max-height:90vh}
+.sk{height:260px;border-radius:22px;background:linear-gradient(90deg,#f0f0f0,#fafafa,#f0f0f0);margin-bottom:16px}
+.stk{position:sticky;bottom:0;background:#fff;padding:10px 0 4px;margin-top:14px}#modal{overscroll-behavior:contain}
+details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:12px 0;font-size:14px;line-height:1.5}summary{font-weight:700;cursor:pointer}
+@media(min-width:720px){#modal{padding:28px 14px}.sheet{max-width:780px;min-height:0;border-radius:18px;box-shadow:0 20px 60px #0005}.gal #gm{height:330px}}
+.gal{display:flex;gap:10px;align-items:center}#gmain{flex:1;min-width:0}.gal .th{flex-direction:column;width:76px;flex:none;max-height:340px;padding:0}.gal .th img{width:70px}
+.vb{width:46px;height:46px;border-radius:50%;background:var(--r);color:#fff;border:0;font-size:16px;cursor:pointer;flex:none;align-self:center}
+@media(max-width:719px){.gal{flex-direction:column;align-items:stretch}.gal .th{flex-direction:row;width:100%;max-height:none;overflow:auto}}
+.acts{display:flex;gap:8px;margin:12px 0;border-top:1px solid var(--bd);padding-top:12px}.acts .btn{margin:0;border-radius:10px;padding:14px 6px;font-size:14px;flex:1}
+.ft{font-size:18px;font-weight:800;margin:18px 0 8px}.desc{white-space:normal;line-height:1.55;margin-top:0}.hl{color:var(--mu);font-weight:800;margin:6px 0}
+.fin{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}.fin>div{flex:1}.fin img{width:48%;border:1px solid var(--bd);border-radius:12px;object-fit:contain}
+.hw{background:var(--cd);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5;margin:10px 0}.pill{width:auto!important;margin:0!important;padding:12px 18px!important}
+/* admin */
+.ad{max-width:760px;margin:0 auto;padding:18px}.tabs{display:flex;gap:8px;margin:14px 0}.tabs .btn{margin:0;padding:11px}.tabs .on{background:var(--r);color:#fff}
+.it{display:flex;gap:12px;align-items:center;border:1px solid var(--bd);border-radius:14px;padding:10px;margin-top:10px}
+.it img{width:70px;height:54px;object-fit:contain}.it .g{flex:1}.it button,.sm{border:1px solid var(--bd);background:var(--cd);border-radius:10px;padding:8px 12px;cursor:pointer;font:600 13px Inter}
+.ph{display:grid;grid-template-columns:repeat(auto-fill,90px);gap:8px;margin-top:10px}.ph div{position:relative}.ph img{width:90px;height:70px;object-fit:contain;border:1px solid var(--bd);border-radius:8px}
+.ph i{position:absolute;top:-6px;right:-6px;background:var(--r);color:#fff;border-radius:50%;width:22px;height:22px;text-align:center;font-style:normal;cursor:pointer}
+.pr{display:flex;gap:8px}.pr input{margin-top:8px}
 
--- Perfil do vendedor (sempre 1 linha, id = 1)
-create table if not exists public.vendedor (
-  id int primary key default 1 check (id = 1),
-  nome text not null default 'Shayron',
-  bio text default 'Conectando você à sua próxima moto com as melhores condições!',
-  whatsapp text default '5568984041407',      -- só números, com 55 + DDD
-  instagram text default 'shayrondahonda',
-  foto_url text,
-  logo_url text,
-  updated_at timestamptz default now()
-);
-insert into public.vendedor (id) values (1) on conflict (id) do nothing;
+/* ===== V2: visual profissional ===== */
+:root{--ink:#0d0d12;--paper:#f3f3f6;--sh:0 1px 2px #0001,0 14px 34px -16px #0003}
+html{scroll-behavior:smooth}
+body{background:var(--paper);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
+:focus-visible{outline:3px solid #c8000066;outline-offset:2px}
+.hero{position:relative;overflow:hidden;color:#fff;padding:28px 32px 30px;border-radius:0 0 32px 32px;background:radial-gradient(640px 240px at 90% -40%,#c8000050,transparent 70%),linear-gradient(160deg,#1b1b23,#0a0a0e 78%);box-shadow:0 22px 44px -30px #000}
+.glow{position:absolute;width:280px;height:280px;left:-130px;bottom:-190px;background:#c80000;filter:blur(110px);opacity:.26;animation:breathe 7s ease-in-out infinite;pointer-events:none}
+.spd{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.spd i{position:absolute;height:2px;width:36vw;left:-40vw;opacity:0;background:linear-gradient(90deg,transparent,#ff3b30,transparent);transform:skewX(-30deg);animation:dash 5.5s cubic-bezier(.4,0,.2,1) infinite}
+.spd i:nth-child(1){top:24%}.spd i:nth-child(2){top:52%;animation-delay:1.8s;width:26vw}.spd i:nth-child(3){top:80%;animation-delay:3.4s}.spd i:nth-child(4){display:none}
+@keyframes dash{0%{left:-40vw;opacity:0}15%{opacity:.7}60%{opacity:.4}100%{left:110vw;opacity:0}}
+@keyframes breathe{50%{opacity:.4;transform:scale(1.15)}}
+@keyframes up{from{opacity:0;transform:translateY(18px)}}
+.hin{position:relative;max-width:1376px;margin:0 auto;display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"a id l s" "a c l s";column-gap:22px;row-gap:14px;align-items:center}
+.hin.nl{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"a id s" "a c s"}
+.hin>*{animation:up .7s cubic-bezier(.2,.8,.2,1) both}
+.hero .ava{grid-area:a;width:96px;height:96px;border:3px solid #ffffff33;box-shadow:0 0 0 6px #ffffff10,0 14px 34px #0008;flex:none}
+.idt{grid-area:id;min-width:0;align-self:end;animation-delay:.06s}
+.hero h1{margin:0;font-size:clamp(28px,3.4vw,40px);line-height:1.05;display:flex;align-items:center;gap:10px;font-weight:800}
+.vf{width:.5em;height:.5em;flex:none}
+.hero p{margin:6px 0 0;color:#ffffffbd;font-size:15px;max-width:520px;line-height:1.45}
+.ctas{grid-area:c;display:flex;gap:10px;align-self:start;flex-wrap:wrap;animation-delay:.12s}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:12px 22px;border-radius:999px;font:700 14.5px Inter,sans-serif;color:#fff;text-decoration:none;background:#ffffff14;border:1px solid #ffffff30;backdrop-filter:blur(6px);transition:transform .25s,background .25s,box-shadow .25s}
+.cta svg{width:18px;height:18px;flex:none}
+.cta.w{background:linear-gradient(135deg,#e01a1a,#b00000);border-color:#ff5a4d66;box-shadow:0 10px 26px -10px #e0111199}
+.cta:hover{transform:translateY(-2px);background:#ffffff26}.cta.w:hover{background:linear-gradient(135deg,#f02a2a,#c00000);box-shadow:0 14px 30px -10px #e01111cc}
+.hlogo{grid-area:l;height:58px;max-width:150px;object-fit:contain;background:#fff;border-radius:14px;padding:7px 11px;box-shadow:0 10px 26px -12px #000a;animation-delay:.18s}
+.stats{grid-area:s;display:flex;gap:10px;animation-delay:.24s}
+.stats div{background:#ffffff0d;border:1px solid #ffffff1c;border-radius:16px;padding:12px 18px;min-width:150px;backdrop-filter:blur(10px)}
+.stats b{display:block;font:800 clamp(21px,2.2vw,28px) Sora,sans-serif;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stats span{display:block;margin-top:3px;font-size:12px;color:#ffffff9e;line-height:1.3}
+.wrap{max-width:1440px;padding:0 32px 60px}
+.sec{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:28px 0 12px}
+.sec h2{margin:0;font-size:clamp(22px,2.4vw,28px)}
+.nc{font:600 13px Inter,sans-serif;color:var(--mu);white-space:nowrap}
+.bar{position:sticky;top:10px;z-index:6;margin:0 0 22px;display:flex;align-items:center;gap:14px;padding:10px 12px;background:#ffffffe8;backdrop-filter:blur(16px) saturate(1.4);border:1px solid #fff;border-radius:20px;box-shadow:0 14px 36px -18px #0005;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.bar.hd{transform:translateY(calc(-100% - 24px))}.bar:focus-within{transform:none}
+.sb{position:relative;flex:0 1 340px}.sb svg{position:absolute;left:16px;top:50%;translate:0 -50%;width:18px;color:var(--mu)}
+.sb input{margin:0;padding:12px 16px 12px 44px;border-radius:14px;transition:box-shadow .2s,border-color .2s}
+.sb input:focus{outline:0;border-color:var(--r);box-shadow:0 0 0 4px #c8000020}
+.bar .chips{flex:1;padding:6px 0;margin:-6px 0;min-width:0;scrollbar-width:none}.bar .chips::-webkit-scrollbar{display:none}
+.chip{transition:all .25s}.chip:hover{border-color:var(--r);color:var(--r)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.cd{position:relative;display:flex;flex-direction:column;border:1px solid #0000000d;border-radius:26px;background:#fff;overflow:hidden;box-shadow:var(--sh);transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
+.cd::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(380px circle at var(--mx,50%) var(--my,0%),#c8000014,transparent 60%)}
+.cd:hover{transform:translateY(-8px);box-shadow:0 30px 60px -24px #c8000066,0 8px 20px -10px #0003}.cd:hover::before{opacity:1}
+.an .cd{animation:cin .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i)*70ms)}
+@keyframes cin{from{opacity:0;transform:translateY(40px) scale(.96)}}
+.im{position:relative;margin:10px 10px 0;border-radius:18px;aspect-ratio:4/3;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#fff,#eceef3)}
+.im::after{content:"";position:absolute;bottom:13%;left:20%;right:20%;height:14px;background:#000;filter:blur(14px);opacity:.2;border-radius:50%;transition:all .5s}
+.cd:hover .im::after{opacity:.34;left:12%;right:12%}
+.im img{position:relative;z-index:1;width:88%;height:88%;margin:0;object-fit:contain;opacity:0;transition:opacity .6s,transform .35s ease-out;transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1))}
+.im img.ok{opacity:1}.cd:hover .im img{--s:1.08}
+.selo{top:18px;right:18px;z-index:2;background:linear-gradient(135deg,#dc1414,#a00000);box-shadow:0 6px 16px -6px #c80000}
+.cb{position:relative;display:flex;flex-direction:column;flex:1;padding:16px 18px 18px}
+.cb small{font:600 12px Inter,sans-serif}.cb h3{font-size:18px;line-height:1.2;margin:2px 0 10px}
+.par{margin:0 0 14px;min-height:36px;font-size:12.5px;line-height:1.35;color:var(--mu)}.par b{display:block;color:var(--r);font:800 17px Sora,sans-serif;letter-spacing:-.02em}
+.cb .btn{margin-top:0;border-radius:14px;transition:transform .2s,box-shadow .25s,background .25s,color .2s}
+.cb .btn.red{background:linear-gradient(135deg,#dc1414,#b00000);box-shadow:0 10px 22px -10px #c80000}.cb .btn.red:hover{transform:translateY(-2px);box-shadow:0 14px 28px -10px #c80000}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.two .btn{padding:12px 6px;font-size:13.5px;background:#fff}.two .btn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.empty{grid-column:1/-1;text-align:center;padding:70px 20px;color:var(--mu)}.empty b{display:block;margin-bottom:6px;font:700 20px Sora,sans-serif;color:var(--tx)}.empty .btn{display:inline-block;width:auto;padding:13px 26px;margin-top:14px}
+.sk{height:390px;margin:0;border-radius:26px;background:linear-gradient(90deg,#e9e9ee 25%,#f7f7fa 50%,#e9e9ee 75%);background-size:200% 100%;animation:sh 1.3s infinite}@keyframes sh{to{background-position:-200% 0}}
+.foot2{background:var(--ink);color:#ffffff99;text-align:center;padding:40px 20px 110px;font-size:13px;line-height:1.9}.foot2 b{color:#fff;font:700 17px Sora,sans-serif}.foot2 a{color:#ffffffb3;margin:0 8px}.foot2 a:hover{color:#fff}
+.bw{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;animation:up .8s 1.2s cubic-bezier(.2,.8,.2,1) both}
+.bubble{position:relative;right:auto;bottom:auto;z-index:auto;background:linear-gradient(135deg,#2bc597,#1f9a76);box-shadow:0 12px 30px -8px #1f9a7699;transition:transform .3s}
+.bubble:hover{transform:translateY(-3px) scale(1.02)}.bubble::after{content:"";position:absolute;inset:0;border-radius:inherit;animation:ring 2.6s infinite;pointer-events:none}
+.bx{position:absolute;top:-9px;right:-4px;width:26px;height:26px;border-radius:50%;border:0;background:#fff;color:#444;font:700 16px/1 Inter,sans-serif;box-shadow:0 4px 12px #0004;cursor:pointer;z-index:2;display:grid;place-items:center;padding:0}
+@keyframes ring{0%{box-shadow:0 0 0 0 #25ae8899}70%,100%{box-shadow:0 0 0 18px #25ae8800}}
+#modal{background:#08080cb3;backdrop-filter:blur(10px)}
+.sheet{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}@keyframes pop{from{opacity:0;transform:translateY(40px) scale(.97)}}
+@media(min-width:720px){.sheet{max-width:1000px;border-radius:28px;padding:22px 30px 34px}.gal #gm{height:440px}.gal .th{max-height:440px}}
+#gmain{border-radius:20px;background:radial-gradient(circle at 50% 40%,#fff,#eceef3)}.gal #gm{animation:fd .4s both}@keyframes fd{from{opacity:0;transform:scale(.97)}}
+.th img{transition:all .2s}.th img:hover{border-color:var(--r);transform:translateY(-2px)}
+.mt b{transition:transform .2s}.mt b:hover{transform:scale(1.25)}
+.sheet .btn{border-radius:14px;transition:transform .2s,box-shadow .2s}.sheet .btn:hover{transform:translateY(-2px)}.sheet .btn.red{background:linear-gradient(135deg,#dc1414,#b00000)}
+.pl label{padding:12px 14px;margin-top:8px;border:1px solid var(--bd);border-radius:14px;transition:all .2s}.pl label:hover,.pl label:has(input:checked){border-color:var(--r);background:#fff5f5}
+.pl label:has(input:checked){box-shadow:0 0 0 3px #c8000018}
+@media(max-width:1180px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:899px){
+.hero{padding:24px 22px 24px}
+.hin{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"a id l" "c c c" "s s s";column-gap:16px;row-gap:14px}
+.hin.nl{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"a id" "c c" "s s"}
+.idt{align-self:center}.ctas{flex-wrap:nowrap}.cta{flex:1}
+.stats div{flex:1;min-width:0}
+}
+@media(max-width:860px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}}
+@media(max-width:719px){
+.bar{flex-direction:column;align-items:stretch;gap:8px;padding:10px;top:8px;border-radius:18px}
+.sb{flex:none}
+.bar .chips{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+.chip{padding:8px 15px;font-size:13.5px}
+}
+@media(max-width:560px){
+.grid{grid-template-columns:1fr}.wrap{padding:0 14px 50px}
+.hero{padding:20px 16px 18px;border-radius:0 0 26px 26px}
+.hin{column-gap:14px;row-gap:12px}
+.hero .ava{width:68px;height:68px;border-width:2px;box-shadow:0 0 0 4px #ffffff10,0 10px 24px #0008}
+.hero h1{font-size:27px}
+.hero p{font-size:13.5px;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cta{padding:13px 10px;font-size:14px}
+.hlogo{height:44px;max-width:88px;padding:5px 8px;border-radius:12px}
+.stats{gap:8px}.stats div{padding:10px 12px;border-radius:14px}.stats b{font-size:20px}.stats span{font-size:11.5px}
+.sec{margin-top:22px}
+.im{aspect-ratio:16/11}.cb{padding:14px 16px 16px}
+.bubble{font-size:13px;padding:6px 16px 6px 6px}.bubble .ava{width:38px;height:38px}
+}
+@media(max-width:560px){.mp{min-width:0;gap:8px}.mp small{white-space:nowrap}.wab{flex:none;padding:10px 14px;font-size:14px}.ava.s{width:46px;height:46px}}
+body:has(#modal[style*="block"]){overflow:hidden}
+.im{cursor:pointer}
+.sheet{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast"></div>
+<script>
+/* ===== CONFIGURE AQUI (Supabase > Project Settings > API) ===== */
+const SUPABASE_URL='https://qrmwgqkiwoenlkfzjazs.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybXdncWtpd29lbmxrZnpqYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDc3OTIsImV4cCI6MjEwNjM4Mzc5Mn0.lhgkQS_WcB55uG0SKk0ngQgpc9oruFRt2H2D8orjNnc';
+/* =============================================================== */
+const SU=SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,'');
+const DEMO=!(/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SU)&&SUPABASE_KEY.trim().length>30&&!SUPABASE_KEY.startsWith('COLE_'));
+const sb=DEMO?null:supabase.createClient(SU,SUPABASE_KEY.trim());
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+let V={nome:'Vendedor',whatsapp:'5568984041407'},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='perfil';
+const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2800)};
+const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
+const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
+const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}" alt="${esc(V.nome)}" decoding="async">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
+const img0=m=>(m.fotos||[])[0]||'';
 
--- Motos
-create table if not exists public.motos (
-  id uuid primary key default gen_random_uuid(),
-  nome text not null,
-  modelo text,
-  categoria text default 'Street',
-  descricao text,
-  fotos jsonb not null default '[]'::jsonb,    -- lista de URLs
-  video_url text,                               -- YouTube ou arquivo enviado
-  planos jsonb not null default '[]'::jsonb,   -- [{"parcelas":80,"valor":512.68}]
-  ordem int not null default 0,
-  ativo boolean not null default true,
-  created_at timestamptz not null default now()
-);
+const ph=(t,c)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='600' height='400' fill='#f3f3f3'/><circle cx='170' cy='280' r='70' fill='#333'/><circle cx='430' cy='280' r='70' fill='#333'/><path d='M170 280 L260 170 L380 170 L430 280 L330 230 Z' fill='${c}'/><text x='300' y='60' font-size='34' font-family='Arial' font-weight='700' text-anchor='middle' fill='#555'>${t}</text></svg>`);
+const DEMO_M=[
+ {id:'d1',nome:'CB300F TWISTER ABS',modelo:'ABS',categoria:'Street',selo:'Mais vendida',ativo:true,fotos:[ph('CB300F','#c80000'),ph('CB300F','#222')],planos:[{parcelas:80,valor:512.68},{parcelas:60,valor:664.03},{parcelas:48,valor:817.9},{parcelas:36,valor:1077.53},{parcelas:24,valor:1584.88}],descricao:'Design\nExemplo de descrição. No painel você cola aqui o texto copiado do Google.\n\nEspecificações\nCilindrada: 293,5 cc\nTransmissão: 6 velocidades'},
+ {id:'d2',nome:'BIZ 125 ES',modelo:'ES',categoria:'Street',selo:'Novo',ativo:true,fotos:[ph('BIZ 125 ES','#1e3a8a')],planos:[{parcelas:80,valor:310.5},{parcelas:60,valor:401.2}],descricao:'Exemplo de moto cadastrada.'},
+ {id:'d3',nome:'XRE 190',modelo:'',categoria:'Adventure',ativo:true,fotos:[ph('XRE 190','#111')],planos:[],descricao:'Exemplo de moto Adventure.'}];
+async function init(){
+  if(DEMO){V={nome:'Shayron',bio:'Conectando você à sua próxima moto com as melhores condições!',whatsapp:'5568984041407',instagram:'shayrondahonda'};M=DEMO_M;
+    document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;top:0;left:0;right:0;background:#222;color:#fff;font:600 12px Inter,sans-serif;text-align:center;padding:5px;z-index:40">MODO DEMONSTRAÇÃO – configure o Supabase no início do arquivo</div>');return route()}
+  if(!M.length)$('#app').innerHTML='<div class="hero" style="min-height:230px"></div><div class="wrap" style="padding-top:28px"><div class="grid">'+'<div class="sk"></div>'.repeat(8)+'</div></div>';
+  const [v,m]=await Promise.all([sb.from('vendedor').select().eq('id',1).maybeSingle(),sb.from('motos').select().order('ordem').order('created_at')]);
+  if(v.data)V=v.data;M=m.data||[];route();
+}
+addEventListener('hashchange',route);
+async function route(){
+  $('#modal').style.display='none';
+  if(location.hash==='#admin'){if(DEMO){$('#app').innerHTML='<div class="ad"><h1>Área do vendedor</h1><p class="mu">Configure o Supabase no início do arquivo para usar o painel.</p><p class=\"mu\" style=\"font-size:12px\">O arquivo está lendo: URL = '+esc(SUPABASE_URL.slice(0,45))+' | chave com '+SUPABASE_KEY.length+' caracteres</p><a class="btn red" href="#">Voltar ao site</a></div>';return}const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
+}
 
--- Selo (ex: Novo, Oferta) e preço à vista opcionais (seguro rodar de novo)
-alter table public.motos add column if not exists selo text;
-alter table public.motos add column if not exists preco numeric;
+/* ================= CLIENTE ================= */
+const IC={wa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
+ig:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></svg>',
+se:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'};
+const chipsH=()=>K.map((c,i)=>`<button class="chip ${c===C?'on':''}" aria-pressed="${c===C}" onclick="setC(${i})">${esc(c)}</button>`).join('');
+function setC(i){C=K[i];$('#chips').innerHTML=chipsH();lista(1)}
+function cnt(){const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n,m=e.dataset.m,t0=performance.now();
+  const f=t=>{const k=rm?1:Math.min(1,(t-t0)/1400),v=n*(1-Math.pow(1-k,3));e.textContent=m?brl(v):Math.round(v);k<1&&requestAnimationFrame(f)};requestAnimationFrame(f)})}
+function home(){
+  A=M.filter(m=>m.ativo);document.title=V.nome+' | Motos';
+  K=['Todas',...new Set(A.map(m=>m.categoria).filter(Boolean))];
+  const vs=A.flatMap(m=>(m.planos||[]).map(p=>p.valor)).filter(v=>v>0),mn=vs.length?Math.min(...vs):0;
+  const bxd=(()=>{try{return sessionStorage.getItem('bx')}catch(e){return''}})();
+  $('#app').innerHTML=`<header class="hero"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
+  <div class="hin ${V.logo_url?'':'nl'}">${av(V.foto_url)}
+  <div class="idt"><h1>${esc(V.nome)}<svg class="vf" viewBox="0 0 24 24" aria-label="Verificado" role="img"><circle cx="12" cy="12" r="11" fill="#1d9bf0"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>${V.bio?`<p>${esc(V.bio)}</p>`:''}</div>
+  <div class="ctas"><a class="cta w" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}">${IC.wa}Fale comigo</a>${V.instagram?`<a class="cta" target="_blank" rel="noopener" href="https://instagram.com/${esc(V.instagram)}">${IC.ig}Instagram</a>`:''}</div>
+  ${V.logo_url?`<img class="hlogo" src="${esc(V.logo_url)}" alt="Logo da empresa" decoding="async">`:''}
+  <div class="stats"><div><b data-n="${A.length}">${A.length}</b><span>modelos para escolher</span></div>${mn?`<div><b data-n="${mn}" data-m="1">${brl(mn)}</b><span>parcela de consórcio a partir de</span></div>`:''}</div></div></header>
+  <main class="wrap"><div class="sec"><h2>Escolha sua moto</h2><span class="nc" id="nc"></span></div>
+  <div class="bar"><div class="sb">${IC.se}<input id="q" type="search" placeholder="Buscar moto" aria-label="Buscar moto" autocomplete="off" value="${esc(Q)}" oninput="Q=this.value;lista()"></div>
+  <div class="chips" id="chips">${chipsH()}</div></div><div id="ls" class="grid"></div></main>
+  <footer class="foot2"><b>${esc(V.nome)}</b><br>${tel()}${V.instagram?' · @'+esc(V.instagram):''}<br><a href="#admin">Área do vendedor</a></footer>
+  ${bxd?'':`<div class="bw"><a class="bubble" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site.')}">${av(V.foto_url)}Estou online. Fale agora!</a><button class="bx" aria-label="Fechar" onclick="try{sessionStorage.setItem('bx',1)}catch(e){}this.closest('.bw').remove()">×</button></div>`}`;
+  lista(1);cnt();
+}
+function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
+function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
+function openM(i,v){
+  cur=i;G=0;const m=L[i],f=m.fotos||[];let b='';
+  const how=t=>`<div id="hw" class="hw" style="display:none">${t}</div>`;
+  if(v==='det')b=`<div class="gal"><div id="gmain"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}"></div>
+    ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" onclick="gShow(${k})">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
+    <div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
+    <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+' e gostaria de saber sobre a compra à vista.')}">Whatsapp</a></div>
+    ${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
+    <button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
+  if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
+    ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
+    <div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0"><img src="${esc(f[0]||'')}" style="width:100%;height:230px;object-fit:contain"></div>
+    <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
+    <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
+    <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
+  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div><img src="${esc(f[0]||'')}"></div>
+    ${how('O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.')}
+    <input id="f_ent" placeholder="Valor de entrada" inputmode="numeric" oninput="msk(this,'rs')"><input id="f_nas" placeholder="Data de Nascimento" inputmode="numeric" oninput="msk(this,'dt')">
+    <input id="f_cpf" placeholder="CPF:" inputmode="numeric" oninput="msk(this,'cpf')"><input id="f_nom" placeholder="Nome:" autocomplete="name"><input id="f_tel" placeholder="Telefone:" inputmode="tel" oninput="msk(this,'tel')">
+    <label class="l" style="margin-bottom:-6px">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
+    <p class="mu" style="font-size:12px;border-top:1px solid var(--bd);padding-top:12px">Ao enviar, você concorda com nossa <a href="#" onclick="priv();return false">Política de Privacidade</a>.</p>
+    <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
+  const mo=$('#modal');if(mo.style.display!=='block')history.pushState({m:1},'');
+  const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
+  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
+  <div class="mt"><h2>${esc(m.nome)}</h2><span><b onclick="nav(-1)">‹</b><b onclick="nav(1)">›</b><b onclick="closeM()">✕</b></span></div>${b}</div>`;
+  mo.style.display='block';mo.scrollTop=0;bindSwipe();
+}
+const nav=d=>openM((cur+d+L.length)%L.length,'det');
+const closeM=()=>history.state&&history.state.m?history.back():$('#modal').style.display='none';
+async function lead(tipo,x={}){const m=L[cur];try{await sb.from('leads').insert({tipo,moto_id:m.id,moto_nome:m.nome,...x})}catch(e){}}
+function conWa(rep){
+  const m=L[cur],r=document.querySelector('input[name=pl]:checked'),p=r&&(m.planos||[])[r.value];
+  const t=rep?`Olá! Quero um repasse de consórcio da ${m.nome}.`:`Olá! Tenho interesse no consórcio da ${m.nome}${p?` em ${p.parcelas}x de ${brl(p.valor)}`:''}.`;
+  lead('consorcio',{detalhes:t});window.open(wa(t),'_blank');
+}
+async function finSend(){
+  const g=i=>$('#'+i).value.trim(),m=L[cur];
+  if(!g('f_nom')||!g('f_tel'))return toast('Preencha nome e telefone');
+  const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value};
+  await lead('financiamento',d);
+  const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\nPossui habilitação: ${d.habilitacao}`;
+  window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
+}
 
--- Contatos / simulações enviados pelos clientes
-create table if not exists public.leads (
-  id uuid primary key default gen_random_uuid(),
-  tipo text not null,                           -- financiamento | consorcio | whatsapp
-  moto_id uuid references public.motos(id) on delete set null,
-  moto_nome text,
-  nome text,
-  telefone text,
-  cpf text,
-  nascimento text,
-  entrada text,
-  habilitacao text,
-  detalhes text,
-  created_at timestamptz not null default now()
-);
-
-alter table public.vendedor enable row level security;
-alter table public.motos    enable row level security;
-alter table public.leads    enable row level security;
-
--- VENDEDOR: todos leem, só logado altera
-drop policy if exists vendedor_ler on public.vendedor;
-create policy vendedor_ler on public.vendedor for select using (true);
-drop policy if exists vendedor_admin on public.vendedor;
-create policy vendedor_admin on public.vendedor for all to authenticated using (true) with check (true);
-
--- MOTOS: público vê só ativas; logado vê e altera tudo
-drop policy if exists motos_ler on public.motos;
-create policy motos_ler on public.motos for select using (ativo = true or auth.role() = 'authenticated');
-drop policy if exists motos_admin on public.motos;
-create policy motos_admin on public.motos for all to authenticated using (true) with check (true);
-
--- LEADS: qualquer cliente envia; só logado lê/apaga
-drop policy if exists leads_enviar on public.leads;
-create policy leads_enviar on public.leads for insert to anon, authenticated with check (true);
-drop policy if exists leads_ler on public.leads;
-create policy leads_ler on public.leads for select to authenticated using (true);
-drop policy if exists leads_apagar on public.leads;
-create policy leads_apagar on public.leads for delete to authenticated using (true);
-
--- STORAGE: bucket público "midia" para fotos, vídeos e perfil
-insert into storage.buckets (id, name, public)
-values ('midia', 'midia', true)
-on conflict (id) do update set public = true;
-
-drop policy if exists midia_ler on storage.objects;
-create policy midia_ler on storage.objects for select using (bucket_id = 'midia');
-drop policy if exists midia_enviar on storage.objects;
-create policy midia_enviar on storage.objects for insert to authenticated with check (bucket_id = 'midia');
-drop policy if exists midia_alterar on storage.objects;
-create policy midia_alterar on storage.objects for update to authenticated using (bucket_id = 'midia');
-drop policy if exists midia_apagar on storage.objects;
-create policy midia_apagar on storage.objects for delete to authenticated using (bucket_id = 'midia');
-
--- =====================================================
--- DEPOIS DE RODAR:
--- 1) Authentication > Users > Add user (email + senha do vendedor)
--- 2) Authentication > Providers > Email: desative "Allow new users to sign up"
---    (qualquer usuário logado é admin)
--- =====================================================
+/* ================= ADMIN ================= */
+function login(){
+  $('#app').innerHTML=`<div class="ad" style="max-width:380px"><h1>Área do vendedor</h1><input id="em" type="email" placeholder="E-mail"><input id="se" type="password" placeholder="Senha">
+  <button class="btn red" onclick="doLogin()">Entrar</button><p class="foot"><a href="#">← Voltar ao site</a></p></div>`;
+}
+async function doLogin(){
+  const{error}=await sb.auth.signInWithPassword({email:$('#em').value,password:$('#se').value});
+  if(error)return toast('E-mail ou senha incorretos');await init();adm();
+}
+async function out(){await sb.auth.signOut();location.hash='';home()}
+async function up(file){
+  const p=`${Date.now()}-${Math.random().toString(36).slice(2,7)}-${file.name.replace(/[^\w.]/g,'_')}`;
+  const{error}=await sb.storage.from('midia').upload(p,file);if(error)throw error;
+  return sb.storage.from('midia').getPublicUrl(p).data.publicUrl;
+}
+function adm(t){
+  if(t)T=t;
+  const tabs=['perfil','motos','leads'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',leads:'Contatos'}[k]}</button>`).join('');
+  $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
+  <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
+  ({perfil:pPerfil,motos:pMotos,leads:pLeads})[T]();
+}
+function pPerfil(){
+  $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:10px">${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}">`:''}<div><label class="l">Logo da empresa</label><input type="file" accept="image/*" onchange="upV('logo_url',this)"></div></div>
+  <label class="l">Nome do vendedor</label><input id="v_n" value="${esc(V.nome)}">
+  <label class="l">Frase / bio</label><input id="v_b" value="${esc(V.bio)}">
+  <label class="l">WhatsApp (55 + DDD + número, só números)</label><input id="v_w" value="${esc(V.whatsapp)}" inputmode="numeric">
+  <label class="l">Instagram (sem @)</label><input id="v_i" value="${esc(V.instagram)}">
+  <button class="btn red" onclick="saveV()">Salvar perfil</button>`;
+}
+async function upV(k,el){
+  try{toast('Enviando...');V[k]=await up(el.files[0]);await sb.from('vendedor').upsert({id:1,...V});toast('Salvo!');pPerfil()}catch(e){toast('Erro: '+e.message)}
+}
+async function saveV(){
+  V={...V,nome:$('#v_n').value,bio:$('#v_b').value,whatsapp:$('#v_w').value.replace(/\D/g,''),instagram:$('#v_i').value.replace('@','')};
+  const{error}=await sb.from('vendedor').upsert({id:1,...V});toast(error?'Erro: '+error.message:'Perfil salvo!');
+}
+const CAT=[['POP 110I ES +10%', 'Street', 'C', '80:216.59,60:280.54,48:345.55,36:455.23,24:669.58,18:887.60,12:1323.66'], ['BIZ 125 ES', 'Street', 'C', '80:273.75,60:354.56,48:436.72,36:575.35,24:846.25,18:1121.80,12:1672.91'], ['ELITE 125', 'Street', 'C', '80:287.34,60:372.16,48:458.40,36:603.92,24:888.27,18:1177.49,12:1755.97'], ['BIZ 125 EX', 'Street', 'C', '80:339.18,60:439.31,48:541.12,36:712.89,24:1048.54,18:1389.96,12:2072.81'], ['CG 160 START', 'Street', 'C', '80:349.24,60:452.34,48:557.16,36:734.03,24:1079.64,18:1431.17,12:2134.28'], ['PCX CBS', 'Street', 'C', '80:374.60,60:485.19,48:597.62,36:787.33,24:1158.04,18:1535.11,12:2289.27'], ['CG 160 FAN', 'Street', 'C', '80:381.06,60:493.56,48:607.93,36:800.91,24:1178.01,18:1561.58,12:2328.74'], ['CG 160 TITAN', 'Street', 'C', '80:404.82,60:524.33,48:645.83,36:850.85,24:1251.46,18:1658.94,12:2473.95'], ['PCX ABS', 'Street', 'C', '80:410.87,60:532.17,48:655.49,36:863.56,24:1270.17'], ['NXR160 BROS CBS', 'Adventure', 'C', '80:447.90,60:580.12,48:714.55,36:941.38,24:1384.62'], ['NXR160 BROS ABS', 'Adventure', 'C', '80:469.53,60:608.14,48:749.07,36:986.85,24:1451.51'], ['CRF 300F', 'Off Road', 'S', '80:439.74,60:569.56,48:701.54,36:924.24,24:1359.41'], ['XRE 190', 'Adventure', 'C', '80:469.31,60:607.86,48:748.72,36:986.40,24:1450.83'], ['HONDA ADV', 'Adventure', 'C', '80:504.99,60:654.08,48:805.64,36:1061.39,24:1561.13'], ['CB300F TWISTER ABS', 'Street', 'C', '80:512.68,60:664.03,48:817.90,36:1077.53,24:1584.88'], ['XR 300L TORNADO', 'Adventure', 'C', '80:602.02,60:779.75,48:960.44,36:1265.32,24:1861.08'], ['SAHARA 300', 'Adventure', 'C', '80:618.12,60:800.59,48:986.11,36:1299.14,24:1910.83'], ['SAHARA 300 ADV', 'Adventure', 'C', '80:638.80,60:827.38,48:1019.11,36:1342.61,24:1974.77'], ['CB 500 HORNET', 'Street', 'S', '72:779.89'], ['NX 500', 'Adventure', 'S', '72:829.67'], ['CB1000 HORNET ABS (70% DO VALOR)', 'Street', 'S', '72:955.38'], ['CB 750 HORNET', 'Street', 'S', '72:961.23'], ['TRX 420FM (4X4)', 'Off Road', 'S', '72:998.13'], ['NC 750X ABS MT', 'Adventure', 'S', '72:1014.82'], ['CB 650R E-CLUTCH', 'Street', 'S', '72:1065.03'], ['CRF 1100L AFRICA TWIN MT (70% DO VALOR)', 'Adventure', 'S', '72:1067.64'], ['XL 750 TRANSALP', 'Big Trail', 'S', '72:1171.81']];
+const pl=t=>t.split(',').map(x=>{const[p,v]=x.split(':');return{parcelas:+p,valor:+v}}),emp=c=>c[2]==='C'?'Com emplacamento':'Sem emplacamento';
+function pMotos(){
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0])),sem=M.filter(m=>CAT.some(c=>c[0]===(m.nome||'').trim().toUpperCase())&&!(m.planos||[]).length);
+  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button>`+M.map(m=>`<div class="it">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small></div>
+  <button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
+  (sem.length?`<button class="btn or" onclick="aplicarPlanos()">Aplicar planos de consórcio do catálogo (${sem.length} motos sem plano)</button>`:'')+
+  (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
+  <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
+}
+async function addCat(i){const c=CAT[i];
+  const{data,error}=await sb.from('motos').insert({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length}).select().single();
+  if(error)return toast('Erro: '+error.message);M.push(data);edit(data.id)}
+async function addAll(){
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),rows=CAT.filter(c=>!tem.has(c[0])).map((c,k)=>({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length+k}));
+  const{data,error}=await sb.from('motos').insert(rows).select();
+  if(error)return toast('Erro: '+error.message);M.push(...data);toast(data.length+' motos adicionadas!');pMotos()}
+async function aplicarPlanos(){let n=0;
+  for(const m of M){const c=CAT.find(x=>x[0]===(m.nome||'').trim().toUpperCase());if(!c||(m.planos||[]).length)continue;
+    const d={planos:pl(c[3]),emplacamento:emp(c)};const{error}=await sb.from('motos').update(d).eq('id',m.id);if(error)return toast('Erro: '+error.message);Object.assign(m,d);n++}
+  toast(n+' motos atualizadas!');pMotos()}
+async function tog(id){const m=M.find(x=>x.id===id);m.ativo=!m.ativo;await sb.from('motos').update({ativo:m.ativo}).eq('id',id);pMotos()}
+function edit(id){
+  E=id?JSON.parse(JSON.stringify(M.find(m=>m.id===id))):{nome:'',modelo:'',categoria:'Street',descricao:'',fotos:[],video_url:'',planos:[],ordem:M.length,ativo:true};
+  fm();
+}
+function fm(){
+  const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
+  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}
+  <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Big Trail','Scooter','Esportiva'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
+  <label class="l">Ficha técnica: clique em pesquisar, copie do Google e cole aqui (uma linha por item, ex: Cilindrada: 109,5 cc)</label>
+  <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
+  <button class="sm" style="margin-top:8px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button>
+  <label class="l">Fotos (a primeira é a capa; toque numa foto para torná-la capa, × remove)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
+  <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}" onclick="E.fotos.unshift(E.fotos.splice(${i},1)[0]);fm()"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
+  <label class="l">Vídeo: link do YouTube ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value">
+  <input type="file" accept="video/*" onchange="upVid(this)">
+  <label class="l">Planos de consórcio (parcelas e valor)</label><select onchange="E.emplacamento=this.value">${['Com emplacamento','Sem emplacamento'].map(o=>`<option ${(E.emplacamento||'Com emplacamento')===o?'selected':''}>${o}</option>`).join('')}</select>
+  ${E.planos.map((p,i)=>`<div class="pr"><input type="number" value="${p.parcelas}" placeholder="Parcelas" oninput="E.planos[${i}].parcelas=+this.value"><input type="number" step="0.01" value="${p.valor}" placeholder="Valor R$" oninput="E.planos[${i}].valor=+this.value"><button class="sm" onclick="E.planos.splice(${i},1);fm()">×</button></div>`).join('')}
+  <button class="sm" style="margin-top:8px" onclick="E.planos.push({parcelas:80,valor:0});fm()">+ Adicionar plano</button>
+  <label class="l"><input type="checkbox" style="width:auto" ${E.ativo?'checked':''} onchange="E.ativo=this.checked"> Mostrar no site</label>
+  <button class="btn red" onclick="saveM()">Salvar moto</button>`;
+}
+async function upF(el){try{toast('Enviando fotos...');for(const f of el.files)E.fotos.push(await up(f));fm()}catch(e){toast('Erro: '+e.message)}}
+async function upVid(el){try{toast('Enviando vídeo...');E.video_url=await up(el.files[0]);fm();toast('Vídeo enviado')}catch(e){toast('Erro: '+e.message)}}
+async function saveM(){
+  if(!E.nome.trim())return toast('Informe o nome da moto');
+  const{error}=await sb.from('motos').upsert(E);if(error)return toast('Erro: '+error.message);
+  toast('Moto salva!');await init();adm('motos');
+}
+async function del(id){if(!confirm('Excluir esta moto?'))return;await sb.from('motos').delete().eq('id',id);await init();adm('motos')}
+async function pLeads(){
+  const{data}=await sb.from('leads').select().order('created_at',{ascending:false}).limit(100);
+  $('#pn').innerHTML=(data||[]).map(l=>`<div class="it"><div class="g"><b>${esc(l.nome||'Cliente')}</b> · ${esc(l.tipo)}<br><small>${esc(l.moto_nome||'')} · ${new Date(l.created_at).toLocaleString('pt-BR')}</small>
+  <br><small>${esc(l.telefone||'')} ${esc(l.cpf?'CPF '+l.cpf:'')} ${esc(l.entrada?'Entrada '+l.entrada:'')}</small></div><button onclick="delL('${l.id}')">Excluir</button></div>`).join('')||'<p class="mu">Nenhum contato ainda.</p>';
+}
+async function delL(id){await sb.from('leads').delete().eq('id',id);pLeads()}
+const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0];
+function lista(an){
+  const q=Q.toLowerCase();
+  L=A.filter(m=>(C==='Todas'||m.categoria===C)&&((m.nome||'')+' '+(m.modelo||'')).toLowerCase().includes(q));
+  const g=$('#ls');g.className='grid'+(an?' an':'');
+  g.innerHTML=L.map((m,i)=>{const p=minP(m);return `<article class="cd" style="--i:${Math.min(i,11)}">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
+   <div class="im" onclick="openM(${i},'det')"><img src="${esc(img0(m))}" alt="${esc(m.nome)}" ${i<2?'fetchpriority="high"':'loading="lazy"'} decoding="async" onload="this.classList.add('ok')" onerror="this.style.visibility='hidden'"></div>
+   <div class="cb"><small>${esc(m.categoria)}</small><h3>${esc(m.nome)}</h3>
+   <p class="par">${p?`Consórcio a partir de<b>${p.parcelas}x ${brl(p.valor)}</b>`:'Consulte as condições'}</p>
+   <button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button>
+   <div class="two"><button class="btn" onclick="openM(${i},'con')">Consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div></div></article>`}).join('')
+   ||`<div class="empty"><b>Nenhuma moto encontrada</b>Tente outro nome ou escolha outra categoria.<br><button class="btn red" onclick="Q='';C='Todas';home()">Ver todas as motos</button></div>`;
+  const n=$('#nc');if(n)n.textContent=L.length+(L.length===1?' moto':' motos');
+}
+if(matchMedia('(hover:hover)').matches){
+  document.addEventListener('mousemove',e=>{const c=e.target.closest&&e.target.closest('.cd');if(!c)return;const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    c.style.setProperty('--rx',((y-.5)*-8).toFixed(1)+'deg');c.style.setProperty('--ry',((x-.5)*10).toFixed(1)+'deg');c.style.setProperty('--mx',(x*100)+'%');c.style.setProperty('--my',(y*100)+'%')});
+  document.addEventListener('mouseout',e=>{const c=e.target.closest&&e.target.closest('.cd');if(c&&!c.contains(e.relatedTarget)){c.style.removeProperty('--rx');c.style.removeProperty('--ry')}});
+}
+function msk(e,t){let v=e.value.replace(/\D/g,'');
+  if(t==='cpf')v=v.slice(0,11).replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  if(t==='tel')v=v.slice(0,11).replace(/(\d{2})(\d)/,'($1) $2').replace(/(\d{5})(\d{1,4})$/,'$1-$2');
+  if(t==='dt')v=v.slice(0,8).replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2})(\d)/,'$1/$2');
+  if(t==='rs')v=v?brl(v/100):'';
+  e.value=v}
+function gShow(k){const f=L[cur].fotos||[];G=k;$('#gmain').innerHTML=`<img id="gm" src="${esc(f[k]||'')}" onclick="zoom()">`;bindSwipe()}
+function gal(d){const f=L[cur].fotos||[];if(f.length)gShow((G+d+f.length)%f.length)}
+function gVid(){$('#gmain').innerHTML=vid(L[cur].video_url)}
+function bindSwipe(){const g=$('#gm');if(!g)return;let x0=0;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)gal(d<0?1:-1)}}
+const howT=()=>{const e=$('#hw');e.style.display=e.style.display==='none'?'block':'none'};
+function fmtDesc(t){return esc(t).split('\n').map(l=>{const x=l.trim();if(!x)return'<div style="height:8px"></div>';
+  if(x.length>8&&x===x.toUpperCase()&&/[A-ZÀ-Ú]{3}/.test(x))return`<div class="hl">${x}</div>`;
+  const m=/^([^:]{2,40}):(.*)$/.exec(x);return m?`<div><b>${m[1]}:</b>${m[2]}</div>`:`<div>${x}</div>`}).join('')}
+function priv(){const d=document.createElement('div');d.className='lb';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste formulário (nome, telefone, CPF, data de nascimento e valor de entrada) são usados somente para a cotação do seu financiamento e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;document.body.appendChild(d)}
+function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${esc(u)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+function shareM(){const m=L[cur],u=location.origin+location.pathname+'#moto='+m.id;
+  if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
+  else navigator.clipboard.writeText(u).then(()=>toast('Link copiado!'))}
+addEventListener('popstate',()=>{$('#modal').style.display='none'});
+addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+(()=>{let y=0,t=0;addEventListener('scroll',()=>{if(t)return;t=requestAnimationFrame(()=>{t=0;const b=document.querySelector('.bar');if(!b)return;const c=scrollY,d=c-y;
+  if(innerWidth<720){if(d>8&&c>420)b.classList.add('hd');else if(d<-8||c<200)b.classList.remove('hd')}else b.classList.remove('hd');if(Math.abs(d)>8)y=c})},{passive:true})})();
+init();
+</script>
+</body>
+</html>
