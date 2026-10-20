@@ -132,7 +132,7 @@ function openM(i,v){
   if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
     ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
     <div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0"><img src="${esc(f[0]||'')}" style="width:100%;height:230px;object-fit:contain"></div>
-    <h3 style="text-align:center">Com emplacamento</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
+    <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
     <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
     <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
   if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div><img src="${esc(f[0]||'')}"></div>
@@ -203,21 +203,27 @@ async function saveV(){
   V={...V,nome:$('#v_n').value,bio:$('#v_b').value,whatsapp:$('#v_w').value.replace(/\D/g,''),instagram:$('#v_i').value.replace('@','')};
   const{error}=await sb.from('vendedor').upsert({id:1,...V});toast(error?'Erro: '+error.message:'Perfil salvo!');
 }
-const CAT=[['POP 110I ES +10%','Street'],['BIZ 125 ES','Street'],['ELITE 125','Street'],['BIZ 125 EX','Street'],['CG 160 START','Street'],['PCX CBS','Street'],['CG 160 FAN','Street'],['CG 160 TITAN','Street'],['PCX ABS','Street'],['NXR160 BROS CBS','Adventure'],['NXR160 BROS ABS','Adventure'],['CRF 300F','Off Road'],['XRE 190','Adventure'],['HONDA ADV','Adventure'],['CB300F TWISTER ABS','Street'],['XR 300L TORNADO','Adventure'],['SAHARA 300','Adventure'],['SAHARA 300 ADV','Adventure'],['CB 500 HORNET','Street'],['NX 500','Adventure'],['CB1000 HORNET ABS (70% DO VALOR)','Street'],['CB 750 HORNET','Street'],['TRX 420FM (4X4)','Off Road'],['NC 750X ABS MT','Adventure'],['CB 650R E-CLUTCH','Street'],['CRF 1100L AFRICA TWIN MT (70% DO VALOR)','Adventure'],['XL 750 TRANSALP','Big Trail']];
+const CAT=[['POP 110I ES +10%', 'Street', 'C', '80:216.59,60:280.54,48:345.55,36:455.23,24:669.58,18:887.60,12:1323.66'], ['BIZ 125 ES', 'Street', 'C', '80:273.75,60:354.56,48:436.72,36:575.35,24:846.25,18:1121.80,12:1672.91'], ['ELITE 125', 'Street', 'C', '80:287.34,60:372.16,48:458.40,36:603.92,24:888.27,18:1177.49,12:1755.97'], ['BIZ 125 EX', 'Street', 'C', '80:339.18,60:439.31,48:541.12,36:712.89,24:1048.54,18:1389.96,12:2072.81'], ['CG 160 START', 'Street', 'C', '80:349.24,60:452.34,48:557.16,36:734.03,24:1079.64,18:1431.17,12:2134.28'], ['PCX CBS', 'Street', 'C', '80:374.60,60:485.19,48:597.62,36:787.33,24:1158.04,18:1535.11,12:2289.27'], ['CG 160 FAN', 'Street', 'C', '80:381.06,60:493.56,48:607.93,36:800.91,24:1178.01,18:1561.58,12:2328.74'], ['CG 160 TITAN', 'Street', 'C', '80:404.82,60:524.33,48:645.83,36:850.85,24:1251.46,18:1658.94,12:2473.95'], ['PCX ABS', 'Street', 'C', '80:410.87,60:532.17,48:655.49,36:863.56,24:1270.17'], ['NXR160 BROS CBS', 'Adventure', 'C', '80:447.90,60:580.12,48:714.55,36:941.38,24:1384.62'], ['NXR160 BROS ABS', 'Adventure', 'C', '80:469.53,60:608.14,48:749.07,36:986.85,24:1451.51'], ['CRF 300F', 'Off Road', 'S', '80:439.74,60:569.56,48:701.54,36:924.24,24:1359.41'], ['XRE 190', 'Adventure', 'C', '80:469.31,60:607.86,48:748.72,36:986.40,24:1450.83'], ['HONDA ADV', 'Adventure', 'C', '80:504.99,60:654.08,48:805.64,36:1061.39,24:1561.13'], ['CB300F TWISTER ABS', 'Street', 'C', '80:512.68,60:664.03,48:817.90,36:1077.53,24:1584.88'], ['XR 300L TORNADO', 'Adventure', 'C', '80:602.02,60:779.75,48:960.44,36:1265.32,24:1861.08'], ['SAHARA 300', 'Adventure', 'C', '80:618.12,60:800.59,48:986.11,36:1299.14,24:1910.83'], ['SAHARA 300 ADV', 'Adventure', 'C', '80:638.80,60:827.38,48:1019.11,36:1342.61,24:1974.77'], ['CB 500 HORNET', 'Street', 'S', '72:779.89'], ['NX 500', 'Adventure', 'S', '72:829.67'], ['CB1000 HORNET ABS (70% DO VALOR)', 'Street', 'S', '72:955.38'], ['CB 750 HORNET', 'Street', 'S', '72:961.23'], ['TRX 420FM (4X4)', 'Off Road', 'S', '72:998.13'], ['NC 750X ABS MT', 'Adventure', 'S', '72:1014.82'], ['CB 650R E-CLUTCH', 'Street', 'S', '72:1065.03'], ['CRF 1100L AFRICA TWIN MT (70% DO VALOR)', 'Adventure', 'S', '72:1067.64'], ['XL 750 TRANSALP', 'Big Trail', 'S', '72:1171.81']];
+const pl=t=>t.split(',').map(x=>{const[p,v]=x.split(':');return{parcelas:+p,valor:+v}}),emp=c=>c[2]==='C'?'Com emplacamento':'Sem emplacamento';
 function pMotos(){
-  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0]));
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0])),sem=M.filter(m=>CAT.some(c=>c[0]===(m.nome||'').trim().toUpperCase())&&!(m.planos||[]).length);
   $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button>`+M.map(m=>`<div class="it">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small></div>
   <button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
+  (sem.length?`<button class="btn or" onclick="aplicarPlanos()">Aplicar planos de consórcio do catálogo (${sem.length} motos sem plano)</button>`:'')+
   (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
   <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
 }
 async function addCat(i){const c=CAT[i];
-  const{data,error}=await sb.from('motos').insert({nome:c[0],categoria:c[1],ativo:false,ordem:M.length}).select().single();
+  const{data,error}=await sb.from('motos').insert({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length}).select().single();
   if(error)return toast('Erro: '+error.message);M.push(data);edit(data.id)}
 async function addAll(){
-  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),rows=CAT.filter(c=>!tem.has(c[0])).map((c,k)=>({nome:c[0],categoria:c[1],ativo:false,ordem:M.length+k}));
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),rows=CAT.filter(c=>!tem.has(c[0])).map((c,k)=>({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length+k}));
   const{data,error}=await sb.from('motos').insert(rows).select();
   if(error)return toast('Erro: '+error.message);M.push(...data);toast(data.length+' motos adicionadas!');pMotos()}
+async function aplicarPlanos(){let n=0;
+  for(const m of M){const c=CAT.find(x=>x[0]===(m.nome||'').trim().toUpperCase());if(!c||(m.planos||[]).length)continue;
+    const d={planos:pl(c[3]),emplacamento:emp(c)};const{error}=await sb.from('motos').update(d).eq('id',m.id);if(error)return toast('Erro: '+error.message);Object.assign(m,d);n++}
+  toast(n+' motos atualizadas!');pMotos()}
 async function tog(id){const m=M.find(x=>x.id===id);m.ativo=!m.ativo;await sb.from('motos').update({ativo:m.ativo}).eq('id',id);pMotos()}
 function edit(id){
   E=id?JSON.parse(JSON.stringify(M.find(m=>m.id===id))):{nome:'',modelo:'',categoria:'Street',descricao:'',fotos:[],video_url:'',planos:[],ordem:M.length,ativo:true};
@@ -234,7 +240,7 @@ function fm(){
   <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}" onclick="E.fotos.unshift(E.fotos.splice(${i},1)[0]);fm()"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
   <label class="l">Vídeo: link do YouTube ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value">
   <input type="file" accept="video/*" onchange="upVid(this)">
-  <label class="l">Planos de consórcio (parcelas e valor)</label>
+  <label class="l">Planos de consórcio (parcelas e valor)</label><select onchange="E.emplacamento=this.value">${['Com emplacamento','Sem emplacamento'].map(o=>`<option ${(E.emplacamento||'Com emplacamento')===o?'selected':''}>${o}</option>`).join('')}</select>
   ${E.planos.map((p,i)=>`<div class="pr"><input type="number" value="${p.parcelas}" placeholder="Parcelas" oninput="E.planos[${i}].parcelas=+this.value"><input type="number" step="0.01" value="${p.valor}" placeholder="Valor R$" oninput="E.planos[${i}].valor=+this.value"><button class="sm" onclick="E.planos.splice(${i},1);fm()">×</button></div>`).join('')}
   <button class="sm" style="margin-top:8px" onclick="E.planos.push({parcelas:80,valor:0});fm()">+ Adicionar plano</button>
   <label class="l"><input type="checkbox" style="width:auto" ${E.ativo?'checked':''} onchange="E.ativo=this.checked"> Mostrar no site</label>
