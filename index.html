@@ -72,8 +72,9 @@ details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:1
 const SUPABASE_URL='COLE_AQUI_A_URL_DO_PROJETO';
 const SUPABASE_KEY='COLE_AQUI_A_ANON_KEY';
 /* =============================================================== */
-const DEMO=SUPABASE_URL.startsWith('COLE_');
-const sb=DEMO?null:supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const SU=SUPABASE_URL.trim().replace(/\/(rest|auth)\/v1.*$/,'').replace(/\/+$/,'');
+const DEMO=!(/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SU)&&SUPABASE_KEY.trim().length>30&&!SUPABASE_KEY.startsWith('COLE_'));
+const sb=DEMO?null:supabase.createClient(SU,SUPABASE_KEY.trim());
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -99,7 +100,7 @@ async function init(){
 addEventListener('hashchange',route);
 async function route(){
   $('#modal').style.display='none';
-  if(location.hash==='#admin'){if(DEMO){$('#app').innerHTML='<div class="ad"><h1>Área do vendedor</h1><p class="mu">Configure o Supabase no início do arquivo para usar o painel.</p><a class="btn red" href="#">Voltar ao site</a></div>';return}const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
+  if(location.hash==='#admin'){if(DEMO){$('#app').innerHTML='<div class="ad"><h1>Área do vendedor</h1><p class="mu">Configure o Supabase no início do arquivo para usar o painel.</p><p class=\"mu\" style=\"font-size:12px\">O arquivo está lendo: URL = '+esc(SUPABASE_URL.slice(0,45))+' | chave com '+SUPABASE_KEY.length+' caracteres</p><a class="btn red" href="#">Voltar ao site</a></div>';return}const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
 }
 
 /* ================= CLIENTE ================= */
