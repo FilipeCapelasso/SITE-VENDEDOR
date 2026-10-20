@@ -48,6 +48,14 @@ textarea{min-height:150px}label.l{display:block;font-size:13px;color:var(--mu);m
 .sk{height:260px;border-radius:22px;background:linear-gradient(90deg,#f0f0f0,#fafafa,#f0f0f0);margin-bottom:16px}
 .stk{position:sticky;bottom:0;background:#fff;padding:10px 0 4px;margin-top:14px}#modal{overscroll-behavior:contain}
 details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:12px 0;font-size:14px;line-height:1.5}summary{font-weight:700;cursor:pointer}
+@media(min-width:720px){#modal{padding:28px 14px}.sheet{max-width:780px;min-height:0;border-radius:18px;box-shadow:0 20px 60px #0005}.gal #gm{height:330px}}
+.gal{display:flex;gap:10px;align-items:center}#gmain{flex:1;min-width:0}.gal .th{flex-direction:column;width:76px;flex:none;max-height:340px;padding:0}.gal .th img{width:70px}
+.vb{width:46px;height:46px;border-radius:50%;background:var(--r);color:#fff;border:0;font-size:16px;cursor:pointer;flex:none;align-self:center}
+@media(max-width:719px){.gal{flex-direction:column;align-items:stretch}.gal .th{flex-direction:row;width:100%;max-height:none;overflow:auto}}
+.acts{display:flex;gap:8px;margin:12px 0;border-top:1px solid var(--bd);padding-top:12px}.acts .btn{margin:0;border-radius:10px;padding:14px 6px;font-size:14px;flex:1}
+.ft{font-size:18px;font-weight:800;margin:18px 0 8px}.desc{white-space:normal;line-height:1.55;margin-top:0}.hl{color:var(--mu);font-weight:800;margin:6px 0}
+.fin{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}.fin>div{flex:1}.fin img{width:48%;border:1px solid var(--bd);border-radius:12px;object-fit:contain}
+.hw{background:var(--cd);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.5;margin:10px 0}.pill{width:auto!important;margin:0!important;padding:12px 18px!important}
 /* admin */
 .ad{max-width:760px;margin:0 auto;padding:18px}.tabs{display:flex;gap:8px;margin:14px 0}.tabs .btn{margin:0;padding:11px}.tabs .on{background:var(--r);color:#fff}
 .it{display:flex;gap:12px;align-items:center;border:1px solid var(--bd);border-radius:14px;padding:10px;margin-top:10px}
@@ -61,10 +69,11 @@ details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:1
 <div id="app"></div><div id="modal"></div><div id="toast"></div>
 <script>
 /* ===== CONFIGURE AQUI (Supabase > Project Settings > API) ===== */
-const SUPABASE_URL='https://qrmwgqkiwoenlkfzjazs.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybXdncWtpd29lbmxrZnpqYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDc3OTIsImV4cCI6MjEwNjM4Mzc5Mn0.lhgkQS_WcB55uG0SKk0ngQgpc9oruFRt2H2D8orjNnc';
+const SUPABASE_URL='COLE_AQUI_A_URL_DO_PROJETO';
+const SUPABASE_KEY='COLE_AQUI_A_ANON_KEY';
 /* =============================================================== */
-const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const DEMO=SUPABASE_URL.startsWith('COLE_');
+const sb=DEMO?null:supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -75,7 +84,14 @@ const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(
 const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
 const img0=m=>(m.fotos||[])[0]||'';
 
+const ph=(t,c)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400'><rect width='600' height='400' fill='#f3f3f3'/><circle cx='170' cy='280' r='70' fill='#333'/><circle cx='430' cy='280' r='70' fill='#333'/><path d='M170 280 L260 170 L380 170 L430 280 L330 230 Z' fill='${c}'/><text x='300' y='60' font-size='34' font-family='Arial' font-weight='700' text-anchor='middle' fill='#555'>${t}</text></svg>`);
+const DEMO_M=[
+ {id:'d1',nome:'CB300F TWISTER ABS',modelo:'ABS',categoria:'Street',selo:'Mais vendida',ativo:true,fotos:[ph('CB300F','#c80000'),ph('CB300F','#222')],planos:[{parcelas:80,valor:512.68},{parcelas:60,valor:664.03},{parcelas:48,valor:817.9},{parcelas:36,valor:1077.53},{parcelas:24,valor:1584.88}],descricao:'Design\nExemplo de descrição. No painel você cola aqui o texto copiado do Google.\n\nEspecificações\nCilindrada: 293,5 cc\nTransmissão: 6 velocidades'},
+ {id:'d2',nome:'BIZ 125 ES',modelo:'ES',categoria:'Street',selo:'Novo',ativo:true,fotos:[ph('BIZ 125 ES','#1e3a8a')],planos:[{parcelas:80,valor:310.5},{parcelas:60,valor:401.2}],descricao:'Exemplo de moto cadastrada.'},
+ {id:'d3',nome:'XRE 190',modelo:'',categoria:'Adventure',ativo:true,fotos:[ph('XRE 190','#111')],planos:[],descricao:'Exemplo de moto Adventure.'}];
 async function init(){
+  if(DEMO){V={nome:'Shayron',bio:'Conectando você à sua próxima moto com as melhores condições!',whatsapp:'5568984041407',instagram:'shayrondahonda'};M=DEMO_M;
+    document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;top:0;left:0;right:0;background:#222;color:#fff;font:600 12px Inter,sans-serif;text-align:center;padding:5px;z-index:40">MODO DEMONSTRAÇÃO – configure o Supabase no início do arquivo</div>');return route()}
   if(!M.length)$('#app').innerHTML='<div class="cover"></div><div class="wrap" style="padding-top:70px"><div class="sk"></div><div class="sk"></div></div>';
   const [v,m]=await Promise.all([sb.from('vendedor').select().eq('id',1).maybeSingle(),sb.from('motos').select().order('ordem').order('created_at')]);
   if(v.data)V=v.data;M=m.data||[];route();
@@ -83,7 +99,7 @@ async function init(){
 addEventListener('hashchange',route);
 async function route(){
   $('#modal').style.display='none';
-  if(location.hash==='#admin'){const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
+  if(location.hash==='#admin'){if(DEMO){$('#app').innerHTML='<div class="ad"><h1>Área do vendedor</h1><p class="mu">Configure o Supabase no início do arquivo para usar o painel.</p><a class="btn red" href="#">Voltar ao site</a></div>';return}const{data}=await sb.auth.getSession();data.session?adm():login()}else{C='Todas';Q='';home();const d=/^#moto=(.+)/.exec(location.hash);if(d){const i=L.findIndex(x=>x.id===d[1]);if(i>=0)openM(i,'det')}}
 }
 
 /* ================= CLIENTE ================= */
@@ -104,30 +120,32 @@ function home(){
 function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
 function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
 function openM(i,v){
-  cur=i;G=0;const m=L[i],f=m.fotos||[],pr=minP(m);let b='';
-  if(v==='det')b=`<div class="gal"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}">
-    ${f.length>1?`<div class="th">${f.map((u,k)=>`<img src="${esc(u)}" onclick="G=${k};gal(0)">`).join('')}</div>`:''}${vid(m.video_url)}</div>
-    ${m.preco>0?`<div class="par">À vista <b>${brl(m.preco)}</b></div>`:''}${pr?`<div class="par">Consórcio a partir de <b>${brl(pr.valor)}</b>/mês (${pr.parcelas}x)</div>`:''}
-    <div class="row" style="flex-wrap:wrap"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button><button class="btn" onclick="shareM()">Compartilhar</button></div>
-    <div class="desc">${esc(m.descricao)}</div>
-    <div class="stk"><a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+'.')}">Conversar com vendedor</a></div>`;
-  if(v==='con'){const p=m.planos||[];b=`<h3>Tabela de consórcio</h3><img src="${esc(f[0]||'')}" style="width:100%;height:230px;object-fit:contain">
+  cur=i;G=0;const m=L[i],f=m.fotos||[];let b='';
+  const how=t=>`<div id="hw" class="hw" style="display:none">${t}</div>`;
+  if(v==='det')b=`<div class="gal"><div id="gmain"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}"></div>
+    ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" onclick="gShow(${k})">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
+    <div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
+    <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+' e gostaria de saber sobre a compra à vista.')}">Whatsapp</a></div>
+    ${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
+    <button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
+  if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
+    ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
+    <div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0"><img src="${esc(f[0]||'')}" style="width:100%;height:230px;object-fit:contain"></div>
     <h3 style="text-align:center">Com emplacamento</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
     <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
-    <details><summary>Como funciona o consórcio?</summary>Você entra em um grupo, paga parcelas mensais sem juros (há taxa de administração) e a moto é liberada por sorteio ou lance. Fale com o vendedor para tirar dúvidas.</details>
     <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
-  if(v==='fin')b=`<h3>Financiamento</h3><p class="mu">Preencha o formulário para que o vendedor traga as melhores cotações do mercado.</p>
-    <details><summary>Como funciona?</summary>O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.</details>
-    <input id="f_ent" placeholder="Valor de entrada" inputmode="numeric" oninput="msk(this,'rs')"><input id="f_nas" placeholder="Data de nascimento" inputmode="numeric" oninput="msk(this,'dt')">
-    <input id="f_cpf" placeholder="CPF" inputmode="numeric" oninput="msk(this,'cpf')"><input id="f_nom" placeholder="Nome" autocomplete="name"><input id="f_tel" placeholder="Telefone" inputmode="tel" oninput="msk(this,'tel')">
-    <select id="f_hab"><option>Possui habilitação? Sim</option><option>Possui habilitação? Não</option></select>
-    <p class="mu" style="font-size:12px">Ao enviar, seus dados vão apenas para o vendedor, para a cotação.</p>
+  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div><img src="${esc(f[0]||'')}"></div>
+    ${how('O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.')}
+    <input id="f_ent" placeholder="Valor de entrada" inputmode="numeric" oninput="msk(this,'rs')"><input id="f_nas" placeholder="Data de Nascimento" inputmode="numeric" oninput="msk(this,'dt')">
+    <input id="f_cpf" placeholder="CPF:" inputmode="numeric" oninput="msk(this,'cpf')"><input id="f_nom" placeholder="Nome:" autocomplete="name"><input id="f_tel" placeholder="Telefone:" inputmode="tel" oninput="msk(this,'tel')">
+    <label class="l" style="margin-bottom:-6px">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
+    <p class="mu" style="font-size:12px;border-top:1px solid var(--bd);padding-top:12px">Ao enviar, você concorda com nossa <a href="#" onclick="priv();return false">Política de Privacidade</a>.</p>
     <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
   const mo=$('#modal');if(mo.style.display!=='block')history.pushState({m:1},'');
-  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${av(V.foto_url,'s')}<div><b>${esc(V.nome)}</b><br><small>${tel()}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
+  const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
+  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
   <div class="mt"><h2>${esc(m.nome)}</h2><span><b onclick="nav(-1)">‹</b><b onclick="nav(1)">›</b><b onclick="closeM()">✕</b></span></div>${b}</div>`;
-  mo.style.display='block';mo.scrollTop=0;
-  const g=$('#gm');if(g){let x0=0;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)gal(d<0?1:-1)}}
+  mo.style.display='block';mo.scrollTop=0;bindSwipe();
 }
 const nav=d=>openM((cur+d+L.length)%L.length,'det');
 const closeM=()=>history.state&&history.state.m?history.back():$('#modal').style.display='none';
@@ -142,7 +160,7 @@ async function finSend(){
   if(!g('f_nom')||!g('f_tel'))return toast('Preencha nome e telefone');
   const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value};
   await lead('financiamento',d);
-  const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\n${d.habilitacao}`;
+  const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\nPossui habilitação: ${d.habilitacao}`;
   window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
 }
 
@@ -194,9 +212,9 @@ function edit(id){
 }
 function fm(){
   const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
-  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Modelo / versão')}${f('selo','Selo no card (opcional)','Ex: Novo, Oferta, Mais vendida')}<label class="l">Preço à vista (opcional)</label><input type="number" step="0.01" value="${E.preco||''}" oninput="E.preco=+this.value||null">
+  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}
   <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Scooter','Esportiva'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
-  <label class="l">Descrição / ficha técnica (cole aqui o texto que copiou do Google)</label>
+  <label class="l">Ficha técnica: clique em pesquisar, copie do Google e cole aqui (uma linha por item, ex: Cilindrada: 109,5 cc)</label>
   <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
   <button class="sm" style="margin-top:8px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button>
   <label class="l">Fotos (a primeira é a capa)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
@@ -229,7 +247,7 @@ function lista(){
   L=A.filter(m=>(C==='Todas'||m.categoria===C)&&((m.nome||'')+' '+(m.modelo||'')).toLowerCase().includes(q));
   $('#ls').innerHTML=L.map((m,i)=>{const p=minP(m);return `<div class="card">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}<h3>${esc(m.nome)}</h3><small>${esc(m.categoria)}</small>
    <img src="${esc(img0(m))}" alt="${esc(m.nome)}" loading="lazy" onerror="this.style.visibility='hidden'">
-   ${p?`<div class="par">Consórcio a partir de <b>${brl(p.valor)}</b>/mês (${p.parcelas}x)</div>`:''}
+   
    <button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button><button class="btn" onclick="openM(${i},'con')">Planos de consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div>`}).join('')||'<p class="mu">Nenhuma moto encontrada.</p>';
 }
 function msk(e,t){let v=e.value.replace(/\D/g,'');
@@ -238,7 +256,15 @@ function msk(e,t){let v=e.value.replace(/\D/g,'');
   if(t==='dt')v=v.slice(0,8).replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2})(\d)/,'$1/$2');
   if(t==='rs')v=v?brl(v/100):'';
   e.value=v}
-function gal(d){const f=L[cur].fotos||[];if(!f.length)return;G=(G+d+f.length)%f.length;$('#gm').src=f[G]}
+function gShow(k){const f=L[cur].fotos||[];G=k;$('#gmain').innerHTML=`<img id="gm" src="${esc(f[k]||'')}" onclick="zoom()">`;bindSwipe()}
+function gal(d){const f=L[cur].fotos||[];if(f.length)gShow((G+d+f.length)%f.length)}
+function gVid(){$('#gmain').innerHTML=vid(L[cur].video_url)}
+function bindSwipe(){const g=$('#gm');if(!g)return;let x0=0;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)gal(d<0?1:-1)}}
+const howT=()=>{const e=$('#hw');e.style.display=e.style.display==='none'?'block':'none'};
+function fmtDesc(t){return esc(t).split('\n').map(l=>{const x=l.trim();if(!x)return'<div style="height:8px"></div>';
+  if(x.length>8&&x===x.toUpperCase()&&/[A-ZÀ-Ú]{3}/.test(x))return`<div class="hl">${x}</div>`;
+  const m=/^([^:]{2,40}):(.*)$/.exec(x);return m?`<div><b>${m[1]}:</b>${m[2]}</div>`:`<div>${x}</div>`}).join('')}
+function priv(){const d=document.createElement('div');d.className='lb';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste formulário (nome, telefone, CPF, data de nascimento e valor de entrada) são usados somente para a cotação do seu financiamento e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;document.body.appendChild(d)}
 function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${esc(u)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
 function shareM(){const m=L[cur],u=location.origin+location.pathname+'#moto='+m.id;
   if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
