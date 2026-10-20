@@ -6,7 +6,7 @@
 create table if not exists public.vendedor (
   id int primary key default 1 check (id = 1),
   nome text not null default 'Shayron',
-  bio text default 'Entregador de sonhos',
+  bio text default 'Conectando você à sua próxima moto com as melhores condições!',
   whatsapp text default '5568984041407',      -- só números, com 55 + DDD
   instagram text default 'shayrondahonda',
   foto_url text,
@@ -33,7 +33,6 @@ create table if not exists public.motos (
 -- Selo (ex: Novo, Oferta) e preço à vista opcionais (seguro rodar de novo)
 alter table public.motos add column if not exists selo text;
 alter table public.motos add column if not exists preco numeric;
-alter table public.motos add column if not exists emplacamento text default 'Com emplacamento';
 
 -- Contatos / simulações enviados pelos clientes
 create table if not exists public.leads (
