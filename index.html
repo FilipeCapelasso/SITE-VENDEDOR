@@ -238,6 +238,13 @@ body:has(#modal[style*="block"]){overflow:hidden}
 .chf button:disabled,.chf input:disabled{opacity:.5}
 body.chopen .bw{display:none}
 @media(prefers-reduced-motion:reduce){.ch,.chm,.chq button{animation:none}}
+.pdf{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 6px}.pdf button{border:1px solid var(--bd);background:#fff;border-radius:999px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer}.pdf .on{background:var(--r);color:#fff;border-color:var(--r)}
+.pd{border:1px solid var(--bd);border-radius:16px;padding:14px;margin-top:12px;background:#fff;box-shadow:0 8px 24px -16px #0003}.pd.inc{background:#fffdf5;border-style:dashed}
+.pdh{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.pdh small{display:block;color:var(--mu);margin-top:2px}
+.pdb{font:700 12px Inter,sans-serif;padding:5px 11px;border-radius:999px;background:#eee;white-space:nowrap}.s-novo{background:#ffe3e3;color:#a00000}.s-atendimento{background:#fff1cc;color:#8a5a00}.s-concluido{background:#d9f5e8;color:#136b46}.s-cancelado{background:#eee;color:#666}
+.pdg{margin:10px 0}.pdr{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:14px}.pdr span{color:var(--mu)}.pdr b{text-align:right;word-break:break-word}
+.pd details{margin:8px 0;font-size:13px}.pd pre{white-space:pre-wrap;background:var(--cd);padding:10px;border-radius:10px;margin:8px 0 0;font:13px/1.45 Inter,sans-serif}
+.pda{display:flex;gap:8px;align-items:center;margin-top:10px}.pda select{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);font:600 14px Inter,sans-serif;background:#fff}.pda .btn{margin:0;width:auto;padding:12px 18px;border-radius:12px}
 </style>
 </head>
 <body>
@@ -371,10 +378,10 @@ async function up(file){
 }
 function adm(t){
   if(t)T=t;
-  const tabs=['perfil','motos','leads'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',leads:'Contatos'}[k]}</button>`).join('');
+  const tabs=['perfil','motos','pedidos','leads'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}</button>`).join('');
   $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
   <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
-  ({perfil:pPerfil,motos:pMotos,leads:pLeads})[T]();
+  ({perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();
 }
 function pPerfil(){
   $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
@@ -501,6 +508,27 @@ function fotoV(){if(!V.foto_url||document.querySelector('.lb.fv'))return;const d
   document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('img[data-foto]')&&!e.target.closest('.bubble'))fotoV()})})();
 (()=>{let y=0,t=0;addEventListener('scroll',()=>{if(t)return;t=requestAnimationFrame(()=>{t=0;const b=document.querySelector('.bar');if(!b)return;const c=scrollY,d=c-y;
   if(innerWidth<720){if(d>8&&c>420)b.classList.add('hd');else if(d<-8||c<200)b.classList.remove('hd')}else b.classList.remove('hd');if(Math.abs(d)>8)y=c})},{passive:true})})();
+/* ===== ADMIN: PEDIDOS ===== */
+const PST={novo:'Novo',atendimento:'Em atendimento',concluido:'Concluído',cancelado:'Cancelado'};let PF='todos',PD=[];
+const pCpf=d=>{d=String(d||'').replace(/\D/g,'');return d.length===11?d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'):d};
+async function pPedidos(){
+  const{data,error}=await sb.from('pedidos').select().order('created_at',{ascending:false}).limit(300);
+  if(error){$('#pn').innerHTML='<p class="mu">Não consegui carregar. Rode o SQL.txt atualizado no Supabase (cria a tabela de pedidos).</p>';return}
+  PD=data||[];pdView()}
+function pdView(){
+  const c={todos:PD.length,novo:0,atendimento:0,concluido:0,cancelado:0,incompleto:0};PD.forEach(p=>{p.completo?c[p.status]=(c[p.status]||0)+1:c.incompleto++});
+  const nm={todos:'Todos',novo:'Novos',atendimento:'Em atendimento',concluido:'Concluídos',cancelado:'Cancelados',incompleto:'Incompletos'};
+  const f=PD.filter(p=>PF==='todos'?true:PF==='incompleto'?!p.completo:p.completo&&p.status===PF);
+  const row=(k,v)=>v?`<div class="pdr"><span>${k}</span><b>${v}</b></div>`:'';
+  $('#pn').innerHTML=`<div class="pdf">${Object.keys(nm).map(k=>`<button class="${PF===k?'on':''}" onclick="PF='${k}';pdView()">${nm[k]} (${c[k]||0})</button>`).join('')}</div>`+
+  (f.map(p=>{const n=p.nome_completo||p.nome||'Cliente',tel=String(p.telefone||'').replace(/\D/g,'');
+   return `<div class="pd ${p.completo?'':'inc'}"><div class="pdh"><div><b>${esc(p.moto_nome||'Moto não informada')}</b><small>${new Date(p.created_at).toLocaleString('pt-BR')}${p.completo?'':' · conversa incompleta'}</small></div><span class="pdb s-${esc(p.status)}">${esc(PST[p.status]||p.status)}</span></div>
+   <div class="pdg">${row('Modalidade',esc(({consorcio:'Consórcio',financiamento:'Financiamento',avista:'À vista',cartao:'Cartão de crédito'})[p.pagamento]||''))}${row('Cliente',esc(n))}${row('WhatsApp',esc(p.telefone||''))}${row('CPF',esc(pCpf(p.cpf)))}${row('Nascimento',esc(p.nascimento||''))}${row('Entrada',esc(p.entrada||''))}${row('Parcela desejada',esc(p.parcela||''))}${row('Forma de pagamento',esc(p.forma_pagamento||''))}${row('Moto na troca',esc(p.troca||''))}${row('Parcelamento',esc(p.parcelamento_cartao||''))}${row('Habilitação',esc(p.habilitacao||''))}</div>
+   ${p.mensagem?`<details><summary>Mensagem enviada ao WhatsApp</summary><pre>${esc(p.mensagem)}</pre></details>`:''}
+   <div class="pda"><select onchange="pdSt('${p.id}',this.value)" aria-label="Status">${Object.keys(PST).map(k=>`<option value="${k}" ${p.status===k?'selected':''}>${PST[k]}</option>`).join('')}</select>${tel?`<a class="btn red" target="_blank" rel="noopener" href="https://wa.me/${tel}">WhatsApp</a>`:''}<button class="btn" onclick="pdDel('${p.id}')">Excluir</button></div></div>`}).join('')||'<p class="mu">Nenhum pedido aqui ainda.</p>')}
+async function pdSt(id,v){await sb.from('pedidos').update({status:v}).eq('id',id);const p=PD.find(x=>x.id===id);if(p)p.status=v;pdView()}
+async function pdDel(id){if(!confirm('Excluir este pedido?'))return;await sb.from('pedidos').delete().eq('id',id);PD=PD.filter(x=>x.id!==id);pdView()}
+
 /* ===== VENDEDOR VIRTUAL: chat guiado (sem IA, só programação) ===== */
 (()=>{
 const EMP='STAR MOTOS'; /* nome da loja na mensagem de boas-vindas */
@@ -559,6 +587,7 @@ async function submit(v){v=String(v||'').trim();if(!v||CH.busy||!ST[CH.step])ret
  if(r.err){addU(v);$c('chi').value='';addB({err:r.err});return}
  addU(r.show||v);$c('chi').value='';opts([]);lock(true);
  Object.assign(CH.ans,r.set||{});if(r._c)CH.ans.cand=r._c.map(m=>m.nome);
+ sync(false);
  const items=r.say?r.say(CH.ans):[];if(items.length&&await say(items)===false)return;
  const n=typeof r.next==='function'?r.next(CH.ans):r.next;n==='fim'?fim():ask(n)}
 const T={financiamento:'FINANCIAMENTO',consorcio:'CONSÓRCIO',avista:'COMPRA À VISTA',cartao:'COMPRA NO CARTÃO DE CRÉDITO'};
@@ -566,12 +595,12 @@ function resumo(){const a=CH.ans,l=[];a.moto&&l.push('Moto: '+a.moto);a.pag&&l.p
 function msg(){const a=CH.ans,nd=a.pag==='financiamento'||a.pag==='consorcio',l=[`Olá, vim do seu site e quero as condições de ${T[a.pag]} da ${(a.moto||'moto').toUpperCase()} que vi no seu site.`,nd?'Seguem os dados para APROVACAO:':'Seguem meus dados:'];
  if(a.pag==='financiamento')l.push('Entrada: '+(a.entrada||'Sem entrada'));if(a.pag==='consorcio'&&a.parcela)l.push('Parcela desejada: '+a.parcela);if(a.pag==='avista'){l.push('Forma de pagamento: '+a.forma);l.push('Moto na troca: '+a.troca)}if(a.pag==='cartao')l.push('Parcelamento: '+a.cartao);
  if(nd){l.push('Data de nascimento: '+a.nasc);l.push('CPF: '+a.cpf)}l.push('Nome: '+(a.nomec||a.nome));l.push('Celular: +'+a.tel);if(a.hab)l.push('Habilitação: '+a.hab);l.push('IA VENDEDOR VIRTUAL');return l.join('\n')}
-async function save(tipo,det){if(!sb)return;const a=CH.ans,row={tipo,moto_id:/^[0-9a-f-]{36}$/i.test(a.motoId||'')?a.motoId:null,moto_nome:a.moto||null,nome:a.nomec||a.nome||null,telefone:a.tel?'+'+a.tel:null,cpf:a.cpf||null,nascimento:a.nasc||null,entrada:a.entrada||null,habilitacao:a.hab||null,detalhes:det};
- try{const r=await sb.from('leads').insert({...row,pagamento:a.pag||null,origem:'chat'});if(r.error)await sb.from('leads').insert(row)}catch(e){}}
-async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd=a.pag==='financiamento'||a.pag==='consorcio';CH.saved=true;save(a.pag,m);
+const uid=()=>window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&3|8).toString(16)});
+async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={id:CH.id,completo:!!done,moto_id:a.motoId||'',moto_nome:a.moto,pagamento:a.pag,nome:a.nome,nome_completo:a.nomec,telefone:'+'+a.tel,cpf:a.cpf,nascimento:a.nasc,entrada:a.entrada,parcela:a.parcela,forma_pagamento:a.forma,troca:a.troca,parcelamento_cartao:a.cartao,habilitacao:a.hab};if(done)p.mensagem=msg();Object.keys(p).forEach(k=>(p[k]===undefined||p[k]===null)&&delete p[k]);try{await sb.rpc('registrar_pedido',{p})}catch(e){}}
+async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd=a.pag==='financiamento'||a.pag==='consorcio';CH.saved=true;sync(true);
  if(await say([nd?`Fechado, ${pn()}! Recebi seus dados para a pré-análise. O resultado final é passado pelo vendedor.`:`Fechado, ${pn()}! Já anotei tudo por aqui. O vendedor te passa os valores e as condições.`,'Clique no botão abaixo para continuar com o vendedor pelo WhatsApp.',{wa:m}])===false)return;opts(['Nova conversa']);CH.step='fim';chBk()}
-function partial(){const a=CH.ans;if(CH.saved||CH.part||!a.tel)return;CH.part=true;save('chat_incompleto','Conversa não concluída\n'+resumo())}
-function start(){CH.tk++;CH.ans={};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo à ${esc(EMP)}! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
+function partial(){}
+function start(){CH.tk++;CH.id=uid();CH.ans={};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo à ${esc(EMP)}! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
 function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend',`<div class="chbd" id="chbd"></div><div class="ch" id="ch" role="dialog" aria-label="Chat com o vendedor"><div class="chh"><button class="chb" id="chbk" type="button" aria-label="Voltar uma pergunta" title="Voltar">‹</button>${avH()}<div><b>${esc(V.nome)}</b><small><i></i>Online agora</small></div><button class="chb" id="chrs" type="button" aria-label="Recomeçar" title="Recomeçar">↻</button><button class="chb" id="chx" type="button" aria-label="Fechar">✕</button></div><div class="chl" id="chl" aria-live="polite"></div><div class="chq" id="chq"></div><form class="chf" id="chf" autocomplete="off"><input id="chi" placeholder="Digite aqui" enterkeyhint="send" aria-label="Sua resposta"><button>Enviar</button></form></div>`);
  $c('chf').onsubmit=e=>{e.preventDefault();submit($c('chi').value)};
  $c('chq').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=CH.opts[+b.dataset.i];if(CH.step==='fim'){start();return}submit(v)};
