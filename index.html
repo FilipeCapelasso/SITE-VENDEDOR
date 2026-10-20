@@ -113,6 +113,7 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
 .bar .chips{flex:1;padding:6px 0;margin:-6px 0;min-width:0;scrollbar-width:none}.bar .chips::-webkit-scrollbar{display:none}
 .chip{transition:all .25s}.chip:hover{border-color:var(--r);color:var(--r)}
 .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.dvs{grid-column:1/-1;display:flex;align-items:center;gap:14px;margin:18px 0 4px;color:var(--mu)}.dvs::before,.dvs::after{content:'';flex:1;height:1px;background:var(--bd)}.dvs span{font:700 13px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
 .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
 .cd{position:relative;display:flex;flex-direction:column;border:1px solid #0000000d;border-radius:26px;background:#fff;overflow:hidden;box-shadow:var(--sh);transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s}
 .cd::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(380px circle at var(--mx,50%) var(--my,0%),#c8000014,transparent 60%)}
@@ -411,8 +412,10 @@ const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0
 function lista(an){
   const q=Q.toLowerCase();
   L=A.filter(m=>(C==='Todas'||m.categoria===C)&&((m.nome||'')+' '+(m.modelo||'')+' '+(m.categoria||'')).toLowerCase().includes(q));
+  L=[...L.filter(m=>!soCon(m)),...L.filter(soCon)];
+  const fm=L.findIndex(soCon),dv=fm>0;
   const g=$('#ls');g.className='grid'+(an?' an':'');
-  g.innerHTML=L.map((m,i)=>{const p=minP(m),sc=soCon(m),vw=sc?'con':'det';return `<article class="cd" style="--i:${Math.min(i,11)}">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
+  g.innerHTML=L.map((m,i)=>{const p=minP(m),sc=soCon(m),vw=sc?'con':'det';return `${dv&&i===fm?'<div class="dvs" role="separator"><span>Motores e Máquinas</span></div>':''}<article class="cd" style="--i:${Math.min(i,11)}">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
    <div class="im${sc?' mm':''}" onclick="openM(${i},'${vw}')">${img0(m)?`<img src="${esc(img0(m))}" alt="${esc(m.nome)}" ${i<2?'fetchpriority="high"':'loading="lazy"'} decoding="async" onload="this.classList.add('ok')" onerror="this.style.visibility='hidden'">`:'<span class="nof">Foto em breve</span>'}</div>
    <div class="cb"><small>${esc(m.categoria)}</small><h3>${esc(m.nome)}</h3>
    <p class="par">${p?`Consórcio a partir de<b>${p.parcelas}x ${brl(p.valor)}</b>`:'Consulte as condições'}</p>
