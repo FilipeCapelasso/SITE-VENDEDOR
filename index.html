@@ -188,6 +188,10 @@ h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
 .foot2 .fp:hover{background:#ffffff14;border-color:#ffffff55;transform:translateY(-2px)}
 .foot2 .mk{display:inline-flex;align-items:center;gap:12px;margin:0;padding:13px 24px;border-radius:999px;background:linear-gradient(135deg,#e01a1a,#b00000);color:#ffffffe6;text-decoration:none;font:500 14px Inter,sans-serif;box-shadow:0 12px 28px -12px #e01111aa;transition:transform .25s}
 .foot2 .mk b{font:800 14px Inter,sans-serif;color:#fff}.foot2 .mk:hover{transform:translateY(-2px)}
+.hero .ava[data-foto],.mp .ava[data-foto]{cursor:zoom-in;transition:transform .25s}.hero .ava[data-foto]:hover,.mp .ava[data-foto]:hover{transform:scale(1.05)}
+.lb{animation:fd .25s both;cursor:zoom-out}.lb.fv img{width:min(88vw,520px);height:auto;max-height:84vh;object-fit:cover;border-radius:28px;box-shadow:0 30px 80px #000a}
+#modal{cursor:pointer}.sheet{cursor:auto}
+@media(max-width:719px){.sheet{position:relative;margin-top:9vh;min-height:calc(100% - 9vh);border-radius:26px 26px 0 0;box-shadow:0 -12px 40px #0004}.sheet::before{content:"";display:block;width:42px;height:4px;border-radius:4px;background:#d3d3db;margin:-6px auto 12px}}
 body:has(#modal[style*="block"]){overflow:hidden}
 .im{cursor:pointer}
 .sheet{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
@@ -211,7 +215,7 @@ let V={nome:'Vendedor',whatsapp:'5568984041407'},M=[],L=[],A=[],K=[],Q='',C='Tod
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2800)};
 const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
 const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
-const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}" alt="${esc(V.nome)}" decoding="async">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
+const av=(u,c)=>u?`<img class="ava ${c||''}" src="${esc(u)}" alt="${esc(V.nome)}" decoding="async" data-foto="1" title="Ver foto" tabindex="0" role="button">`:`<div class="ava ${c||''}">${esc((V.nome||'?')[0])}</div>`;
 const img0=m=>(m.fotos||[])[0]||'';
 const soCon=m=>m.categoria==='Motores e Máquinas';
 
@@ -436,13 +440,21 @@ const howT=()=>{const e=$('#hw');e.style.display=e.style.display==='none'?'block
 function fmtDesc(t){return esc(t).split('\n').map(l=>{const x=l.trim();if(!x)return'<div style="height:8px"></div>';
   if(x.length>8&&x===x.toUpperCase()&&/[A-ZÀ-Ú]{3}/.test(x))return`<div class="hl">${x}</div>`;
   const m=/^([^:]{2,40}):(.*)$/.exec(x);return m?`<div><b>${m[1]}:</b>${m[2]}</div>`:`<div>${x}</div>`}).join('')}
-function priv(){const d=document.createElement('div');d.className='lb';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste formulário (nome, telefone, CPF, data de nascimento e valor de entrada) são usados somente para a cotação do seu financiamento e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;document.body.appendChild(d)}
+function priv(){const d=document.createElement('div');d.className='lb';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste formulário (nome, telefone, CPF, data de nascimento e valor de entrada) são usados somente para a cotação do seu financiamento e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;d.onclick=e=>{if(e.target===d)d.remove()};document.body.appendChild(d)}
 function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${esc(u)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
 function shareM(){const m=L[cur],u=location.origin+location.pathname+'#moto='+m.id;
   if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
   else navigator.clipboard.writeText(u).then(()=>toast('Link copiado!'))}
-addEventListener('popstate',()=>{$('#modal').style.display='none'});
-addEventListener('keydown',e=>{if(e.key==='Escape')closeM()});
+addEventListener('popstate',()=>{document.querySelectorAll('.lb').forEach(x=>x.remove());$('#modal').style.display='none'});
+addEventListener('keydown',e=>{if(e.key==='Escape'){const l=document.querySelectorAll('.lb');l.length?l[l.length-1].remove():closeM()}});
+/* fechar tocando fora + foto do vendedor ampliada */
+function fotoV(){if(!V.foto_url||document.querySelector('.lb.fv'))return;const d=document.createElement('div');d.className='lb fv';d.setAttribute('role','dialog');d.setAttribute('aria-label','Foto do vendedor');
+  d.innerHTML=`<img src="${esc(V.foto_url)}" alt="${esc(V.nome)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+(()=>{const mo=$('#modal');let dn=null;
+  mo.addEventListener('pointerdown',e=>{dn=e.target});
+  mo.addEventListener('click',e=>{if(e.target===mo&&dn===mo)closeM()});
+  document.addEventListener('click',e=>{const f=e.target.closest&&e.target.closest('img[data-foto]');if(f&&!f.closest('.bubble')){e.preventDefault();fotoV()}});
+  document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('img[data-foto]')&&!e.target.closest('.bubble'))fotoV()})})();
 (()=>{let y=0,t=0;addEventListener('scroll',()=>{if(t)return;t=requestAnimationFrame(()=>{t=0;const b=document.querySelector('.bar');if(!b)return;const c=scrollY,d=c-y;
   if(innerWidth<720){if(d>8&&c>420)b.classList.add('hd');else if(d<-8||c<200)b.classList.remove('hd')}else b.classList.remove('hd');if(Math.abs(d)>8)y=c})},{passive:true})})();
 init();
