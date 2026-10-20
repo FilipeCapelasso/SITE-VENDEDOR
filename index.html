@@ -202,7 +202,8 @@ body:has(#modal[style*="block"]){overflow:hidden}
 .ch{position:fixed;z-index:30;display:none;flex-direction:column;background:#f6f6f8;inset:0;height:100dvh;overflow:hidden}
 .ch.on{display:flex;animation:chin .35s cubic-bezier(.2,.8,.2,1)}
 @keyframes chin{from{opacity:0;transform:translateY(24px) scale(.98)}}
-@media(min-width:721px){.ch{inset:auto 20px 20px auto;width:392px;height:min(680px,calc(100dvh - 40px));border-radius:22px;box-shadow:0 30px 80px -20px #000a,0 0 0 1px #0001}}
+@media(min-width:721px){.ch{inset:0;margin:auto;width:min(540px,94vw);height:min(780px,calc(100dvh - 48px));border-radius:24px;box-shadow:0 40px 120px -20px #000c}.chm>div{font-size:16px}.chq button{font-size:15px}}
+.chbd{position:fixed;inset:0;z-index:29;background:#000a;backdrop-filter:blur(3px);display:none;animation:chmi .3s both}body.chopen .chbd{display:block}@media(max-width:720px){.chbd{display:none!important}}
 .chh{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 10px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:linear-gradient(135deg,#1a1a22,#0d0d12);color:#fff;border-bottom:2px solid var(--r)}
 .chh>div{flex:1;min-width:0}.chh b{display:block;font:700 15px Sora,Inter,sans-serif}
 .chh small{display:flex;align-items:center;gap:6px;color:#b8f5df;font-size:12px}
@@ -219,7 +220,7 @@ body:has(#modal[style*="block"]){overflow:hidden}
 .chm>div{max-width:80%;padding:11px 14px;border-radius:14px 14px 14px 4px;background:#fff;box-shadow:0 1px 3px #0002;font-size:15px;line-height:1.4;word-break:break-word;color:var(--tx)}
 .chm.u>div{background:#2b2b33;color:#fff;border-radius:14px 14px 4px 14px}
 .chm.e>div{background:#fff1f0;color:#a00000}
-.chm>div.im{padding:6px}.chm .im img{display:block;width:100%;max-width:260px;border-radius:10px}
+.chm>div.chim{padding:6px}.chm .chim img{display:block;width:100%;max-width:340px;height:auto;border-radius:10px;opacity:1;transform:none}
 .chm a.ln{color:inherit;text-decoration:underline;word-break:break-all}
 .chm>div.wb{padding:0;background:none;box-shadow:none;max-width:88%}
 .chw{display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#2bc597,#1f9a76);color:#fff!important;font-weight:700;text-decoration:none;padding:14px 18px;border-radius:12px;box-shadow:0 10px 24px -10px #1f9a76cc;text-align:center}
@@ -546,7 +547,7 @@ const $c=s=>document.getElementById(s);
 const avH=()=>V.foto_url?`<img class="cha" src="${esc(V.foto_url)}" alt="">`:`<div class="cha">${esc((V.nome||'?')[0])}</div>`;
 const bot=()=>$c('chl').scrollTo({top:1e6,behavior:'smooth'});
 function addB(it){const l=$c('chl'),d=document.createElement('div');d.className='chm';let h;
- if(typeof it==='string')h=`<div>${esc(it)}</div>`;else if(it.html)h=`<div>${it.html}</div>`;else if(it.img)h=`<div class="im"><img src="${esc(it.img)}" alt="" onload="document.getElementById('chl').scrollTo({top:1e6})" onerror="this.closest('.chm').remove()"></div>`;else if(it.wa)h=`<div class="wb"><a class="chw" target="_blank" rel="noopener" href="${esc(wa(it.wa))}">${IC.wa}Clique aqui e fale comigo no WhatsApp</a></div>`;else if(it.err){d.className='chm e';h=`<div>${esc(it.err)}</div>`}
+ if(typeof it==='string')h=`<div>${esc(it)}</div>`;else if(it.html)h=`<div>${it.html}</div>`;else if(it.img)h=`<div class="chim"><img src="${esc(it.img)}" alt="" onload="document.getElementById('chl').scrollTo({top:1e6})" onerror="this.closest('.chm').remove()"></div>`;else if(it.wa)h=`<div class="wb"><a class="chw" target="_blank" rel="noopener" href="${esc(wa(it.wa))}">${IC.wa}Clique aqui e fale comigo no WhatsApp</a></div>`;else if(it.err){d.className='chm e';h=`<div>${esc(it.err)}</div>`}
  d.innerHTML=avH()+h;l.appendChild(d);bot()}
 function addU(t){const d=document.createElement('div');d.className='chm u';d.innerHTML=`<div>${esc(t)}</div>`;$c('chl').appendChild(d);bot()}
 async function say(items){const tk=CH.tk;CH.busy=true;chBk();for(const it of items){const l=$c('chl'),t=document.createElement('div');t.className='chm chty';t.innerHTML=avH()+'<div><span></span><span></span><span></span></div>';l.appendChild(t);bot();const len=typeof it==='string'?it.length:30;await sleep(400+Math.min(len*12,800));t.remove();if(tk!==CH.tk)return false;addB(it)}CH.busy=false;chBk();return true}
@@ -571,10 +572,10 @@ async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd
  if(await say([nd?`Fechado, ${pn()}! Recebi seus dados para a pré-análise. O resultado final é passado pelo vendedor.`:`Fechado, ${pn()}! Já anotei tudo por aqui. O vendedor te passa os valores e as condições.`,'Clique no botão abaixo para continuar com o vendedor pelo WhatsApp.',{wa:m}])===false)return;opts(['Nova conversa']);CH.step='fim';chBk()}
 function partial(){const a=CH.ans;if(CH.saved||CH.part||!a.tel)return;CH.part=true;save('chat_incompleto','Conversa não concluída\n'+resumo())}
 function start(){CH.tk++;CH.ans={};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo à ${esc(EMP)}! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
-function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend',`<div class="ch" id="ch" role="dialog" aria-label="Chat com o vendedor"><div class="chh"><button class="chb" id="chbk" type="button" aria-label="Voltar uma pergunta" title="Voltar">‹</button>${avH()}<div><b>${esc(V.nome)}</b><small><i></i>Online agora</small></div><button class="chb" id="chrs" type="button" aria-label="Recomeçar" title="Recomeçar">↻</button><button class="chb" id="chx" type="button" aria-label="Fechar">✕</button></div><div class="chl" id="chl" aria-live="polite"></div><div class="chq" id="chq"></div><form class="chf" id="chf" autocomplete="off"><input id="chi" placeholder="Digite aqui" enterkeyhint="send" aria-label="Sua resposta"><button>Enviar</button></form></div>`);
+function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend',`<div class="chbd" id="chbd"></div><div class="ch" id="ch" role="dialog" aria-label="Chat com o vendedor"><div class="chh"><button class="chb" id="chbk" type="button" aria-label="Voltar uma pergunta" title="Voltar">‹</button>${avH()}<div><b>${esc(V.nome)}</b><small><i></i>Online agora</small></div><button class="chb" id="chrs" type="button" aria-label="Recomeçar" title="Recomeçar">↻</button><button class="chb" id="chx" type="button" aria-label="Fechar">✕</button></div><div class="chl" id="chl" aria-live="polite"></div><div class="chq" id="chq"></div><form class="chf" id="chf" autocomplete="off"><input id="chi" placeholder="Digite aqui" enterkeyhint="send" aria-label="Sua resposta"><button>Enviar</button></form></div>`);
  $c('chf').onsubmit=e=>{e.preventDefault();submit($c('chi').value)};
  $c('chq').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=CH.opts[+b.dataset.i];if(CH.step==='fim'){start();return}submit(v)};
- $c('chx').onclick=close;$c('chrs').onclick=()=>{partial();start()};
+ $c('chx').onclick=close;$c('chbd').onclick=close;$c('chrs').onclick=()=>{partial();start()};
  $c('chbk').onclick=()=>{if(CH.busy||CH.hist.length<2||CH.step==='fim')return;CH.tk++;CH.hist.pop();const h=CH.hist.pop(),l=$c('chl');while(l.children.length>h.n)l.lastChild.remove();CH.ans={...h.ans};CH.busy=false;ask(h.id)};
  $c('chi').oninput=function(){const s=ST[CH.step],k=s&&s.mask;if(!k)return;let d=dg(this.value);if(k==='tel'){if(d.length>11&&d.startsWith('55'))d=d.slice(2);this.value=fTel(d.slice(0,11))}else if(k==='cpf')this.value=fCpf(d.slice(0,11));else this.value=fNas(d.slice(0,8))};
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$c('ch').classList.contains('on'))close()});addEventListener('pagehide',partial)}
