@@ -1,0 +1,98 @@
+-- =====================================================
+-- VITRINE DE MOTOS DO VENDEDOR - Supabase (rode tudo no SQL Editor)
+-- =====================================================
+
+-- Perfil do vendedor (sempre 1 linha, id = 1)
+create table if not exists public.vendedor (
+  id int primary key default 1 check (id = 1),
+  nome text not null default 'Shayron',
+  bio text default 'Entregador de sonhos!',
+  whatsapp text default '5568984041407',      -- só números, com 55 + DDD
+  instagram text default 'shayrondahonda',
+  foto_url text,
+  logo_url text,
+  updated_at timestamptz default now()
+);
+insert into public.vendedor (id) values (1) on conflict (id) do nothing;
+
+-- Motos
+create table if not exists public.motos (
+  id uuid primary key default gen_random_uuid(),
+  nome text not null,
+  modelo text,
+  categoria text default 'Street',
+  descricao text,
+  fotos jsonb not null default '[]'::jsonb,    -- lista de URLs
+  video_url text,                               -- YouTube ou arquivo enviado
+  planos jsonb not null default '[]'::jsonb,   -- [{"parcelas":80,"valor":512.68}]
+  ordem int not null default 0,
+  ativo boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- Selo (ex: Novo, Oferta) e preço à vista opcionais (seguro rodar de novo)
+alter table public.motos add column if not exists selo text;
+alter table public.motos add column if not exists preco numeric;
+-- Com/Sem emplacamento (usado pelo painel e pelo catálogo de consórcio)
+alter table public.motos add column if not exists emplacamento text;
+
+-- Contatos / simulações enviados pelos clientes
+create table if not exists public.leads (
+  id uuid primary key default gen_random_uuid(),
+  tipo text not null,                           -- financiamento | consorcio | whatsapp
+  moto_id uuid references public.motos(id) on delete set null,
+  moto_nome text,
+  nome text,
+  telefone text,
+  cpf text,
+  nascimento text,
+  entrada text,
+  habilitacao text,
+  detalhes text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.vendedor enable row level security;
+alter table public.motos    enable row level security;
+alter table public.leads    enable row level security;
+
+-- VENDEDOR: todos leem, só logado altera
+drop policy if exists vendedor_ler on public.vendedor;
+create policy vendedor_ler on public.vendedor for select using (true);
+drop policy if exists vendedor_admin on public.vendedor;
+create policy vendedor_admin on public.vendedor for all to authenticated using (true) with check (true);
+
+-- MOTOS: público vê só ativas; logado vê e altera tudo
+drop policy if exists motos_ler on public.motos;
+create policy motos_ler on public.motos for select using (ativo = true or auth.role() = 'authenticated');
+drop policy if exists motos_admin on public.motos;
+create policy motos_admin on public.motos for all to authenticated using (true) with check (true);
+
+-- LEADS: qualquer cliente envia; só logado lê/apaga
+drop policy if exists leads_enviar on public.leads;
+create policy leads_enviar on public.leads for insert to anon, authenticated with check (true);
+drop policy if exists leads_ler on public.leads;
+create policy leads_ler on public.leads for select to authenticated using (true);
+drop policy if exists leads_apagar on public.leads;
+create policy leads_apagar on public.leads for delete to authenticated using (true);
+
+-- STORAGE: bucket público "midia" para fotos, vídeos e perfil
+insert into storage.buckets (id, name, public)
+values ('midia', 'midia', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists midia_ler on storage.objects;
+create policy midia_ler on storage.objects for select using (bucket_id = 'midia');
+drop policy if exists midia_enviar on storage.objects;
+create policy midia_enviar on storage.objects for insert to authenticated with check (bucket_id = 'midia');
+drop policy if exists midia_alterar on storage.objects;
+create policy midia_alterar on storage.objects for update to authenticated using (bucket_id = 'midia');
+drop policy if exists midia_apagar on storage.objects;
+create policy midia_apagar on storage.objects for delete to authenticated using (bucket_id = 'midia');
+
+-- =====================================================
+-- DEPOIS DE RODAR:
+-- 1) Authentication > Users > Add user (email + senha do vendedor)
+-- 2) Authentication > Providers > Email: desative "Allow new users to sign up"
+--    (qualquer usuário logado é admin)
+-- =====================================================
