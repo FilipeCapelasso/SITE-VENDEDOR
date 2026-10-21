@@ -245,26 +245,29 @@ body.chopen .bw{display:none}
 .pdg{margin:10px 0}.pdr{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px dashed var(--bd);font-size:14px}.pdr span{color:var(--mu)}.pdr b{text-align:right;word-break:break-word}
 .pd details{margin:8px 0;font-size:13px}.pd pre{white-space:pre-wrap;background:var(--cd);padding:10px;border-radius:10px;margin:8px 0 0;font:13px/1.45 Inter,sans-serif}
 .pda{display:flex;gap:8px;align-items:center;margin-top:10px}.pda select{flex:1;padding:12px;border-radius:12px;border:1px solid var(--bd);font:600 14px Inter,sans-serif;background:#fff}.pda .btn{margin:0;width:auto;padding:12px 18px;border-radius:12px}
-
-/* ===== V3: personalização, filtros, painel ===== */
-:root{--r1:#dc1414}
-.hero{background:radial-gradient(640px 240px at 90% -40%,color-mix(in srgb,var(--r) 31%,transparent),transparent 70%),linear-gradient(160deg,#1b1b23,#0a0a0e 78%)}.glow{background:var(--r)}
-.cta.w,.cb .btn.red,.sheet .btn.red,.selo,.foot2 .mk{background:linear-gradient(135deg,var(--r1),var(--r2))}
-.avs{background:var(--r);color:#fff;text-align:center;font:600 13.5px Inter,sans-serif;padding:9px 14px}
-.ab{display:inline-flex;align-items:center;gap:7px;margin-top:9px;font:600 12.5px Inter,sans-serif;color:#ffffffc0;background:#ffffff14;border-radius:999px;padding:5px 12px}.ab i{width:8px;height:8px;border-radius:50%;background:#9a9aa6}.ab.on i{background:#2bd69b;animation:chrg 1.8s infinite}
-.flt{display:flex;gap:8px;align-items:center}.flt select,.flt input{margin:0;padding:11px 12px;border-radius:14px;width:auto;font-size:14px}.flt input{width:150px}.flt .chip{flex:none}#fvb.on{background:var(--r);border-color:var(--r);color:#fff}
-.fv{position:absolute;top:16px;left:16px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:#fffc;color:#bbb;font-size:19px;cursor:pointer;box-shadow:0 4px 12px #0002;transition:transform .2s}.fv:hover{transform:scale(1.15)}.fv.on{color:var(--r)}
-.av{display:block;margin-top:3px;font:600 12.5px Inter,sans-serif;color:var(--tx)}.pv{font-size:15px;margin:2px 0 10px}.pv b{color:var(--r);font:800 20px Sora,sans-serif}
-@media(max-width:719px){.flt{width:100%}.flt select,.flt input{flex:1;min-width:0}}
-.tabs{overflow:auto}.tabs .btn{white-space:nowrap;flex:1}.bdg:not(:empty){background:var(--r);color:#fff;border-radius:999px;padding:1px 7px;margin-left:6px;font-size:11px}.tabs .on .bdg{background:#fff;color:var(--r)}
-.ad{max-width:980px}.it{flex-wrap:wrap}.ac{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.ac button:disabled{opacity:.3}
-.kps{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.kp{border:1px solid var(--bd);border-radius:16px;padding:16px;background:#fff}.kp b{display:block;font:800 28px Sora,sans-serif}.kp span{font-size:12.5px;color:var(--mu)}.kp.hot{background:var(--r);color:#fff}.kp.hot span{color:#fffc}
-.rk{position:relative;display:flex;justify-content:space-between;padding:10px 12px;margin:6px 0;border-radius:10px;overflow:hidden;background:var(--cd);font-size:14px}.rk i{position:absolute;inset:0 auto 0 0;background:color-mix(in srgb,var(--r) 18%,transparent)}.rk span,.rk b{position:relative}
-.sw{display:flex;gap:8px;align-items:center;margin-top:8px}.sw button{width:36px;height:36px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--bd);cursor:pointer}.sw input{width:52px;height:40px;padding:2px;margin:0}
+/* ===== V3 ===== */
+.btn:active{transform:scale(.98)}
+.hrt{position:absolute;top:18px;left:18px;z-index:2;width:38px;height:38px;border-radius:50%;border:0;background:#ffffffe6;color:#b4b4be;font-size:19px;line-height:1;cursor:pointer;box-shadow:0 4px 14px -4px #0004;transition:transform .2s,color .2s;display:grid;place-items:center;padding:0}
+.hrt:hover{transform:scale(1.12)}.hrt.on{color:var(--r);animation:pop2 .35s}@keyframes pop2{40%{transform:scale(1.35)}}
+.so{flex:none;width:auto;margin:0;padding:12px 14px;border-radius:14px;font:600 14px Inter,sans-serif}
+.par .av{display:block;margin-top:3px;color:var(--tx);font:600 12.5px Inter,sans-serif}
+.pv{margin:10px 0 0;font-size:15px;color:var(--mu)}.pv b{font:800 22px Sora,sans-serif;color:var(--tx)}
+.pl label .tt{margin-left:auto;font-size:12.5px;color:var(--mu);font-weight:500}
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 0;padding:0;list-style:none;counter-reset:s}
+.how li{counter-increment:s;background:#fff;border-radius:22px;padding:22px;box-shadow:var(--sh);font-size:14.5px;line-height:1.5;color:var(--mu)}
+.how li::before{content:counter(s);display:grid;place-items:center;width:34px;height:34px;margin-bottom:12px;border-radius:50%;background:var(--ink);color:#fff;font:800 15px Sora,sans-serif}
+.how b{display:block;margin-bottom:4px;font:700 17px Sora,sans-serif;color:var(--tx)}
+.faq{background:#fff;border-radius:22px;padding:6px 20px;box-shadow:var(--sh)}.faq details{border:0;border-bottom:1px solid var(--bd);border-radius:0;margin:0;padding:16px 0;font-size:15px}.faq details:last-child{border:0}
+.faq summary{list-style:none;display:flex;justify-content:space-between;gap:12px}.faq summary::after{content:"+";font-size:20px;line-height:1;color:var(--r);transition:transform .25s}.faq details[open] summary::after{transform:rotate(45deg)}.faq p{margin:10px 0 0;color:var(--mu);line-height:1.6}
+@media(max-width:719px){.how{grid-template-columns:1fr}}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}.kp div{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:12px;text-align:center}.kp b{display:block;font:800 24px Sora,sans-serif}.kp span{font-size:12px;color:var(--mu)}.kp .n b{color:var(--r)}
+.tabs{position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 0;margin:6px 0}
+.nb{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--r);color:#fff;font:700 12px Inter,sans-serif}.tabs .on .nb{background:#fff;color:var(--r)}
+.ad{max-width:880px}.it{background:#fff;flex-wrap:wrap}.it .g{min-width:140px}.it small.w{color:#b56a00;font-weight:600}
 </style>
 </head>
 <body>
-<div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast"></div>
+<div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast" role="status" aria-live="polite"></div>
 <script>
 /* ===== CONFIGURE AQUI (Supabase > Project Settings > API) ===== */
 const SUPABASE_URL='https://qrmwgqkiwoenlkfzjazs.supabase.co';
@@ -276,7 +279,7 @@ const sb=DEMO?null:supabase.createClient(SU,SUPABASE_KEY.trim());
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-let V={nome:'Vendedor',whatsapp:'5568984041407'},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='resumo',SO='rel',BG=0,FV=0;
+let V={nome:'Vendedor',whatsapp:'5568984041407'},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='pedidos',SO='',FV=(()=>{try{return JSON.parse(localStorage.getItem('fv')||'[]')}catch(e){return[]}})();
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2800)};
 const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
 const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
@@ -306,28 +309,39 @@ async function route(){
 const IC={wa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
 ig:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><path d="M17.5 6.5h.01"/></svg>',
 se:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'};
+const INFO=`<div class="sec"><h2>Como comprar</h2></div><ol class="how"><li><b>Escolha a moto</b>Veja fotos, ficha técnica e as parcelas de consórcio.</li><li><b>Fale com o vendedor</b>Use o chat ou o formulário e informe seus dados para a pré-análise.</li><li><b>Receba as condições</b>O vendedor responde no seu WhatsApp com valores e próximos passos.</li></ol>
+<div class="sec"><h2>Dúvidas frequentes</h2></div><div class="faq">
+<details><summary>Qual a diferença entre consórcio e financiamento?</summary><p>No consórcio você paga parcelas sem juros (com taxa de administração) e a moto é liberada por sorteio ou lance. No financiamento a moto vem após a aprovação e as parcelas têm juros.</p></details>
+<details><summary>Posso financiar sem entrada?</summary><p>Dá para tentar. Você faz a pré-análise e o resultado final é passado pelo vendedor.</p></details>
+<details><summary>Ainda não tenho CNH. Posso pedir uma cotação?</summary><p>Pode. Informe isso no atendimento e o vendedor orienta você.</p></details>
+<details><summary>Meus dados estão seguros?</summary><p>Eles são usados só para a cotação e o contato do vendedor. Você pode pedir a exclusão a qualquer momento.</p></details></div>`;
 const chipsH=()=>K.map((c,i)=>`<button class="chip ${c===C?'on':''}" aria-pressed="${c===C}" onclick="setC(${i})">${esc(c)}</button>`).join('');
+const FVC='♥ Favoritas';
+function mkK(){K=['Todas',...(FV.length?[FVC]:[]),...new Set(A.map(m=>m.categoria).filter(Boolean))]}
+function fav(id,b){const i=FV.indexOf(id);i<0?FV.push(id):FV.splice(i,1);try{localStorage.setItem('fv',JSON.stringify(FV))}catch(e){}
+  b.classList.toggle('on',i<0);b.setAttribute('aria-pressed',i<0);toast(i<0?'Salva nos favoritos':'Removida dos favoritos');
+  const rl=C===FVC;if(rl&&!FV.length)C='Todas';mkK();$('#chips').innerHTML=chipsH();if(rl)lista()}
 function setC(i){C=K[i];$('#chips').innerHTML=chipsH();lista(1)}
 function cnt(){const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;document.querySelectorAll('[data-n]').forEach(e=>{const n=+e.dataset.n,m=e.dataset.m,t0=performance.now();
   const f=t=>{const k=rm?1:Math.min(1,(t-t0)/1400),v=n*(1-Math.pow(1-k,3));e.textContent=m?brl(v):Math.round(v);k<1&&requestAnimationFrame(f)};requestAnimationFrame(f)})}
 function home(){
-  A=M.filter(m=>m.ativo);document.title=V.nome+' | Motos';theme();
-  K=['Todas',...new Set(A.map(m=>m.categoria).filter(Boolean))];
+  A=M.filter(m=>m.ativo);document.title=V.nome+' | Motos';
+  mkK();
   const AM=A.filter(m=>!soCon(m)),vs=AM.flatMap(m=>(m.planos||[]).map(p=>p.valor)).filter(v=>v>0),mn=vs.length?Math.min(...vs):0;
   const bxd=(()=>{try{return sessionStorage.getItem('bx')}catch(e){return''}})();
-  $('#app').innerHTML=avisoH()+`<header class="hero"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
+  $('#app').innerHTML=`<header class="hero"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
   <div class="hin ${V.logo_url?'':'nl'}">${av(V.foto_url)}
-  <div class="idt"><h1>${esc(V.nome)}<svg class="vf" viewBox="0 0 24 24" aria-label="Verificado" role="img"><circle cx="12" cy="12" r="11" fill="#1d9bf0"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>${V.bio?`<p>${esc(V.bio)}</p>`:''}${abertoH()}</div>
+  <div class="idt"><h1>${esc(V.nome)}<svg class="vf" viewBox="0 0 24 24" aria-label="Verificado" role="img"><circle cx="12" cy="12" r="11" fill="#1d9bf0"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>${V.bio?`<p>${esc(V.bio)}</p>`:''}</div>
   <div class="ctas"><a class="cta w" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}" onclick="return chatOpen(event)">${IC.wa}Fale comigo</a>${V.instagram?`<a class="cta" target="_blank" rel="noopener" href="https://instagram.com/${esc(V.instagram)}">${IC.ig}Instagram</a>`:''}</div>
   ${V.logo_url?`<img class="hlogo" src="${esc(V.logo_url)}" alt="Logo da empresa" decoding="async">`:''}
   <div class="stats"><div><b data-n="${AM.length}">${AM.length}</b><span>modelos para escolher</span></div>${mn?`<div><b data-n="${mn}" data-m="1">${brl(mn)}</b><span>parcela de consórcio a partir de</span></div>`:''}</div></div></header>
   <main class="wrap"><div class="sec"><h2>Escolha sua moto</h2><span class="nc" id="nc"></span></div>
   <div class="bar"><div class="sb">${IC.se}<input id="q" type="search" placeholder="Buscar moto" aria-label="Buscar moto" autocomplete="off" value="${esc(Q)}" oninput="Q=this.value;lista()"></div>
-  ${fltH()}<div class="chips" id="chips">${chipsH()}</div></div><div id="ls" class="grid"></div></main>
-  <footer class="foot2"><b>${esc(V.nome)}</b><br>${tel()}${V.instagram?' · @'+esc(V.instagram):''}${infoH()}
+  <div class="chips" id="chips">${chipsH()}</div><select class="so" aria-label="Ordenar" onchange="SO=this.value;lista()">${[['','Ordem padrão'],['mn','Menor parcela'],['mx','Maior parcela'],['az','A – Z']].map(o=>`<option value="${o[0]}" ${o[0]===SO?'selected':''}>${o[1]}</option>`).join('')}</select></div><div id="ls" class="grid"></div>${INFO}</main>
+  <footer class="foot2"><b>${esc(V.nome)}</b><br>${tel()}${V.instagram?' · @'+esc(V.instagram):''}
   <div class="fl"><a class="fp" target="_blank" rel="noopener" href="https://fichacdc.vercel.app/">Ficha CDC<small>Financiamento</small></a><a class="fp" target="_blank" rel="noopener" href="https://fichacnh.vercel.app/">Ficha CNH<small>Consórcio</small></a></div>
   <a class="mk" target="_blank" rel="noopener" href="https://wa.me/5568974005458?text=${encodeURIComponent('Olá! Vi o site do vendedor e quero criar o meu.')}">Crie seu site do vendedor<b>Clique aqui</b></a></footer>
-  ${bxd?'':`<div class="bw"><a class="bubble" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site.')}" onclick="return chatOpen(event)">${av(V.foto_url)}${esc(cf('bolha')||'Estou online. Fale agora!')}</a><button class="bx" aria-label="Fechar" onclick="try{sessionStorage.setItem('bx',1)}catch(e){}this.closest('.bw').remove()">×</button></div>`}`;
+  ${bxd?'':`<div class="bw"><a class="bubble" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site.')}" onclick="return chatOpen(event)">${av(V.foto_url)}Estou online. Fale agora!</a><button class="bx" aria-label="Fechar" onclick="try{sessionStorage.setItem('bx',1)}catch(e){}this.closest('.bw').remove()">×</button></div>`}`;
   lista(1);cnt();
 }
 function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
@@ -335,16 +349,16 @@ function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src
 function openM(i,v){
   cur=i;G=0;const m=L[i],f=m.fotos||[];let b='';
   const how=t=>`<div id="hw" class="hw" style="display:none">${t}</div>`;
-  if(v==='det')b=`${m.preco?`<div class="pv">À vista <b>${brl(m.preco)}</b></div>`:''}<div class="gal"><div id="gmain"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}"></div>
+  if(v==='det')b=`<div class="gal"><div id="gmain"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}"></div>
     ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" onclick="gShow(${k})">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
-    <button class="btn wa" onclick="chatOpen(null,L[cur].id)">⚡ Pedido rápido pelo chat (1 minuto)</button><div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
+    ${m.preco>0?`<p class="pv">À vista <b>${brl(m.preco)}</b></p>`:''}<div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
     <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+' e gostaria de saber sobre a compra à vista.')}">Whatsapp</a></div>
     ${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
-    <button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
+    <button class="btn" onclick="chatOpen(null,'${m.id}')">Tirar dúvidas no chat com o vendedor</button><button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
   if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
     ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
     ${f[0]?`<div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0;overflow:hidden"><img src="${esc(f[0])}" alt="${esc(m.nome)}" style="display:block;width:100%;${soCon(m)?'max-height:340px':'height:230px'};object-fit:contain"></div>`:''}
-    <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
+    <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b><span class="tt">Total aprox. ${brl(x.parcelas*x.valor)}</span></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
     <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
     <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
   if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div><img src="${esc(f[0]||'')}"></div>
@@ -357,7 +371,7 @@ function openM(i,v){
   const mo=$('#modal');if(mo.style.display!=='block')history.pushState({m:1},'');
   const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
   mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
-  <div class="mt"><h2>${esc(m.nome)}</h2><span><b onclick="nav(-1)">‹</b><b onclick="nav(1)">›</b><b onclick="closeM()">✕</b></span></div>${b}</div>`;
+  <div class="mt"><h2>${esc(m.nome)}</h2><span><b role="button" tabindex="0" aria-label="Moto anterior" onclick="nav(-1)">‹</b><b role="button" tabindex="0" aria-label="Próxima moto" onclick="nav(1)">›</b><b role="button" tabindex="0" aria-label="Fechar" onclick="closeM()">✕</b></span></div>${b}</div>`;
   mo.style.display='block';mo.scrollTop=0;bindSwipe();
 }
 const nav=d=>{const j=(cur+d+L.length)%L.length;openM(j,soCon(L[j])?'con':'det')};
@@ -370,9 +384,9 @@ function conWa(rep){
 }
 async function finSend(){
   const g=i=>$('#'+i).value.trim(),m=L[cur];
-  if(!g('f_nom')||!g('f_tel'))return toast('Preencha nome e telefone');
+  if(g('f_nom').length<3||g('f_tel').replace(/\D/g,'').length<10)return toast('Preencha nome e telefone com DDD');
   const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value};
-  await lead('financiamento',d);
+  lead('financiamento',d);
   const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\nPossui habilitação: ${d.habilitacao}`;
   window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
 }
@@ -387,17 +401,22 @@ async function doLogin(){
   if(error)return toast('E-mail ou senha incorretos');await init();adm();
 }
 async function out(){await sb.auth.signOut();location.hash='';home()}
-async function up(file){
+async function shrink(f){
+  if(!/^image\/(png|jpe?g|webp)$/.test(f.type)||f.size<250e3)return f;
+  try{const b=await createImageBitmap(f),k=Math.min(1,1600/Math.max(b.width,b.height)),c=document.createElement('canvas');c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);c.getContext('2d').drawImage(b,0,0,c.width,c.height);
+    const o=await new Promise(r=>c.toBlob(r,'image/webp',.86));
+    return o&&o.type==='image/webp'&&o.size<f.size?new File([o],f.name.replace(/\.\w+$/,'')+'.webp',{type:'image/webp'}):f}catch(e){return f}}
+async function up(file){file=await shrink(file);
   const p=`${Date.now()}-${Math.random().toString(36).slice(2,7)}-${file.name.replace(/[^\w.]/g,'_')}`;
   const{error}=await sb.storage.from('midia').upload(p,file);if(error)throw error;
   return sb.storage.from('midia').getPublicUrl(p).data.publicUrl;
 }
 function adm(t){
-  if(t)T=t;theme();
-  const tabs=['resumo','perfil','aparencia','motos','pedidos','leads'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',perfil:'Perfil',aparencia:'Aparência',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}<span class="bdg" id="bd_${k}"></span></button>`).join('');
+  if(t)T=t;
+  const tabs=['pedidos','motos','leads','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
   $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
   <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
-  ({resumo:pResumo,perfil:pPerfil,aparencia:pAparencia,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();badge();
+  ({perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
 }
 function pPerfil(){
   $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
@@ -408,6 +427,11 @@ function pPerfil(){
   <label class="l">Instagram (sem @)</label><input id="v_i" value="${esc(V.instagram)}">
   <button class="btn red" onclick="saveV()">Salvar perfil</button>`;
 }
+async function nbSync(){const b=$('#nb');if(!b)return;const{count}=await sb.from('pedidos_chat').select('id',{count:'exact',head:true}).eq('status','novo').eq('completo',true);b.hidden=!count;b.textContent=count||'';document.title=(count?`(${count}) `:'')+'Painel'}
+let RT=null;
+function rt(){if(RT)return;try{RT=sb.channel('pd').on('postgres_changes',{event:'*',schema:'public',table:'pedidos_chat'},e=>{
+  if(e.new&&e.new.completo&&e.new.status==='novo'&&!(e.old&&e.old.completo))toast('Novo pedido recebido!');
+  nbSync();if(T==='pedidos'&&location.hash==='#admin'&&!/SELECT/.test(document.activeElement.tagName))pPedidos()}).subscribe()}catch(x){}}
 async function upV(k,el){
   try{toast('Enviando...');V[k]=await up(el.files[0]);await sb.from('vendedor').upsert({id:1,...V});toast('Salvo!');pPerfil()}catch(e){toast('Erro: '+e.message)}
 }
@@ -419,11 +443,16 @@ const CAT=[['POP 110I ES +10%', 'Street', 'C', '80:216.59,60:280.54,48:345.55,36
 const pl=t=>t.split(',').map(x=>{const[p,v]=x.split(':');return{parcelas:+p,valor:+v}}),emp=c=>c[2]==='C'?'Com emplacamento':'Sem emplacamento';
 function pMotos(){
   const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0])),sem=M.filter(m=>CAT.some(c=>c[0]===(m.nome||'').trim().toUpperCase())&&!(m.planos||[]).length);
-  $('#pn').innerHTML=motoTop()+motoList()+
+  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button><input type="search" placeholder="Buscar na lista" oninput="const q=this.value.toLowerCase();document.querySelectorAll('#pn .it[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')">`+M.map(m=>`<div class="it" data-n="${esc((m.nome||'').toLowerCase())}">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small>${(m.fotos||[]).length?'':'<br><small class="w">Sem foto</small>'}${(m.planos||[]).length||m.preco>0?'':'<br><small class="w">Sem planos</small>'}</div>
+  <button aria-label="Subir" onclick="mv('${m.id}',-1)">↑</button><button aria-label="Descer" onclick="mv('${m.id}',1)">↓</button><button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="dup('${m.id}')">Duplicar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
   (sem.length?`<button class="btn or" onclick="aplicarPlanos()">Aplicar planos de consórcio do catálogo (${sem.length} motos sem plano)</button>`:'')+
   (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
   <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
 }
+async function mv(id,d){const i=M.findIndex(m=>m.id===id),j=i+d;if(j<0||j>=M.length)return;[M[i],M[j]]=[M[j],M[i]];
+  await Promise.all(M.map((m,k)=>{if(m.ordem===k)return;m.ordem=k;return sb.from('motos').update({ordem:k}).eq('id',m.id)}));pMotos()}
+async function dup(id){const o=M.find(m=>m.id===id),{id:_a,created_at:_b,...c}=o;c.nome+=' (cópia)';c.ativo=false;c.ordem=M.length;
+  const{data,error}=await sb.from('motos').insert(c).select().single();if(error)return toast('Erro: '+error.message);M.push(data);toast('Cópia criada (oculta no site)');edit(data.id)}
 async function addCat(i){const c=CAT[i];
   const{data,error}=await sb.from('motos').insert({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length}).select().single();
   if(error)return toast('Erro: '+error.message);M.push(data);edit(data.id)}
@@ -442,7 +471,7 @@ function edit(id){
 }
 function fm(){
   const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
-  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}${f('selo','Selo no card (ex: Novo, Oferta, Mais vendida)')}<label class="l">Preço à vista (opcional, só números)</label><input type="number" step="0.01" value="${E.preco??''}" oninput="E.preco=this.value?+this.value:null">
+  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}${f('selo','Selo no card (opcional: Novo, Oferta, Mais vendida)')}<label class="l">Preço à vista (opcional, só números)</label><input type="number" step="0.01" value="${E.preco||''}" placeholder="Ex: 14990" oninput="E.preco=this.value?+this.value:null">
   <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Big Trail','Scooter','Esportiva','Motores e Máquinas'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
   <label class="l">Ficha técnica: clique em pesquisar, copie do Google e cole aqui (uma linha por item, ex: Cilindrada: 109,5 cc)</label>
   <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
@@ -468,24 +497,25 @@ async function del(id){if(!confirm('Excluir esta moto?'))return;await sb.from('m
 async function pLeads(){
   const{data}=await sb.from('leads').select().order('created_at',{ascending:false}).limit(100);
   $('#pn').innerHTML=(data||[]).map(l=>`<div class="it"><div class="g"><b>${esc(l.nome||'Cliente')}</b> · ${esc(l.tipo)}<br><small>${esc(l.moto_nome||'')} · ${new Date(l.created_at).toLocaleString('pt-BR')}</small>
-  <br><small>${esc(l.telefone||'')} ${esc(l.cpf?'CPF '+l.cpf:'')} ${esc(l.entrada?'Entrada '+l.entrada:'')}</small><br><small style="white-space:pre-line">${esc(l.detalhes||'')}</small></div>${l.telefone?`<a class="sm" style="text-decoration:none;color:inherit" target="_blank" href="https://wa.me/55${String(l.telefone).replace(/[^0-9]/g,'').replace(/^55/,'')}">WhatsApp</a>`:''}<button onclick="delL('${l.id}')">Excluir</button></div>`).join('')||'<p class="mu">Nenhum contato ainda.</p>';
+  <br><small>${esc(l.telefone||'')} ${esc(l.cpf?'CPF '+l.cpf:'')} ${esc(l.entrada?'Entrada '+l.entrada:'')}</small><br><small style="white-space:pre-line">${esc(l.detalhes||'')}</small></div>${wlk(l.telefone)?`<a class="sm" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" href="${wlk(l.telefone)}">WhatsApp</a>`:''}<button onclick="delL('${l.id}')">Excluir</button></div>`).join('')||'<p class="mu">Nenhum contato ainda.</p>';
 }
+const wlk=t=>{const d=String(t||'').replace(/\D/g,'').replace(/^55(?=\d{10,11}$)/,'');return d.length>=10?'https://wa.me/55'+d:''};
 async function delL(id){await sb.from('leads').delete().eq('id',id);pLeads()}
 const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0];
 function lista(an){
-  const q=Q.toLowerCase(),pv=m=>{const p=minP(m);return p?p.valor:1e9};
-  L=A.filter(m=>(C==='Todas'||m.categoria===C)&&(!FV||FAVS.includes(m.id))&&((m.nome||'')+' '+(m.modelo||'')+' '+(m.categoria||'')).toLowerCase().includes(q)&&(!BG||pv(m)<=BG));
-  if(SO!=='rel')L.sort(SO==='az'?(a,b)=>a.nome.localeCompare(b.nome):SO==='menor'?(a,b)=>pv(a)-pv(b):(a,b)=>{const x=pv(a),y=pv(b);return x===1e9?(y===1e9?0:1):y===1e9?-1:y-x});
+  const q=Q.toLowerCase();
+  L=A.filter(m=>(C==='Todas'||(C===FVC?FV.includes(m.id):m.categoria===C))&&((m.nome||'')+' '+(m.modelo||'')+' '+(m.categoria||'')).toLowerCase().includes(q));
+  if(SO)L.sort((a,b)=>SO==='az'?a.nome.localeCompare(b.nome):SO==='mx'?(minP(b)?.valor||0)-(minP(a)?.valor||0):(minP(a)?.valor||1e9)-(minP(b)?.valor||1e9));
   L=[...L.filter(m=>!soCon(m)),...L.filter(soCon)];
   const fm=L.findIndex(soCon),dv=fm>0;
   const g=$('#ls');g.className='grid'+(an?' an':'');
-  g.innerHTML=L.map((m,i)=>{const p=minP(m),sc=soCon(m),vw=sc?'con':'det';return `${dv&&i===fm?'<div class="dvs" role="separator"><span>Motores e Máquinas</span></div>':''}<article class="cd" style="--i:${Math.min(i,11)}">${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}<button class="fv ${FAVS.includes(m.id)?'on':''}" aria-label="Favoritar" onclick="fav('${m.id}',event)">♥</button>
+  g.innerHTML=L.map((m,i)=>{const p=minP(m),sc=soCon(m),vw=sc?'con':'det';return `${dv&&i===fm?'<div class="dvs" role="separator"><span>Motores e Máquinas</span></div>':''}<article class="cd" style="--i:${Math.min(i,11)}"><button class="hrt${FV.includes(m.id)?' on':''}" aria-label="Favoritar ${esc(m.nome)}" aria-pressed="${FV.includes(m.id)}" onclick="fav('${m.id}',this)">♥</button>${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
    <div class="im${sc?' mm':''}" onclick="openM(${i},'${vw}')">${img0(m)?`<img src="${esc(img0(m))}" alt="${esc(m.nome)}" ${i<2?'fetchpriority="high"':'loading="lazy"'} decoding="async" onload="this.classList.add('ok')" onerror="this.style.visibility='hidden'">`:'<span class="nof">Foto em breve</span>'}</div>
    <div class="cb"><small>${esc(m.categoria)}</small><h3>${esc(m.nome)}</h3>
-   <p class="par">${p?`Consórcio a partir de<b>${p.parcelas}x ${brl(p.valor)}</b>`:'Consulte as condições'}${m.preco?`<span class="av">À vista ${brl(m.preco)}</span>`:''}</p>
+   <p class="par">${p?`Consórcio a partir de<b>${p.parcelas}x ${brl(p.valor)}</b>`:'Consulte as condições'}${m.preco>0?`<span class="av">À vista ${brl(m.preco)}</span>`:''}</p>
    ${sc?`<button class="btn red" onclick="openM(${i},'con')">Planos de consórcio</button>`:`<button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button>
    <div class="two"><button class="btn" onclick="openM(${i},'con')">Consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div>`}</div></article>`}).join('')
-   ||`<div class="empty"><b>${FV?'Você ainda não favoritou nenhuma moto':BG?'Nenhuma moto com parcela nesse valor':'Nenhuma moto encontrada'}</b>${FV?'Toque no ♥ das motos que gostar para comparar depois.':'Tente outro nome, categoria ou valor.'}<br><button class="btn red" onclick="Q='';C='Todas';home()">Ver todas as motos</button></div>`;
+   ||`<div class="empty"><b>Nenhuma moto encontrada</b>Tente outro nome ou escolha outra categoria.<br><button class="btn red" onclick="Q='';C='Todas';home()">Ver todas as motos</button></div>`;
   const n=$('#nc');if(n)n.textContent=L.length+(L.length===1?' moto':' motos');
 }
 if(matchMedia('(hover:hover)').matches){
@@ -513,7 +543,9 @@ function shareM(){const m=L[cur],u=location.origin+location.pathname+'#moto='+m.
   if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
   else navigator.clipboard.writeText(u).then(()=>toast('Link copiado!'))}
 addEventListener('popstate',()=>{document.querySelectorAll('.lb').forEach(x=>x.remove());$('#modal').style.display='none'});
-addEventListener('keydown',e=>{if(e.key==='Escape'){const l=document.querySelectorAll('.lb');l.length?l[l.length-1].remove():closeM()}});
+addEventListener('keydown',e=>{if(e.key==='Escape'){const l=document.querySelectorAll('.lb');l.length?l[l.length-1].remove():closeM();return}
+  const t=e.target;if((e.key==='Enter'||e.key===' ')&&t.matches&&t.matches('b[role=button]')){e.preventDefault();t.click();return}
+  if($('#modal').style.display==='block'&&$('#gm')&&!/INPUT|TEXTAREA|SELECT/.test(t.tagName)&&(e.key==='ArrowLeft'||e.key==='ArrowRight'))gal(e.key==='ArrowRight'?1:-1)});
 /* fechar tocando fora + foto do vendedor ampliada */
 function fotoV(){if(!V.foto_url||document.querySelector('.lb.fv'))return;const d=document.createElement('div');d.className='lb fv';d.setAttribute('role','dialog');d.setAttribute('aria-label','Foto do vendedor');
   d.innerHTML=`<img src="${esc(V.foto_url)}" alt="${esc(V.nome)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
@@ -536,13 +568,14 @@ function pdView(){
   const nm={todos:'Todos',novo:'Novos',atendimento:'Em atendimento',concluido:'Concluídos',cancelado:'Cancelados',incompleto:'Incompletos'};
   const f=PD.filter(p=>PF==='todos'?true:PF==='incompleto'?!p.completo:p.completo&&p.status===PF);
   const row=(k,v)=>v?`<div class="pdr"><span>${k}</span><b>${v}</b></div>`:'';
-  $('#pn').innerHTML=`<div class="pdf"><button onclick="pPedidos()">↻ Atualizar</button><button onclick="csvP()">⬇ Exportar CSV</button></div><div class="pdf">${Object.keys(nm).map(k=>`<button class="${PF===k?'on':''}" onclick="PF='${k}';pdView()">${nm[k]} (${c[k]||0})</button>`).join('')}</div>`+
+  const hj=PD.filter(p=>p.completo&&new Date(p.created_at).toDateString()===new Date().toDateString()).length,nb=$('#nb');if(nb){nb.hidden=!c.novo;nb.textContent=c.novo||''}
+  $('#pn').innerHTML=`<div class="kp"><div class="n"><b>${c.novo}</b><span>novos</span></div><div><b>${hj}</b><span>hoje</span></div><div><b>${PD.filter(p=>p.completo).length}</b><span>completos</span></div></div><div class="pdf">${Object.keys(nm).map(k=>`<button class="${PF===k?'on':''}" onclick="PF='${k}';pdView()">${nm[k]} (${c[k]||0})</button>`).join('')}<button onclick="pPedidos()">↻ Atualizar</button></div>`+
   (f.map(p=>{const n=p.nome_completo||p.nome||'Cliente',tel=String(p.telefone||'').replace(/\D/g,'');
    return `<div class="pd ${p.completo?'':'inc'}"><div class="pdh"><div><b>${esc(p.moto_nome||'Moto não informada')}</b><small>${new Date(p.created_at).toLocaleString('pt-BR')}${p.completo?'':' · conversa incompleta'}</small></div><span class="pdb s-${esc(p.status)}">${esc(PST[p.status]||p.status)}</span></div>
    <div class="pdg">${row('Modalidade',esc(({consorcio:'Consórcio',financiamento:'Financiamento',avista:'À vista',cartao:'Cartão de crédito'})[p.pagamento]||''))}${row('Cliente',esc(n))}${row('WhatsApp',esc(p.telefone||''))}${row('CPF',esc(pCpf(p.cpf)))}${row('Nascimento',esc(p.nascimento||''))}${row('Entrada',esc(p.entrada||''))}${row('Parcela desejada',esc(p.parcela||''))}${row('Forma de pagamento',esc(p.forma_pagamento||''))}${row('Moto na troca',esc(p.troca||''))}${row('Parcelamento',esc(p.parcelamento_cartao||''))}${row('Habilitação',esc(p.habilitacao||''))}</div>
    ${p.mensagem?`<details><summary>Mensagem enviada ao WhatsApp</summary><pre>${esc(p.mensagem)}</pre></details>`:''}
-   <div class="pda"><select onchange="pdSt('${p.id}',this.value)" aria-label="Status">${Object.keys(PST).map(k=>`<option value="${k}" ${p.status===k?'selected':''}>${PST[k]}</option>`).join('')}</select>${tel?`<a class="btn red" target="_blank" rel="noopener" href="https://wa.me/${tel}?text=${encodeURIComponent(`Olá ${n.split(' ')[0]}! Aqui é ${V.nome}. Recebi seu pedido da ${p.moto_nome||'moto'} e vou te ajudar com as melhores condições.`)}">Responder</a>`:''}<button class="btn" onclick="pdDel('${p.id}')">Excluir</button></div></div>`}).join('')||'<p class="mu">Nenhum pedido aqui ainda.</p>')}
-async function pdSt(id,v){await sb.from('pedidos_chat').update({status:v}).eq('id',id);const p=PD.find(x=>x.id===id);if(p)p.status=v;pdView();badge()}
+   <div class="pda"><select onchange="pdSt('${p.id}',this.value)" aria-label="Status">${Object.keys(PST).map(k=>`<option value="${k}" ${p.status===k?'selected':''}>${PST[k]}</option>`).join('')}</select>${tel?`<a class="btn red" target="_blank" rel="noopener" href="https://wa.me/${tel}">WhatsApp</a>`:''}<button class="btn" onclick="pdDel('${p.id}')">Excluir</button></div></div>`}).join('')||'<p class="mu">Nenhum pedido aqui ainda.</p>')}
+async function pdSt(id,v){await sb.from('pedidos_chat').update({status:v}).eq('id',id);const p=PD.find(x=>x.id===id);if(p)p.status=v;pdView()}
 async function pdDel(id){if(!confirm('Excluir este pedido?'))return;await sb.from('pedidos_chat').delete().eq('id',id);PD=PD.filter(x=>x.id!==id);pdView()}
 
 /* ===== VENDEDOR VIRTUAL: chat guiado (sem IA, só programação) ===== */
@@ -567,7 +600,7 @@ const nasc=v=>{const d=dg(v);if(d.length!==8)return{err:'Digite a data no format
 
 const ST={
 nome:{q:()=>'Qual o seu nome?',ph:'Digite seu nome',run(v){const n=cap(v);if(n.length<2||/\d/.test(n))return{err:'Digite seu nome, por favor 🙂'};return{show:n,set:{nome:n,primeiro:n.split(' ')[0]},next:'tel'}}},
-tel:{q:()=>'Qual seu WhatsApp com DDD?',ph:'(00) 00000-0000',mode:'tel',mask:'tel',run(v){let d=dg(v);if(d.length>11&&d.startsWith('55'))d=d.slice(2);if(d.length<10||d.length>11||(d.length===11&&d[2]!=='9'))return{err:'Esse número não parece válido. Digite com DDD, por exemplo (69) 98467-9744.'};const pm=CH.pre&&motos().find(x=>x.id===CH.pre);return{show:fTel(d),set:{tel:'55'+d,...(pm?{moto:pm.nome,motoId:pm.id}:{})},say:pm?()=>[img0(pm)?{img:img0(pm)}:null,`Vi que você curtiu a ${pm.nome}. Ótima escolha!`].filter(Boolean):undefined,next:pm?'pag':'moto'}}},
+tel:{q:()=>'Qual seu WhatsApp com DDD?',ph:'(00) 00000-0000',mode:'tel',mask:'tel',run(v){let d=dg(v);if(d.length>11&&d.startsWith('55'))d=d.slice(2);if(d.length<10||d.length>11||(d.length===11&&d[2]!=='9'))return{err:'Esse número não parece válido. Digite com DDD, por exemplo (69) 98467-9744.'};return{show:fTel(d),set:{tel:'55'+d},say:()=>CH.ans.motoId?[`Ótimo! Vou anotar seu interesse na ${CH.ans.moto}.`]:[],next:CH.ans.motoId?'pag':'moto'}}},
 moto:{q:a=>a.cand?'Encontrei mais de uma. Qual delas?':`${pn()}, qual moto Honda do seu interesse?`,ph:'Digite ou toque na moto',opts:a=>(a.cand?a.cand:motos().map(m=>m.nome)).slice(0,40),run(v){if(norm(v).length<2)return{err:'Me diga qual moto você quer 🙂'};const r=achar(v);
  if(r.length>1&&r.length<=10)return{say:()=>[],next:'moto',_c:r};
  if(r.length===1||r.length>10&&0){const m=r[0],p=(m.planos||[]).map(x=>x.valor).filter(x=>x>0),mn=p.length?Math.min(...p):0;return{show:m.nome,set:{moto:m.nome,motoId:m.id,cand:null},say:()=>[img0(m)?{img:img0(m)}:null,`Boa escolha, ${pn()}! A ${m.nome} é uma ótima opção.`,mn?`O consórcio dela começa em ${brl(mn)} por mês.`:null].filter(Boolean),next:'pag'}}
@@ -616,7 +649,7 @@ async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={
 async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd=a.pag==='financiamento'||a.pag==='consorcio';CH.saved=true;sync(true);
  if(await say([nd?`Fechado, ${pn()}! Recebi seus dados para a pré-análise. O resultado final é passado pelo vendedor.`:`Fechado, ${pn()}! Já anotei tudo por aqui. O vendedor te passa os valores e as condições.`,'Clique no botão abaixo para continuar com o vendedor pelo WhatsApp.',{wa:m}])===false)return;opts(['Nova conversa']);CH.step='fim';chBk()}
 function partial(){}
-function start(){CH.tk++;CH.id=uid();CH.ans={};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo à ${esc(cf('loja')||EMP)}! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
+function start(){CH.tk++;CH.id=uid();const pm=CH.pre&&motos().find(m=>m.id===CH.pre);CH.pre=null;CH.ans=pm?{moto:pm.nome,motoId:pm.id}:{};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo à ${esc(EMP)}! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
 function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend',`<div class="chbd" id="chbd"></div><div class="ch" id="ch" role="dialog" aria-label="Chat com o vendedor"><div class="chh"><button class="chb" id="chbk" type="button" aria-label="Voltar uma pergunta" title="Voltar">‹</button>${avH()}<div><b>${esc(V.nome)}</b><small><i></i>Online agora</small></div><button class="chb" id="chrs" type="button" aria-label="Recomeçar" title="Recomeçar">↻</button><button class="chb" id="chx" type="button" aria-label="Fechar">✕</button></div><div class="chl" id="chl" aria-live="polite"></div><div class="chq" id="chq"></div><form class="chf" id="chf" autocomplete="off"><input id="chi" placeholder="Digite aqui" enterkeyhint="send" aria-label="Sua resposta"><button>Enviar</button></form></div>`);
  $c('chf').onsubmit=e=>{e.preventDefault();submit($c('chi').value)};
  $c('chq').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=CH.opts[+b.dataset.i];if(CH.step==='fim'){start();return}submit(v)};
@@ -624,48 +657,10 @@ function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend'
  $c('chbk').onclick=()=>{if(CH.busy||CH.hist.length<2||CH.step==='fim')return;CH.tk++;CH.hist.pop();const h=CH.hist.pop(),l=$c('chl');while(l.children.length>h.n)l.lastChild.remove();CH.ans={...h.ans};CH.busy=false;ask(h.id)};
  $c('chi').oninput=function(){const s=ST[CH.step],k=s&&s.mask;if(!k)return;let d=dg(this.value);if(k==='tel'){if(d.length>11&&d.startsWith('55'))d=d.slice(2);this.value=fTel(d.slice(0,11))}else if(k==='cpf')this.value=fCpf(d.slice(0,11));else this.value=fNas(d.slice(0,8))};
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$c('ch').classList.contains('on'))close()});addEventListener('pagehide',partial)}
-function open(e,id){if(e&&e.preventDefault)e.preventDefault();build();if(id){CH.pre=id;if(CH.started&&CH.ans.motoId!==id)CH.started=false}$c('ch').classList.add('on');document.body.classList.add('chopen');if(innerWidth<=720)document.documentElement.style.overflow='hidden';if(!CH.started)start();return false}
+function open(e,id){if(e&&e.preventDefault)e.preventDefault();build();$c('ch').classList.add('on');document.body.classList.add('chopen');if(innerWidth<=720)document.documentElement.style.overflow='hidden';if(id&&M.some(m=>m.id===id)){if(!CH.started||CH.step==='fim'||CH.ans.motoId!==id){CH.pre=id;start()}}else if(!CH.started)start();return false}
 function close(){const c=$c('ch');if(c)c.classList.remove('on');document.body.classList.remove('chopen');document.documentElement.style.overflow='';partial()}
 window.chatOpen=open;window.chatClose=close;
 })();
-
-/* ===== V3: personalização, favoritos, painel do vendedor ===== */
-const cf=k=>(V.config||{})[k];
-let FAVS=(()=>{try{return JSON.parse(localStorage.getItem('fav')||'[]')}catch(e){return[]}})();
-function theme(){const c=cf('cor')||'#c80000',s=document.documentElement.style;s.setProperty('--r',c);s.setProperty('--r1',`color-mix(in srgb,${c},#fff 14%)`);s.setProperty('--r2',`color-mix(in srgb,${c},#000 22%)`)}
-const avisoH=()=>cf('aviso')?`<div class="avs">${esc(cf('aviso'))}</div>`:'';
-function abertoH(){const a=+cf('h_ini'),f=+cf('h_fim');if(!a||!f)return'';const n=new Date(new Date().toLocaleString('en-US',{timeZone:cf('fuso')||'America/Rio_Branco'})),d=n.getDay(),h=n.getHours()+n.getMinutes()/60,fe=d===6?+cf('h_sab')||0:d===0?0:f,ab=fe&&h>=a&&h<fe;return`<span class="ab ${ab?'on':''}"><i></i>${ab?`Atendendo agora · até ${fe}h`:'Fora do horário · respondo assim que abrir'}</span>`}
-const infoH=()=>cf('endereco')?`<br><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cf('endereco'))}" target="_blank" rel="noopener">📍 ${esc(cf('endereco'))}</a>`:'';
-function fltH(){SO='rel';BG=0;FV=0;return`<div class="flt"><select id="so" aria-label="Ordenar" onchange="SO=this.value;lista()"><option value="rel">Ordenar</option><option value="menor">Menor parcela</option><option value="maior">Maior parcela</option><option value="az">A–Z</option></select><input id="bg" inputmode="numeric" placeholder="Parcela até R$" aria-label="Parcela máxima" oninput="msk(this,'rs');BG=this.value.replace(/[^0-9]/g,'')/100;lista()"><button class="chip" id="fvb" aria-label="Favoritas" onclick="FV=!FV;this.classList.toggle('on',FV);lista()">♥ <span id="fvn">${FAVS.length}</span></button></div>`}
-function fav(id,ev){ev.stopPropagation();const i=FAVS.indexOf(id);i<0?FAVS.push(id):FAVS.splice(i,1);try{localStorage.setItem('fav',JSON.stringify(FAVS))}catch(e){}ev.currentTarget.classList.toggle('on',i<0);const n=$('#fvn');if(n)n.textContent=FAVS.length;if(FV)lista()}
-async function badge(){try{const{count}=await sb.from('pedidos_chat').select('id',{count:'exact',head:true}).eq('completo',true).eq('status','novo');const e=$('#bd_pedidos');if(e)e.textContent=count||''}catch(e){}}
-async function pResumo(){
-  $('#pn').innerHTML='<p class="mu">Carregando…</p>';
-  const[p,l]=await Promise.all([sb.from('pedidos_chat').select('moto_nome,status,completo,created_at').limit(1000),sb.from('leads').select('moto_nome,created_at').limit(1000)]);
-  const P=(p.data||[]).filter(x=>x.completo),Ls=l.data||[],w=Date.now()-6048e5,n7=[...P,...Ls].filter(x=>new Date(x.created_at)>w).length,st=k=>P.filter(x=>x.status===k).length,rk={};
-  [...P,...Ls].forEach(x=>{if(x.moto_nome)rk[x.moto_nome]=(rk[x.moto_nome]||0)+1});
-  const top=Object.entries(rk).sort((a,b)=>b[1]-a[1]).slice(0,5),mx=top[0]?top[0][1]:1,sf=M.filter(m=>!(m.fotos||[]).length),sp=M.filter(m=>m.ativo&&!soCon(m)&&!(m.planos||[]).length),inc=(p.data||[]).filter(x=>!x.completo).length,url=location.origin+location.pathname;
-  const kp=(v,t,c)=>`<div class="kp ${c||''}"><b>${v}</b><span>${t}</span></div>`;
-  $('#pn').innerHTML=`<div class="kps">${kp(st('novo'),'pedidos novos',st('novo')?'hot':'')}${kp(st('atendimento'),'em atendimento')}${kp(n7,'contatos nos últimos 7 dias')}${kp(M.filter(m=>m.ativo).length+'/'+M.length,'motos visíveis no site')}</div>
-  <h3 class="ft">Motos mais procuradas</h3>${top.map(([k,v])=>`<div class="rk"><i style="width:${v/mx*100}%"></i><span>${esc(k)}</span><b>${v}</b></div>`).join('')||'<p class="mu">Ainda sem dados.</p>'}
-  <h3 class="ft">Para ajustar</h3>${[sf.length&&`${sf.length} moto(s) sem foto`,sp.length&&`${sp.length} moto(s) visíveis sem plano de consórcio`,inc&&`${inc} conversa(s) do chat não terminadas: vale chamar esses clientes`].filter(Boolean).map(t=>`<div class="hw">⚠ ${t}</div>`).join('')||'<div class="hw">✅ Tudo certo por aqui.</div>'}
-  <button class="btn wa" onclick="window.open('https://wa.me/?text='+encodeURIComponent('Confira minhas motos: ${url}'))">Compartilhar meu site no WhatsApp</button>
-  <button class="btn" onclick="navigator.clipboard.writeText('${url}').then(()=>toast('Link copiado!'))">Copiar link do site</button>`}
-const COR=['#c80000','#e8452f','#1d4ed8','#0f766e','#7c3aed','#111827'];
-const cs=(k,v)=>{V.config={...(V.config||{}),[k]:v};if(k==='cor')theme()};
-function pAparencia(){
-  const c=V.config||{},f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(c[k]??'')}" placeholder="${ph||''}" oninput="cs('${k}',this.value)">`,n=(k,ph)=>`<input type="number" min="0" max="24" placeholder="${ph}" value="${c[k]??''}" oninput="cs('${k}',this.value)">`;
-  $('#pn').innerHTML=`<label class="l">Cor principal do site</label><div class="sw">${COR.map(x=>`<button type="button" style="background:${x}" aria-label="${x}" onclick="cs('cor','${x}');pAparencia()"></button>`).join('')}<input type="color" value="${c.cor||'#c80000'}" aria-label="Escolher outra cor" oninput="cs('cor',this.value)"></div>
-  ${f('loja','Nome da loja (aparece no chat)','Ex: STAR MOTOS')}${f('aviso','Aviso no topo do site (vazio = oculto)','Ex: 🔥 Feirão: entrada facilitada até domingo!')}${f('bolha','Texto do botão flutuante','Estou online. Fale agora!')}${f('endereco','Endereço da loja (abre no Google Maps)','Rua, número, cidade')}
-  <label class="l">Horário de atendimento em hora cheia (abre, fecha, sábado fecha; 0 = não abre aos sábados)</label><div class="pr">${n('h_ini','Abre')}${n('h_fim','Fecha')}${n('h_sab','Sáb fecha')}</div>
-  <button class="btn red" onclick="saveC()">Salvar aparência</button><a class="btn" href="#" target="_blank">Ver o site</a>`}
-async function saveC(){const{error}=await sb.from('vendedor').upsert({id:1,...V});toast(error?'Erro: '+error.message+' (rode o SQL atualizado)':'Aparência salva!')}
-const motoTop=()=>`<div class="pr"><button class="btn red" style="margin:8px 8px 0 0;width:auto;white-space:nowrap" onclick="edit()">+ Nova moto</button><input placeholder="Buscar moto" aria-label="Buscar moto" oninput="mq(this.value)"></div>`;
-const mq=v=>{v=v.toLowerCase();document.querySelectorAll('#pn .it[data-s]').forEach(e=>e.style.display=e.dataset.s.includes(v)?'':'none')};
-const motoList=()=>M.map((m,i)=>`<div class="it" data-s="${esc((m.nome+' '+(m.categoria||'')).toLowerCase())}">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.categoria||'')}${m.ativo?'':' · oculta'}${img0(m)?'':' · sem foto'}${(m.planos||[]).length?'':' · sem plano'}</small></div><div class="ac"><button onclick="mv('${m.id}',-1)" ${i?'':'disabled'} aria-label="Subir">↑</button><button onclick="mv('${m.id}',1)" ${i<M.length-1?'':'disabled'} aria-label="Descer">↓</button><button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="dup('${m.id}')">Duplicar</button><button onclick="del('${m.id}')">Excluir</button></div></div>`).join('');
-async function mv(id,d){const i=M.findIndex(x=>x.id===id),j=i+d;if(j<0||j>=M.length)return;[M[i],M[j]]=[M[j],M[i]];const ch=M.filter((x,k)=>x.ordem!==k);M.forEach((x,k)=>x.ordem=k);pMotos();await Promise.all(ch.map(x=>sb.from('motos').update({ordem:x.ordem}).eq('id',x.id)))}
-async function dup(id){const{id:_i,created_at:_c,...m}=M.find(x=>x.id===id);const{data,error}=await sb.from('motos').insert({...m,nome:m.nome+' (cópia)',ativo:false,ordem:M.length}).select().single();if(error)return toast('Erro: '+error.message);M.push(data);edit(data.id)}
-function csvP(){const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',r=PD.map(p=>[new Date(p.created_at).toLocaleString('pt-BR'),p.status,p.completo?'sim':'não',p.moto_nome,p.pagamento,p.nome_completo||p.nome,p.telefone,p.cpf,p.nascimento,p.entrada,p.parcela].map(q).join(';')),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+['Data;Status;Completo;Moto;Modalidade;Nome;WhatsApp;CPF;Nascimento;Entrada;Parcela',...r].join('\n')],{type:'text/csv'}));a.download='pedidos.csv';a.click()}
 
 init();
 </script>
