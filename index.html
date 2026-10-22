@@ -449,10 +449,10 @@ async function up(file){file=await shrink(file);
 }
 function adm(t){
   if(t)T=t;
-  const tabs=['resumo','pedidos','motos','leads','site','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',site:'Site',perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
+  const tabs=['resumo','vendas','pedidos','motos','leads','site','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',vendas:'Vendas',site:'Site',perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
   $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
   <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
-  ({resumo:pResumo,site:pSite,perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
+  ({resumo:pResumo,vendas:pVendas,site:pSite,perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
 }
 function pPerfil(){
   $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
@@ -753,6 +753,48 @@ function ldView(){
   <div class="pdg">${dr('Telefone',l.telefone)}${dr('CPF',l.cpf)}${dr('Nascimento',l.nascimento)}${dr('Entrada',l.entrada)}${dr('Habilitação',l.habilitacao)}</div>${l.detalhes?`<details><summary>Detalhes</summary><pre>${esc(l.detalhes)}</pre></details>`:''}
   <div class="pda">${w?`<a class="btn red" target="_blank" rel="noopener" href="${w}">WhatsApp</a>`:''}${st?`<button class="btn" onclick="ldSt('${l.id}','${k==='novo'?'atendido':'novo'}')">${k==='novo'?'Marcar como atendido':'Reabrir'}</button>`:''}<button class="btn" onclick="delL('${l.id}')">Excluir</button></div></div>`}).join('')||'<p class="mu">Nenhum contato aqui ainda.</p>')}
 async function ldSt(id,v){const{error}=await sb.from('leads').update({status:v}).eq('id',id);if(error)return toast('Erro: '+error.message);const l=LD.find(x=>x.id===id);if(l)l.status=v;ldView()}
+/* ===== VENDAS: tudo que os clientes preencheram NESTE site (o banco só entrega as linhas deste vendedor) ===== */
+let VD=[],VF='todos',VQ='';
+const VSRC={chat:'Chat',ficha:'Ficha CDC',contrato:'Pré-contrato CNH',contato:'Contatos'};
+const VTAB={chat:'pedidos_chat',ficha:'fichas',contrato:'contratos',contato:'leads'};
+const VST={chat:{novo:'Novo',atendimento:'Em atendimento',concluido:'Concluído',cancelado:'Cancelado'},
+ ficha:{novo:'Novo',em_analise:'Em análise',aprovado:'Aprovado',recusado:'Recusado'},
+ contrato:{novo:'Novo',em_analise:'Em análise',contrato_enviado:'Contrato enviado',assinado:'Assinado',recusado:'Recusado'},
+ contato:{novo:'Novo',atendido:'Atendido'}};
+const VCL={novo:'s-novo',atendimento:'s-atendimento',em_analise:'s-atendimento',contrato_enviado:'s-atendimento',concluido:'s-concluido',atendido:'s-concluido',aprovado:'s-concluido',assinado:'s-concluido',cancelado:'s-cancelado',recusado:'s-cancelado'};
+const VLB={tipo:'Tipo',pagamento:'Modalidade',telefone:'Telefone',email:'E-mail',cpf:'CPF',rg:'RG',rg_emissao:'Emissão do RG',nascimento:'Nascimento',cidade_nascimento:'Cidade de nascimento',pai:'Pai',mae:'Mãe',cep:'CEP',rua:'Rua',numero:'Número',bairro:'Bairro',cidade:'Cidade',estado:'Estado',telefone_recado:'Telefone de recado',ref_nome:'Referência',ref_telefone:'Tel. da referência',ocupacao:'Ocupação',renda:'Renda',entrada:'Entrada',parcela:'Parcela desejada',forma_pagamento:'Forma de pagamento',troca:'Moto na troca',parcelamento_cartao:'Parcelamento',habilitacao:'Habilitação',lance:'Lance',lance_valor:'Valor do lance'};
+const VPG={consorcio:'Consórcio',financiamento:'Financiamento',avista:'À vista',cartao:'Cartão de crédito'};
+const vdNovo=x=>(x.status||'novo')==='novo'&&(x._s!=='chat'||x.completo);
+async function pVendas(){
+  $('#pn').innerHTML='<div class="kp kg">'+'<div class="sk" style="height:84px"></div>'.repeat(3)+'</div>';
+  const q=t=>sb.from(t).select().order('created_at',{ascending:false}).limit(300);
+  const r=await Promise.all([q('pedidos_chat'),q('fichas'),q('contratos'),q('leads')]);
+  if(r.every(x=>x.error)){$('#pn').innerHTML='<p class="mu">Não consegui carregar as vendas. Rode o SQL atualizado no Supabase e recarregue a página.</p>';return}
+  const tag=(x,k)=>(x.data||[]).map(o=>({...o,_s:k}));
+  VD=[...tag(r[0],'chat'),...tag(r[1],'ficha'),...tag(r[2],'contrato'),...tag(r[3],'contato')].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  $('#pn').innerHTML='<div id="vdk"></div><div class="pdf" id="vdf"></div><input type="search" id="vdq" placeholder="Buscar por nome, telefone, CPF ou moto" value="'+esc(VQ)+'" oninput="VQ=this.value;vdView()" style="margin-bottom:12px"><div id="vdl"></div>';
+  vdView()}
+function vdView(){
+  const nz=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),q=nz(VQ).trim();
+  const c={todos:VD.length,novos:VD.filter(vdNovo).length};Object.keys(VSRC).forEach(k=>c[k]=VD.filter(x=>x._s===k).length);
+  const fl=[['todos','Todos'],['novos','Novos'],...Object.entries(VSRC)];
+  const f=VD.filter(x=>(VF==='todos'||(VF==='novos'?vdNovo(x):x._s===VF))&&(!q||nz([x.nome,x.nome_completo,x.telefone,x.cpf,x.email,x.moto_nome].join(' ')).includes(q)));
+  const hj=VD.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length;
+  $('#vdk').innerHTML=`<div class="kp"><div class="n"><b>${c.novos}</b><span>novos</span></div><div><b>${hj}</b><span>hoje</span></div><div><b>${c.todos}</b><span>no total</span></div></div>`;
+  $('#vdf').innerHTML=fl.map(o=>`<button class="${VF===o[0]?'on':''}" onclick="VF='${o[0]}';vdView()">${esc(o[1])} (${c[o[0]]||0})</button>`).join('')+'<button onclick="pVendas()">↻ Atualizar</button>';
+  $('#vdl').innerHTML=f.map(vdCard).join('')||'<p class="mu">Nenhuma venda ou preenchimento aqui ainda.</p>'}
+function vdCampos(x){return Object.keys(VLB).filter(k=>x[k]!=null&&String(x[k]).trim()!=='').map(k=>{let v=x[k];if(k==='cpf')v=pCpf(v);else if(k==='pagamento')v=VPG[v]||v;else if(k==='tipo')v=TL[v]||v;return[VLB[k],v]})}
+function vdCard(x){
+  const s=x._s,k=x.status||'novo',stl=VST[s],nm=x.nome_completo||x.nome||'Cliente',w=wlk(x.telefone);
+  return `<div class="pd ${s==='chat'&&!x.completo?'inc':''}"><div class="pdh"><div><b>${esc(nm)}</b><small>${esc(x.moto_nome||'Moto não informada')} · ${new Date(x.created_at).toLocaleString('pt-BR')}${s==='chat'&&!x.completo?' · conversa incompleta':''}</small></div><span class="pdb ${VCL[k]||''}">${esc(VSRC[s])}${'status' in x?' · '+esc(stl[k]||k):''}</span></div>
+  <div class="pdg">${vdCampos(x).map(a=>dr(a[0],a[1])).join('')}</div>
+  ${x.detalhes?`<details><summary>Detalhes</summary><pre>${esc(x.detalhes)}</pre></details>`:''}${x.mensagem?`<details><summary>Mensagem enviada ao WhatsApp</summary><pre>${esc(x.mensagem)}</pre></details>`:''}
+  <div class="pda">${'status' in x?`<select onchange="vdSt('${s}','${x.id}',this.value)" aria-label="Status">${Object.keys(stl).map(o=>`<option value="${o}" ${k===o?'selected':''}>${stl[o]}</option>`).join('')}</select>`:''}${w?`<a class="btn red" target="_blank" rel="noopener" href="${w}">WhatsApp</a>`:''}<button class="btn" onclick="vdCp('${s}','${x.id}')">Copiar dados</button><button class="btn" onclick="vdDel('${s}','${x.id}')">Excluir</button></div></div>`}
+async function vdSt(s,id,v){const{error}=await sb.from(VTAB[s]).update({status:v}).eq('id',id);if(error)return toast('Erro: '+error.message);const x=VD.find(o=>o.id===id&&o._s===s);if(x)x.status=v;vdView()}
+async function vdDel(s,id){if(!confirm('Excluir este registro? Não dá para desfazer.'))return;const{error}=await sb.from(VTAB[s]).delete().eq('id',id);if(error)return toast('Erro: '+error.message);VD=VD.filter(o=>!(o.id===id&&o._s===s));vdView()}
+function vdCp(s,id){const x=VD.find(o=>o.id===id&&o._s===s);if(!x)return;
+  const t=[VSRC[s]+' · '+new Date(x.created_at).toLocaleString('pt-BR'),'Cliente: '+(x.nome_completo||x.nome||''),'Moto: '+(x.moto_nome||''),...vdCampos(x).map(a=>a[0]+': '+a[1]),x.detalhes?'Detalhes: '+x.detalhes:'',x.mensagem?'Mensagem: '+x.mensagem:''].filter(Boolean).join('\n');
+  navigator.clipboard.writeText(t).then(()=>toast('Dados copiados!'),()=>toast('Não foi possível copiar'))}
 function pSite(){
   if(!('config' in V)){$('#pn').innerHTML='<p class="mu">Para personalizar os textos do site, rode o SQL opcional (coluna config) no Supabase e recarregue a página.</p>';return}
   const c=CF(),f=(k,l,ph)=>`<label class="l" for="c_${k}">${l}</label><input id="c_${k}" value="${esc(c[k]||'')}" placeholder="${ph}" maxlength="160">`;
