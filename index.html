@@ -482,7 +482,7 @@ function pMotos(){
   const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0])),sem=M.filter(m=>CAT.some(c=>c[0]===(m.nome||'').trim().toUpperCase())&&!(m.planos||[]).length);
   $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button><input type="search" placeholder="Buscar na lista" oninput="const q=this.value.toLowerCase();document.querySelectorAll('#pn .it[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')">`+M.map(m=>`<div class="it" data-n="${esc((m.nome||'').toLowerCase())}">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small>${(m.fotos||[]).length?'':'<br><small class="w">Sem foto</small>'}${(m.planos||[]).length||m.preco>0?'':'<br><small class="w">Sem planos</small>'}</div>
   <button aria-label="Subir" onclick="mv('${m.id}',-1)">↑</button><button aria-label="Descer" onclick="mv('${m.id}',1)">↓</button><button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="dup('${m.id}')">Duplicar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
-  (sem.length?`<button class="btn or" onclick="aplicarPlanos()">Aplicar planos de consórcio do catálogo (${sem.length} motos sem plano)</button>`:'')+
+  (M.some(m=>!(m.planos||[]).length)?`<button class="btn or" onclick="carregarPlanos()">Carregar planos de consórcio padrão (${M.filter(m=>!(m.planos||[]).length).length} motos sem plano)</button>`:'')+
   (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
   <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
 }
@@ -497,6 +497,7 @@ async function addAll(){
   const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),rows=CAT.filter(c=>!tem.has(c[0])).map((c,k)=>({nome:c[0],categoria:c[1],emplacamento:emp(c),planos:pl(c[3]),ativo:false,ordem:M.length+k}));
   const{data,error}=await sb.from('motos').insert(rows).select();
   if(error)return toast('Erro: '+error.message);M.push(...data);toast(data.length+' motos adicionadas!');pMotos()}
+async function carregarPlanos(){if(!confirm('Carregar os planos de consórcio padrão nas motos que estão sem plano? O que você já alterou não será mexido.'))return;const{data,error}=await sb.rpc('carregar_meus_planos',{p_vendedor:V.id});if(error)return toast('Erro: '+error.message);const{data:mm}=await sb.from('motos').select().order('ordem');if(mm)M=mm;toast('Planos carregados!');pMotos()}
 async function aplicarPlanos(){let n=0;
   for(const m of M){const c=CAT.find(x=>x[0]===(m.nome||'').trim().toUpperCase());if(!c||(m.planos||[]).length)continue;
     const d={planos:pl(c[3]),emplacamento:emp(c)};const{error}=await sb.from('motos').update(d).eq('id',m.id);if(error)return toast('Erro: '+error.message);Object.assign(m,d);n++}
