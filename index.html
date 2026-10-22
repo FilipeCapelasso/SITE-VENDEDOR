@@ -13,7 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
-:root{--r:#c80000;--r2:#a00000;--g:#25ae88;--bg:#fff;--cd:#f8f8f8;--bd:#e6e6e6;--tx:#2b2b33;--mu:#8b8b96}
+:root{--r:#c80000;--r2:#a00000;--g:#25ae88;--bg:#fff;--cd:#f8f8f8;--bd:#e6e6e6;--tx:#2b2b33;--mu:#6a6a75}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--tx);background:var(--bg)}
 .wrap{max-width:560px;margin:0 auto;padding:0 18px 90px}
 .cover{height:110px;background:linear-gradient(135deg,#c80000,#e8452f 60%,#7a0000)}
@@ -75,7 +75,7 @@ details{border:1px solid var(--bd);border-radius:14px;padding:12px 14px;margin:1
 html{scroll-behavior:smooth}
 body{background:var(--paper);-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:Sora,Inter,sans-serif;letter-spacing:-.02em}
-:focus-visible{outline:3px solid #c8000066;outline-offset:2px}
+:focus-visible{outline:3px solid #1d6fe0;outline-offset:2px}
 .hero{position:relative;overflow:hidden;color:#fff;padding:28px 32px 30px;border-radius:0 0 32px 32px;background:radial-gradient(640px 240px at 90% -40%,#c8000050,transparent 70%),linear-gradient(160deg,#1b1b23,#0a0a0e 78%);box-shadow:0 22px 44px -30px #000}
 .glow{position:absolute;width:280px;height:280px;left:-130px;bottom:-190px;background:#c80000;filter:blur(110px);opacity:.26;animation:breathe 7s ease-in-out infinite;pointer-events:none}
 .spd{position:absolute;inset:0;pointer-events:none;overflow:hidden}
@@ -264,6 +264,33 @@ body.chopen .bw{display:none}
 .tabs{position:sticky;top:0;z-index:5;background:var(--paper);padding:8px 0;margin:6px 0}
 .nb{display:inline-block;min-width:20px;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--r);color:#fff;font:700 12px Inter,sans-serif}.tabs .on .nb{background:#fff;color:var(--r)}
 .ad{max-width:880px}.it{background:#fff;flex-wrap:wrap}.it .g{min-width:140px}.it small.w{color:#b56a00;font-weight:600}
+
+/* ===== V4 ===== */
+.tr{display:flex;flex-wrap:wrap;gap:8px 20px;list-style:none;margin:22px 0 0;padding:0}.tr li{display:flex;align-items:center;gap:7px;font:600 13.5px Inter,sans-serif}.tr svg{width:16px;height:16px;color:var(--r);flex:none}
+.av2{background:#fff6dc;color:#5c4200;border-bottom:1px solid #efdca0;padding:10px 20px;text-align:center;font:600 14px/1.4 Inter,sans-serif}
+.sb2{display:inline-block;margin-left:6px;background:var(--r);color:#fff;font:700 12px Inter,sans-serif;padding:3px 10px;border-radius:999px;vertical-align:middle}
+.gw{position:relative;flex:1;min-width:0}
+.ga{position:absolute;top:50%;translate:0 -50%;z-index:2;width:44px;height:44px;border-radius:50%;border:0;background:#ffffffe6;box-shadow:0 4px 14px -4px #0005;font-size:24px;line-height:1;cursor:pointer;color:var(--ink)}.ga.l{left:8px}.ga.r{right:8px}.ga:hover{background:#fff}
+.gc{position:absolute;bottom:10px;right:12px;background:#000a;color:#fff;font:600 12px Inter,sans-serif;padding:3px 10px;border-radius:999px}
+.th img.on{border-color:var(--r)}
+.im.bk .nof{padding:0 12px;text-align:center}
+.fe{display:block;color:#b00020;font-size:12.5px;margin-top:4px}.fe:empty{display:none}
+input[aria-invalid=true],select[aria-invalid=true]{border-color:#b00020;box-shadow:0 0 0 3px #b0002018}
+.lb.pv{z-index:40}
+.skl{display:block;height:22px;border-radius:8px;margin:8px 0;background:linear-gradient(90deg,#ffffff14,#ffffff30,#ffffff14);background-size:200% 100%;animation:sh 1.3s infinite}
+.mb{display:none}
+.tabs{overflow-x:auto;scrollbar-width:none}.tabs .btn{flex:none;width:auto;padding:11px 16px;white-space:nowrap}
+.kg{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+@media(hover:none){.cd:hover{transform:none}.cd:hover .im img{--s:1}}
+@media(max-width:719px){
+.spd{display:none}.glow{animation:none}.bw{display:none}
+.chip{min-height:40px}.hrt{width:42px;height:42px}.two .btn{padding:14px 6px}.ga{width:40px;height:40px}
+#toast{bottom:86px}
+.mb{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:#fffffff2;backdrop-filter:blur(14px);border-top:1px solid var(--bd);box-shadow:0 -10px 30px -16px #0004}
+.mb a,.mb button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:48px;padding:0 6px;border-radius:14px;border:1px solid var(--bd);background:#fff;font:700 14px Inter,sans-serif;color:var(--tx);text-decoration:none;cursor:pointer}
+.mb svg{width:18px;height:18px;flex:none}.mb .mw{background:linear-gradient(135deg,#2bc597,#1f9a76);color:#fff;border-color:transparent}.mb .mr{background:var(--r);color:#fff;border-color:var(--r)}
+body.chopen .mb,body:has(#modal[style*="block"]) .mb{display:none}
+}
 </style>
 </head>
 <body>
@@ -287,7 +314,7 @@ async function guard(s){if(!s)return false;const{data}=await sb.from('vendedores
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-let V={nome:'Vendedor',whatsapp:''},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='pedidos',SO='',FV=(()=>{try{return JSON.parse(localStorage.getItem('fv')||'[]')}catch(e){return[]}})();
+let V={nome:'Vendedor',whatsapp:''},M=[],L=[],A=[],K=[],Q='',C='Todas',G=0,cur=0,E={},T='resumo',SO='',FV=(()=>{try{return JSON.parse(localStorage.getItem('fv')||'[]')}catch(e){return[]}})();
 const toast=t=>{const e=$('#toast');e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',2800)};
 const wa=t=>`https://wa.me/${V.whatsapp}?text=${encodeURIComponent(t)}`;
 const tel=()=>{const n=(V.whatsapp||'').replace(/^55/,'');return n.length>=10?`(${n.slice(0,2)}) ${n.slice(2,-4)}-${n.slice(-4)}`:n};
@@ -303,7 +330,7 @@ const DEMO_M=[
 async function init(){
   if(DEMO){V={nome:'Seu Nome',bio:'Conectando você à sua próxima moto com as melhores condições!',whatsapp:'',instagram:''};M=DEMO_M;
     document.body.insertAdjacentHTML('beforeend','<div style="position:fixed;top:0;left:0;right:0;background:#222;color:#fff;font:600 12px Inter,sans-serif;text-align:center;padding:5px;z-index:40">MODO DEMONSTRAÇÃO – configure o Supabase no início do arquivo</div>');return route()}
-  if(!M.length)$('#app').innerHTML='<div class="hero" style="min-height:230px"></div><div class="wrap" style="padding-top:28px"><div class="grid">'+'<div class="sk"></div>'.repeat(8)+'</div></div>';
+  if(!M.length)$('#app').innerHTML='<div class="hero" style="min-height:230px" aria-busy="true"><div class="hin nl"><div class="ava" style="background:#ffffff1a"></div><div class="idt"><i class="skl" style="width:55%"></i><i class="skl" style="width:80%;height:12px"></i></div></div></div><div class="wrap" style="padding-top:28px"><div class="grid">'+'<div class="sk"></div>'.repeat(8)+'</div></div>';
   const [v,m]=await Promise.all([sb.from('vendedor_publico').select().maybeSingle(),sb.from('motos').select().order('ordem').order('created_at')]);
   if(!v.data||v.data.suspenso)return off(!v.data);V=v.data;M=m.data||[];try{const u=V.logo_url||V.foto_url;if(u){$('#fav').href=u;$('#fav').type=''}}catch(e){}route();
 }
@@ -344,23 +371,23 @@ function home(){
   <div class="ctas"><a class="cta w" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}" onclick="return chatOpen(event)">${IC.wa}Fale comigo</a>${V.instagram?`<a class="cta" target="_blank" rel="noopener" href="https://instagram.com/${esc(V.instagram)}">${IC.ig}Instagram</a>`:''}${V.facebook?`<a class="cta" target="_blank" rel="noopener" href="${esc(fbu(V.facebook))}">${IC.fb}Facebook</a>`:''}</div>
   ${V.logo_url?`<img class="hlogo" src="${esc(V.logo_url)}" alt="Logo da empresa" decoding="async">`:''}
   <div class="stats"><div><b data-n="${AM.length}">${AM.length}</b><span>modelos para escolher</span></div>${mn?`<div><b data-n="${mn}" data-m="1">${brl(mn)}</b><span>parcela de consórcio a partir de</span></div>`:''}</div></div></header>
-  <main class="wrap"><div class="sec"><h2>Escolha sua moto</h2><span class="nc" id="nc"></span></div>
-  <div class="bar"><div class="sb">${IC.se}<input id="q" type="search" placeholder="Buscar moto" aria-label="Buscar moto" autocomplete="off" value="${esc(Q)}" oninput="Q=this.value;lista()"></div>
-  <div class="chips" id="chips">${chipsH()}</div><select class="so" aria-label="Ordenar" onchange="SO=this.value;lista()">${[['','Ordem padrão'],['mn','Menor parcela'],['mx','Maior parcela'],['az','A – Z']].map(o=>`<option value="${o[0]}" ${o[0]===SO?'selected':''}>${o[1]}</option>`).join('')}</select></div><div id="ls" class="grid"></div>${INFO}</main>
-  <footer class="foot2"><b>${esc(V.nome)}</b><br>${tel()}${V.instagram?' · @'+esc(V.instagram):''}
+  ${AVISO()}<main class="wrap" id="catalogo"><ul class="tr"><li>${CK}Atendimento personalizado</li><li>${CK}Simulação rápida</li><li>${CK}Fale diretamente comigo</li></ul><div class="sec"><div><h2>${esc(CF().titulo||"Encontre sua próxima Honda")}</h2><p class="mu" style="margin:4px 0 0;font-size:14px">${esc(CF().sub||"Consórcio, financiamento e condições especiais diretamente com seu vendedor.")}</p></div><span class="nc" id="nc" aria-live="polite"></span></div>
+  <div class="bar"><div class="sb">${IC.se}<input id="q" type="search" placeholder="Buscar moto" aria-label="Buscar moto" autocomplete="off" value="${esc(Q)}" oninput="Q=this.value;listaD()"></div>
+  <div class="chips" id="chips">${chipsH()}</div><select class="so" aria-label="Ordenar" onchange="SO=this.value;lista()">${[['','Ordem padrão'],['mn','Menor parcela'],['mx','Maior parcela'],...(M.some(m=>m.preco>0)?[['pn','Menor preço'],['px','Maior preço']]:[]),['az','A – Z']].map(o=>`<option value="${o[0]}" ${o[0]===SO?'selected':''}>${o[1]}</option>`).join('')}</select></div><div id="ls" class="grid"></div>${INFO}</main>
+  ${MB()}<footer class="foot2"><b>${esc(V.nome)}</b><br>${tel()}${V.instagram?' · @'+esc(V.instagram):''}${CF().horario?`<br>Atendimento: ${esc(CF().horario)}`:''}${CF().endereco?`<br>${esc(CF().endereco)}`:''}
   <div class="fl"><a class="fp" target="_blank" rel="noopener" href="${FICHA_CDC_URL}?v=${SLUG}">Ficha CDC<small>Financiamento</small></a><a class="fp" target="_blank" rel="noopener" href="${FICHA_CNH_URL}?v=${SLUG}">Ficha CNH<small>Consórcio</small></a></div></footer>
   ${bxd?'':`<div class="bw"><a class="bubble" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site.')}" onclick="return chatOpen(event)">${av(V.foto_url)}Estou online. Fale agora!</a><button class="bx" aria-label="Fechar" onclick="try{sessionStorage.setItem('bx',1)}catch(e){}this.closest('.bw').remove()">×</button></div>`}`;
-  lista(1);cnt();
+  lista(1);cnt();seo();
 }
 function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
 function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
 function openM(i,v){
   cur=i;G=0;const m=L[i],f=m.fotos||[];let b='';
   const how=t=>`<div id="hw" class="hw" style="display:none">${t}</div>`;
-  if(v==='det')b=`<div class="gal"><div id="gmain"><img id="gm" src="${esc(f[0]||'')}" onclick="zoom()" alt="${esc(m.nome)}"></div>
-    ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" onclick="gShow(${k})">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
+  if(v==='det')b=`<div class="gal"><div class="gw"><div id="gmain">${f[0]?`<img id="gm" src="${esc(f[0])}" onclick="zoom()" alt="${esc(m.nome)} - foto 1 de ${f.length}" decoding="async">`:'<span class="nof" style="display:block;padding:90px 0;text-align:center">Fotos em breve</span>'}</div>${f.length>1?`<button type="button" class="ga l" onclick="gal(-1)" aria-label="Foto anterior">‹</button><button type="button" class="ga r" onclick="gal(1)" aria-label="Próxima foto">›</button><span class="gc" id="gc" aria-hidden="true">1/${f.length}</span>`:''}</div>
+    ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" data-k="${k}" role="button" tabindex="0" alt="Ver foto ${k+1}" class="${k?'':'on'}" onclick="gShow(${k})" loading="lazy" decoding="async">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
     ${m.preco>0?`<p class="pv">À vista <b>${brl(m.preco)}</b></p>`:''}<div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
-    <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+m.nome+(m.modelo?' '+m.modelo:'')+' e gostaria de saber sobre a compra à vista.')}">Whatsapp</a></div>
+    <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+hn(m)+'. Gostaria de saber mais sobre as condições (compra à vista).')}">Whatsapp</a></div>
     ${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
     <button class="btn" onclick="chatOpen(null,'${m.id}')">Tirar dúvidas no chat com o vendedor</button><button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
   if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
@@ -369,39 +396,40 @@ function openM(i,v){
     <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b><span class="tt">Total aprox. ${brl(x.parcelas*x.valor)}</span></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
     <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
     <button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
-  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div><img src="${esc(f[0]||'')}"></div>
+  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>${f[0]?`<img src="${esc(f[0])}" alt="${esc(m.nome)}" decoding="async">`:''}</div>
     ${how('O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.')}
-    <input id="f_ent" placeholder="Valor de entrada" inputmode="numeric" oninput="msk(this,'rs')"><input id="f_nas" placeholder="Data de Nascimento" inputmode="numeric" oninput="msk(this,'dt')">
-    <input id="f_cpf" placeholder="CPF:" inputmode="numeric" oninput="msk(this,'cpf')"><input id="f_nom" placeholder="Nome:" autocomplete="name"><input id="f_tel" placeholder="Telefone:" inputmode="tel" oninput="msk(this,'tel')">
-    <label class="l" style="margin-bottom:-6px">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
+    ${fld('f_nom','Nome completo','autocomplete="name"')}${fld('f_tel','Telefone com DDD (WhatsApp)','inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000"','tel')}${fld('f_cpf','CPF','inputmode="numeric" placeholder="000.000.000-00"','cpf')}${fld('f_nas','Data de nascimento','inputmode="numeric" autocomplete="bday" placeholder="DD/MM/AAAA"','dt')}${fld('f_ent','Valor de entrada (opcional)','inputmode="numeric" placeholder="Deixe em branco se não tiver"','rs')}
+    <label class="l" for="f_hab">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
     <p class="mu" style="font-size:12px;border-top:1px solid var(--bd);padding-top:12px">Ao enviar, você concorda com nossa <a href="#" onclick="priv();return false">Política de Privacidade</a>.</p>
     <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
-  const mo=$('#modal');if(mo.style.display!=='block')history.pushState({m:1},'');
+  const mo=$('#modal');if(mo.style.display!=='block'){history.pushState({m:1},'');FO=document.activeElement}
   const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
   mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
-  <div class="mt"><h2>${esc(m.nome)}</h2><span><b role="button" tabindex="0" aria-label="Moto anterior" onclick="nav(-1)">‹</b><b role="button" tabindex="0" aria-label="Próxima moto" onclick="nav(1)">›</b><b role="button" tabindex="0" aria-label="Fechar" onclick="closeM()">✕</b></span></div>${b}</div>`;
-  mo.style.display='block';mo.scrollTop=0;bindSwipe();
+  <div class="mt"><div><h2>${esc(m.nome)}</h2><small>${[m.categoria,m.modelo].filter(Boolean).map(esc).join(' · ')}</small>${m.selo?`<span class="sb2">${esc(m.selo)}</span>`:''}</div><span><b role="button" tabindex="0" aria-label="Moto anterior" onclick="nav(-1)">‹</b><b role="button" tabindex="0" aria-label="Próxima moto" onclick="nav(1)">›</b><b role="button" tabindex="0" aria-label="Fechar" onclick="closeM()">✕</b></span></div>${b}</div>`;
+  mo.style.display='block';mo.scrollTop=0;bindSwipe();{const x=mo.querySelector('[aria-label=Fechar]');x&&x.focus({preventScroll:true})}
 }
 const nav=d=>{const j=(cur+d+L.length)%L.length;openM(j,soCon(L[j])?'con':'det')};
 const closeM=()=>history.state&&history.state.m?history.back():$('#modal').style.display='none';
 async function lead(tipo,x={}){const m=L[cur];try{await sb.from('leads').insert({tipo,moto_id:m.id,moto_nome:m.nome,...x})}catch(e){}}
 function conWa(rep){
   const m=L[cur],r=document.querySelector('input[name=pl]:checked'),p=r&&(m.planos||[])[r.value];
-  const t=rep?`Olá! Quero um repasse de consórcio da ${m.nome}.`:`Olá! Tenho interesse no consórcio da ${m.nome}${p?` em ${p.parcelas}x de ${brl(p.valor)}`:''}.`;
+  const t=rep?`Olá! Quero um repasse de consórcio da ${hn(m)}.`:p?`Olá! Tenho interesse na ${hn(m)} no plano de ${p.parcelas} parcelas de ${brl(p.valor)}. Gostaria de fazer uma simulação.`:`Olá! Tenho interesse no consórcio da ${hn(m)}. Gostaria de fazer uma simulação.`;
   lead('consorcio',{detalhes:t});window.open(wa(t),'_blank');
 }
-async function finSend(){
+let fsb=0;
+function finSend(){
+  if(fsb)return;let bad=null;['f_nom','f_tel','f_cpf','f_nas'].forEach(i=>{if(!vf(i)&&!bad)bad=i});
+  if(bad){$('#'+bad).focus();return toast('Confira os campos destacados')}
   const g=i=>$('#'+i).value.trim(),m=L[cur];
-  if(g('f_nom').length<3||g('f_tel').replace(/\D/g,'').length<10)return toast('Preencha nome e telefone com DDD');
   const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value};
-  lead('financiamento',d);
-  const t=`Olá! Quero financiar a ${m.nome}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada}\nPossui habilitação: ${d.habilitacao}`;
+  fsb=1;setTimeout(()=>fsb=0,3000);lead('financiamento',d);
+  const t=`Olá! Quero financiar a ${hn(m)}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada||'Sem entrada'}\nPossui habilitação: ${d.habilitacao}`;
   window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
 }
 
 /* ================= ADMIN ================= */
 function login(){
-  $('#app').innerHTML=`<div class="ad" style="max-width:380px"><h1>Área do vendedor</h1><input id="em" type="email" placeholder="E-mail"><input id="se" type="password" placeholder="Senha">
+  $('#app').innerHTML=`<div class="ad" style="max-width:380px"><h1>Área do vendedor</h1><input id="em" type="email" placeholder="E-mail" aria-label="E-mail" autocomplete="username"><input id="se" type="password" placeholder="Senha" aria-label="Senha" autocomplete="current-password" onkeydown="event.key==='Enter'&&doLogin()">
   <button class="btn red" onclick="doLogin()">Entrar</button><p class="foot"><a href="#">← Voltar ao site</a></p></div>`;
 }
 async function doLogin(){
@@ -421,10 +449,10 @@ async function up(file){file=await shrink(file);
 }
 function adm(t){
   if(t)T=t;
-  const tabs=['pedidos','motos','leads','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
+  const tabs=['resumo','pedidos','motos','leads','site','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',site:'Site',perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
   $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
   <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
-  ({perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
+  ({resumo:pResumo,site:pSite,perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
 }
 function pPerfil(){
   $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
@@ -503,28 +531,23 @@ async function saveM(){
   toast('Moto salva!');await init();adm('motos');
 }
 async function del(id){if(!confirm('Excluir esta moto?'))return;await sb.from('motos').delete().eq('id',id);await init();adm('motos')}
-async function pLeads(){
-  const{data}=await sb.from('leads').select().order('created_at',{ascending:false}).limit(100);
-  $('#pn').innerHTML=(data||[]).map(l=>`<div class="it"><div class="g"><b>${esc(l.nome||'Cliente')}</b> · ${esc(l.tipo)}<br><small>${esc(l.moto_nome||'')} · ${new Date(l.created_at).toLocaleString('pt-BR')}</small>
-  <br><small>${esc(l.telefone||'')} ${esc(l.cpf?'CPF '+l.cpf:'')} ${esc(l.entrada?'Entrada '+l.entrada:'')}</small><br><small style="white-space:pre-line">${esc(l.detalhes||'')}</small></div>${wlk(l.telefone)?`<a class="sm" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" href="${wlk(l.telefone)}">WhatsApp</a>`:''}<button onclick="delL('${l.id}')">Excluir</button></div>`).join('')||'<p class="mu">Nenhum contato ainda.</p>';
-}
 const wlk=t=>{const d=String(t||'').replace(/\D/g,'').replace(/^55(?=\d{10,11}$)/,'');return d.length>=10?'https://wa.me/55'+d:''};
-async function delL(id){await sb.from('leads').delete().eq('id',id);pLeads()}
+async function delL(id){if(!confirm('Excluir este contato?'))return;await sb.from('leads').delete().eq('id',id);pLeads()}
 const minP=m=>(m.planos||[]).filter(p=>p.valor>0).sort((a,b)=>a.valor-b.valor)[0];
 function lista(an){
-  const q=Q.toLowerCase();
-  L=A.filter(m=>(C==='Todas'||(C===FVC?FV.includes(m.id):m.categoria===C))&&((m.nome||'')+' '+(m.modelo||'')+' '+(m.categoria||'')).toLowerCase().includes(q));
-  if(SO)L.sort((a,b)=>SO==='az'?a.nome.localeCompare(b.nome):SO==='mx'?(minP(b)?.valor||0)-(minP(a)?.valor||0):(minP(a)?.valor||1e9)-(minP(b)?.valor||1e9));
+  const q=nz(Q);
+  L=A.filter(m=>(C==='Todas'||(C===FVC?FV.includes(m.id):m.categoria===C))&&nz((m.nome||'')+' '+(m.modelo||'')+' '+(m.categoria||'')+' '+(m.selo||'')).includes(q));
+  if(SO)L.sort((a,b)=>SO==='az'?a.nome.localeCompare(b.nome):SO==='mx'?(minP(b)?.valor||0)-(minP(a)?.valor||0):SO==='pn'?(a.preco>0?a.preco:1e12)-(b.preco>0?b.preco:1e12):SO==='px'?(b.preco||0)-(a.preco||0):(minP(a)?.valor||1e9)-(minP(b)?.valor||1e9));
   L=[...L.filter(m=>!soCon(m)),...L.filter(soCon)];
   const fm=L.findIndex(soCon),dv=fm>0;
   const g=$('#ls');g.className='grid'+(an?' an':'');
   g.innerHTML=L.map((m,i)=>{const p=minP(m),sc=soCon(m),vw=sc?'con':'det';return `${dv&&i===fm?'<div class="dvs" role="separator"><span>Motores e Máquinas</span></div>':''}<article class="cd" style="--i:${Math.min(i,11)}"><button class="hrt${FV.includes(m.id)?' on':''}" aria-label="Favoritar ${esc(m.nome)}" aria-pressed="${FV.includes(m.id)}" onclick="fav('${m.id}',this)">♥</button>${m.selo?`<span class="selo">${esc(m.selo)}</span>`:''}
-   <div class="im${sc?' mm':''}" onclick="openM(${i},'${vw}')">${img0(m)?`<img src="${esc(img0(m))}" alt="${esc(m.nome)}" ${i<2?'fetchpriority="high"':'loading="lazy"'} decoding="async" onload="this.classList.add('ok')" onerror="this.style.visibility='hidden'">`:'<span class="nof">Foto em breve</span>'}</div>
+   <div class="im${sc?' mm':''}" onclick="openM(${i},'${vw}')">${img0(m)?`<img src="${esc(img0(m))}" alt="${esc(m.nome)}" ${i<2?'fetchpriority="high"':'loading="lazy"'} decoding="async" onload="this.classList.add('ok')" onerror="imgErr(this)">`:'<span class="nof">Foto em breve</span>'}</div>
    <div class="cb"><small>${esc(m.categoria)}</small><h3>${esc(m.nome)}</h3>
    <p class="par">${p?`Consórcio a partir de<b>${p.parcelas}x ${brl(p.valor)}</b>`:'Consulte as condições'}${m.preco>0?`<span class="av">À vista ${brl(m.preco)}</span>`:''}</p>
    ${sc?`<button class="btn red" onclick="openM(${i},'con')">Planos de consórcio</button>`:`<button class="btn red" onclick="openM(${i},'det')">Detalhes da moto</button>
    <div class="two"><button class="btn" onclick="openM(${i},'con')">Consórcio</button><button class="btn" onclick="openM(${i},'fin')">Financiamento</button></div>`}</div></article>`}).join('')
-   ||`<div class="empty"><b>Nenhuma moto encontrada</b>Tente outro nome ou escolha outra categoria.<br><button class="btn red" onclick="Q='';C='Todas';home()">Ver todas as motos</button></div>`;
+   ||`<div class="empty"><b>Não encontramos nenhuma moto com essa busca.</b>Tente outro nome ou escolha outra categoria.<br><button class="btn red" onclick="limpar()">Limpar filtros</button></div>`;
   const n=$('#nc');if(n)n.textContent=L.length+(L.length===1?' moto':' motos');
 }
 if(matchMedia('(hover:hover)').matches){
@@ -538,7 +561,7 @@ function msk(e,t){let v=e.value.replace(/\D/g,'');
   if(t==='dt')v=v.slice(0,8).replace(/(\d{2})(\d)/,'$1/$2').replace(/(\d{2})(\d)/,'$1/$2');
   if(t==='rs')v=v?brl(v/100):'';
   e.value=v}
-function gShow(k){const f=L[cur].fotos||[];G=k;$('#gmain').innerHTML=`<img id="gm" src="${esc(f[k]||'')}" onclick="zoom()">`;bindSwipe()}
+function gShow(k){const m=L[cur],f=m.fotos||[];G=k;$('#gmain').innerHTML=`<img id="gm" src="${esc(f[k]||'')}" alt="${esc(m.nome)} - foto ${k+1} de ${f.length}" onclick="zoom()" decoding="async">`;const c=$('#gc');if(c)c.textContent=(k+1)+'/'+f.length;document.querySelectorAll('.th img[data-k]').forEach(t=>t.classList.toggle('on',+t.dataset.k===k));bindSwipe()}
 function gal(d){const f=L[cur].fotos||[];if(f.length)gShow((G+d+f.length)%f.length)}
 function gVid(){$('#gmain').innerHTML=vid(L[cur].video_url)}
 function bindSwipe(){const g=$('#gm');if(!g)return;let x0=0;g.ontouchstart=e=>x0=e.touches[0].clientX;g.ontouchend=e=>{const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)gal(d<0?1:-1)}}
@@ -546,14 +569,14 @@ const howT=()=>{const e=$('#hw');e.style.display=e.style.display==='none'?'block
 function fmtDesc(t){return esc(t).split('\n').map(l=>{const x=l.trim();if(!x)return'<div style="height:8px"></div>';
   if(x.length>8&&x===x.toUpperCase()&&/[A-ZÀ-Ú]{3}/.test(x))return`<div class="hl">${x}</div>`;
   const m=/^([^:]{2,40}):(.*)$/.exec(x);return m?`<div><b>${m[1]}:</b>${m[2]}</div>`:`<div>${x}</div>`}).join('')}
-function priv(){const d=document.createElement('div');d.className='lb';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste formulário (nome, telefone, CPF, data de nascimento e valor de entrada) são usados somente para a cotação do seu financiamento e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;d.onclick=e=>{if(e.target===d)d.remove()};document.body.appendChild(d)}
-function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.innerHTML=`<img src="${esc(u)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
+function priv(){const d=document.createElement('div');d.className='lb pv';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste site, no formulário ou no chat (nome, telefone, CPF, data de nascimento, entrada e preferências de compra), são usados somente para a cotação e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;d.onclick=e=>{if(e.target===d)d.remove()};document.body.appendChild(d)}
+function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.setAttribute('role','dialog');d.setAttribute('aria-label','Foto ampliada');d.innerHTML=`<img src="${esc(u)}" alt="${esc(L[cur].nome)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
 function shareM(){const m=L[cur],u=location.origin+location.pathname+location.search+'#moto='+m.id;
   if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
   else navigator.clipboard.writeText(u).then(()=>toast('Link copiado!'))}
-addEventListener('popstate',()=>{document.querySelectorAll('.lb').forEach(x=>x.remove());$('#modal').style.display='none'});
+addEventListener('popstate',()=>{document.querySelectorAll('.lb').forEach(x=>x.remove());$('#modal').style.display='none';if(FO&&FO.focus){FO.focus({preventScroll:true});FO=null}});
 addEventListener('keydown',e=>{if(e.key==='Escape'){const l=document.querySelectorAll('.lb');l.length?l[l.length-1].remove():closeM();return}
-  const t=e.target;if((e.key==='Enter'||e.key===' ')&&t.matches&&t.matches('b[role=button]')){e.preventDefault();t.click();return}
+  const t=e.target;if((e.key==='Enter'||e.key===' ')&&t.matches&&t.matches('[role=button]:not([data-foto])')){e.preventDefault();t.click();return}
   if($('#modal').style.display==='block'&&$('#gm')&&!/INPUT|TEXTAREA|SELECT/.test(t.tagName)&&(e.key==='ArrowLeft'||e.key==='ArrowRight'))gal(e.key==='ArrowRight'?1:-1)});
 /* fechar tocando fora + foto do vendedor ampliada */
 function fotoV(){if(!V.foto_url||document.querySelector('.lb.fv'))return;const d=document.createElement('div');d.className='lb fv';d.setAttribute('role','dialog');d.setAttribute('aria-label','Foto do vendedor');
@@ -604,15 +627,23 @@ const motos=()=>(typeof M!=='undefined'?M:[]).filter(m=>m.ativo&&!soCon(m));
 const moto=()=>(typeof M!=='undefined'?M:[]).find(m=>m.id===CH.ans.motoId);
 function achar(v){const n=norm(v),l=motos();let r=l.filter(m=>norm(m.nome)===n);if(r.length)return r;r=l.filter(m=>norm(m.nome).includes(n)||n.includes(norm(m.nome)));if(r.length)return r;const t=n.split(/\s+/).filter(x=>x.length>1);return t.length?l.filter(m=>t.every(x=>norm(m.nome).includes(x))):[]}
 const pn=()=>CH.ans.primeiro||'';
+const PG=()=>{const p=CH.ans.pagPre;if(!p)return'pag';CH.ans.pag=p;return p==='consorcio'?'con_plano':'fin_tem'};
+const stopC=()=>{CH.step='fim';opts(['Nova conversa']);lock(true);chBk()};
 const nasc=v=>{const d=dg(v);if(d.length!==8)return{err:'Digite a data no formato DD/MM/AAAA, por exemplo 09/10/1998.'};const dd=+d.slice(0,2),mo=+d.slice(2,4),y=+d.slice(4);const t=new Date(y,mo-1,dd);if(t.getMonth()!==mo-1||t.getDate()!==dd||y<1920||t>new Date())return{err:'Essa data não parece válida. Confere e digita de novo (DD/MM/AAAA).'};const h=new Date();let a=h.getFullYear()-y;if(h<new Date(h.getFullYear(),mo-1,dd))a--;if(a<18)return{err:'Para essa modalidade é preciso ter 18 anos ou mais.'};return{show:fNas(d),set:{nasc:`${d.slice(0,2)}/${d.slice(2,4)}/${y}`}}};
 
 const ST={
+ini:{q:()=>'Posso te ajudar a encontrar uma moto. O que você procura?',opts:()=>['Quero uma moto','Quero financiamento','Quero consórcio','Quero saber os preços','Falar com o vendedor'],run(v){const o=['Quero uma moto','Quero financiamento','Quero consórcio','Quero saber os preços','Falar com o vendedor'],i=opt(v,o);if(i<0)return{err:'Toque em uma das opções abaixo 👇'};
+ if(i===1||i===2)return{show:o[i],set:{pagPre:i===1?'financiamento':'consorcio'},say:()=>['Ótimo! Vou pegar alguns dados para a pré-análise.'],next:'nome'};
+ if(i===3){const l=motos().map(m=>({m,p:(m.planos||[]).filter(x=>x.valor>0).sort((a,b)=>a.valor-b.valor)[0]})).filter(x=>x.p).sort((a,b)=>a.p.valor-b.p.valor).slice(0,6);
+  return{show:o[i],say:()=>l.length?['Estas são algumas motos com a parcela inicial do consórcio:',{html:l.map(x=>`${esc(x.m.nome)}: ${x.p.parcelas}x ${brl(x.p.valor)}`).join('<br>')},'Se quiser uma simulação com os valores exatos, me diga seu nome.']:['Os valores variam conforme a moto e a modalidade. Me diga seu nome que eu passo as condições certinhas.'],next:'nome'}}
+ if(i===4)return{show:o[i],say:()=>['Claro! Toque no botão abaixo para falar direto comigo.',{wa:'Olá! Vim pelo seu site e quero falar com o vendedor.'}],next:'stop'};
+ return{show:o[i],next:'nome'}}},
 nome:{q:()=>'Qual o seu nome?',ph:'Digite seu nome',run(v){const n=cap(v);if(n.length<2||/\d/.test(n))return{err:'Digite seu nome, por favor 🙂'};return{show:n,set:{nome:n,primeiro:n.split(' ')[0]},next:'tel'}}},
-tel:{q:()=>'Qual seu WhatsApp com DDD?',ph:'(00) 00000-0000',mode:'tel',mask:'tel',run(v){let d=dg(v);if(d.length>11&&d.startsWith('55'))d=d.slice(2);if(d.length<10||d.length>11||(d.length===11&&d[2]!=='9'))return{err:'Esse número não parece válido. Digite com DDD, por exemplo (00) 90000-0000.'};return{show:fTel(d),set:{tel:'55'+d},say:()=>CH.ans.motoId?[`Ótimo! Vou anotar seu interesse na ${CH.ans.moto}.`]:[],next:CH.ans.motoId?'pag':'moto'}}},
+tel:{q:()=>'Qual seu WhatsApp com DDD?',ph:'(00) 00000-0000',mode:'tel',mask:'tel',run(v){let d=dg(v);if(d.length>11&&d.startsWith('55'))d=d.slice(2);if(d.length<10||d.length>11||(d.length===11&&d[2]!=='9'))return{err:'Esse número não parece válido. Digite com DDD, por exemplo (00) 90000-0000.'};return{show:fTel(d),set:{tel:'55'+d},say:()=>CH.ans.motoId?[`Ótimo! Vou anotar seu interesse na ${CH.ans.moto}.`]:[],next:CH.ans.motoId?PG():'moto'}}},
 moto:{q:a=>a.cand?'Encontrei mais de uma. Qual delas?':`${pn()}, qual moto Honda do seu interesse?`,ph:'Digite ou toque na moto',opts:a=>(a.cand?a.cand:motos().map(m=>m.nome)).slice(0,40),run(v){if(norm(v).length<2)return{err:'Me diga qual moto você quer 🙂'};const r=achar(v);
  if(r.length>1&&r.length<=10)return{say:()=>[],next:'moto',_c:r};
- if(r.length===1||r.length>10&&0){const m=r[0],p=(m.planos||[]).map(x=>x.valor).filter(x=>x>0),mn=p.length?Math.min(...p):0;return{show:m.nome,set:{moto:m.nome,motoId:m.id,cand:null},say:()=>[img0(m)?{img:img0(m)}:null,`Boa escolha, ${pn()}! A ${m.nome} é uma ótima opção.`,mn?`O consórcio dela começa em ${brl(mn)} por mês.`:null].filter(Boolean),next:'pag'}}
- return{set:{moto:cap(v),motoId:null,cand:null},say:()=>['Anotado! O vendedor confirma a disponibilidade pra você.'],next:'pag'}}},
+ if(r.length===1||r.length>10&&0){const m=r[0],p=(m.planos||[]).map(x=>x.valor).filter(x=>x>0),mn=p.length?Math.min(...p):0;return{show:m.nome,set:{moto:m.nome,motoId:m.id,cand:null},say:()=>[img0(m)?{img:img0(m)}:null,`Boa escolha, ${pn()}! A ${m.nome} é uma ótima opção.`,mn?`O consórcio dela começa em ${brl(mn)} por mês.`:null].filter(Boolean),next:PG()}}
+ return{set:{moto:cap(v),motoId:null,cand:null},say:()=>['Anotado! O vendedor confirma a disponibilidade pra você.'],next:PG()}}},
 pag:{q:()=>'Qual modalidade de pagamento você prefere?',opts:()=>['Consórcio','Financiamento','À vista','Cartão de crédito'],run(v){const i=opt(v,['Consórcio','Financiamento','À vista','Cartão de crédito']);if(i<0)return{err:'Toque em uma das opções abaixo 👇'};return{show:['Consórcio','Financiamento','À vista','Cartão de crédito'][i],set:{pag:['consorcio','financiamento','avista','cartao'][i]},say:()=>[`Certo, ${pn()}!`],next:['con_plano','fin_tem','av_forma','cc_parc'][i]}}},
 fin_tem:{q:()=>'Você tem entrada para o financiamento?',opts:()=>['Sim','Não'],run(v){const n=money(v);if(/\d/.test(v)&&n>0)return{show:v,set:{entrada:brl(n)},say:()=>['Anotado!'],next:'nomec'};const i=opt(v,['Sim','Não']);if(i<0)return{err:'Toque em Sim ou Não 👇'};return i===0?{show:'Sim',next:'fin_val'}:{show:'Não',set:{entrada:'Sem entrada'},say:()=>['Tudo bem, dá pra tentar o financiamento mesmo sem entrada. Vamos fazer uma pré-análise e o resultado final é passado pelo vendedor.'],next:'nomec'}}},
 fin_val:{q:()=>'Qual o valor da entrada?',ph:'Ex.: 3000',mode:'decimal',run(v){const n=money(v);if(n<=0)return{err:'Digite só o valor, por exemplo 3000.'};return{show:brl(n),set:{entrada:brl(n)},say:()=>['Anotado!'],next:'nomec'}}},
@@ -646,7 +677,7 @@ async function submit(v){v=String(v||'').trim();if(!v||CH.busy||!ST[CH.step])ret
  Object.assign(CH.ans,r.set||{});if(r._c)CH.ans.cand=r._c.map(m=>m.nome);
  sync(false);
  const items=r.say?r.say(CH.ans):[];if(items.length&&await say(items)===false)return;
- const n=typeof r.next==='function'?r.next(CH.ans):r.next;n==='fim'?fim():ask(n)}
+ const n=typeof r.next==='function'?r.next(CH.ans):r.next;n==='fim'?fim():n==='stop'?stopC():ask(n)}
 const T={financiamento:'FINANCIAMENTO',consorcio:'CONSÓRCIO',avista:'COMPRA À VISTA',cartao:'COMPRA NO CARTÃO DE CRÉDITO'};
 function resumo(){const a=CH.ans,l=[];a.moto&&l.push('Moto: '+a.moto);a.pag&&l.push('Pagamento: '+T[a.pag]);a.entrada&&l.push('Entrada: '+a.entrada);a.parcela&&l.push('Parcela desejada: '+a.parcela);a.forma&&l.push('Forma: '+a.forma);a.troca&&l.push('Troca: '+a.troca);a.cartao&&l.push('Cartão: '+a.cartao);return l.join('\n')}
 function msg(){const a=CH.ans,nd=a.pag==='financiamento'||a.pag==='consorcio',l=[`Olá, vim do seu site e quero as condições de ${T[a.pag]} da ${(a.moto||'moto').toUpperCase()} que vi no seu site.`,nd?'Seguem os dados para APROVACAO:':'Seguem meus dados:'];
@@ -657,7 +688,7 @@ async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={
 async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd=a.pag==='financiamento'||a.pag==='consorcio';CH.saved=true;sync(true);
  if(await say([nd?`Fechado, ${pn()}! Recebi seus dados para a pré-análise. O resultado final é passado pelo vendedor.`:`Fechado, ${pn()}! Já anotei tudo por aqui. O vendedor te passa os valores e as condições.`,'Clique no botão abaixo para continuar com o vendedor pelo WhatsApp.',{wa:m}])===false)return;opts(['Nova conversa']);CH.step='fim';chBk()}
 function partial(){}
-function start(){CH.tk++;CH.id=uid();const pm=CH.pre&&motos().find(m=>m.id===CH.pre);CH.pre=null;CH.ans=pm?{moto:pm.nome,motoId:pm.id}:{};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo(a)! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com os nossos Termos de Uso.<br><br><a class="ln" href="https://vendedor.site/termos/lgpd" target="_blank" rel="noopener">https://vendedor.site/termos/lgpd</a>`}])===false)return;ask('nome')})()}
+function start(){CH.tk++;CH.id=uid();const pm=CH.pre&&motos().find(m=>m.id===CH.pre),hasPre=!!pm;CH.pre=null;CH.ans=pm?{moto:pm.nome,motoId:pm.id}:{};CH.hist=[];CH.saved=false;CH.part=false;CH.step=null;CH.busy=false;CH.started=true;$c('chl').innerHTML='';opts([]);(async()=>{lock(true);if(await say([{html:`Bem-vindo(a)! Sou ${esc(V.nome)} e vou te ajudar a escolher sua próxima moto. Ao avançar você concorda com a nossa Política de Privacidade.<br><br><a class="ln" href="#" onclick="priv();return false">Ler a Política de Privacidade</a>`}])===false)return;ask(hasPre?'nome':'ini')})()}
 function build(){if($c('ch'))return;document.body.insertAdjacentHTML('beforeend',`<div class="chbd" id="chbd"></div><div class="ch" id="ch" role="dialog" aria-label="Chat com o vendedor"><div class="chh"><button class="chb" id="chbk" type="button" aria-label="Voltar uma pergunta" title="Voltar">‹</button>${avH()}<div><b>${esc(V.nome)}</b><small><i></i>Online agora</small></div><button class="chb" id="chrs" type="button" aria-label="Recomeçar" title="Recomeçar">↻</button><button class="chb" id="chx" type="button" aria-label="Fechar">✕</button></div><div class="chl" id="chl" aria-live="polite"></div><div class="chq" id="chq"></div><form class="chf" id="chf" autocomplete="off"><input id="chi" placeholder="Digite aqui" enterkeyhint="send" aria-label="Sua resposta"><button>Enviar</button></form></div>`);
  $c('chf').onsubmit=e=>{e.preventDefault();submit($c('chi').value)};
  $c('chq').onclick=e=>{const b=e.target.closest('button');if(!b)return;const v=CH.opts[+b.dataset.i];if(CH.step==='fim'){start();return}submit(v)};
@@ -669,6 +700,65 @@ function open(e,id){if(e&&e.preventDefault)e.preventDefault();build();$c('ch').c
 function close(){const c=$c('ch');if(c)c.classList.remove('on');document.body.classList.remove('chopen');document.documentElement.style.overflow='';partial()}
 window.chatOpen=open;window.chatClose=close;
 })();
+
+/* ===== V4: utilitários, SEO, validação, painel ===== */
+let FO=null;
+const nz=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+let _lt;const listaD=()=>{clearTimeout(_lt);_lt=setTimeout(lista,90)};
+function limpar(){Q='';C='Todas';SO='';const q=$('#q'),o=document.querySelector('.so');if(q)q.value='';if(o)o.value='';$('#chips').innerHTML=chipsH();lista(1)}
+function imgErr(i){const p=i.parentNode;if(!p)return;p.classList.add('bk');p.insertAdjacentHTML('beforeend','<span class="nof">Foto indisponível</span>');i.remove()}
+const hn=m=>{const n=(m.nome||'')+(m.modelo&&!nz(m.nome).includes(nz(m.modelo))?' '+m.modelo:'');return soCon(m)||/^honda\b/i.test(n)?n:'Honda '+n};
+const CF=()=>V.config&&typeof V.config==='object'?V.config:{};
+const AVISO=()=>CF().aviso?`<div class="av2" role="status">${esc(CF().aviso)}</div>`:'';
+const CK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
+const MB=()=>`<nav class="mb" aria-label="Ações rápidas">${V.whatsapp?`<a class="mw" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}">${IC.wa}WhatsApp</a>`:''}<button type="button" class="mr" onclick="chatOpen()">Simular</button><button type="button" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})">${IC.se}Ver motos</button></nav>`;
+function seo(){const mt=(a,n,v)=>{if(!v)return;let e=document.head.querySelector(`meta[${a}="${n}"]`);if(!e){e=document.createElement('meta');e.setAttribute(a,n);document.head.appendChild(e)}e.content=v};
+  const t=V.nome+' | Motos Honda',d=(V.bio||'Consórcio, financiamento e condições especiais diretamente com seu vendedor.').slice(0,155);
+  document.title=t;mt('name','description',d);mt('property','og:title',t);mt('property','og:description',d);mt('property','og:image',V.foto_url||V.logo_url);mt('name','twitter:card','summary')}
+/* validação do formulário de financiamento */
+const fld=(id,l,a,mk)=>`<label class="l" for="${id}">${l}</label><input id="${id}" ${a||''} ${mk?`oninput="msk(this,'${mk}')"`:''} ${VR[id]?`onblur="vf('${id}')"`:''}><small class="fe" id="${id}_e" role="alert"></small>`;
+const cpfOk=c=>{if(c.length!==11||/^(\d)\1+$/.test(c))return false;for(const n of[9,10]){let s=0;for(let i=0;i<n;i++)s+=c[i]*(n+1-i);if((s*10%11)%10!=c[n])return false}return true};
+const dtOk=v=>{const d=v.replace(/\D/g,'');if(d.length!==8)return'Digite a data como DD/MM/AAAA.';const dd=+d.slice(0,2),mo=+d.slice(2,4),y=+d.slice(4),t=new Date(y,mo-1,dd);if(t.getMonth()!==mo-1||t.getDate()!==dd||y<1920||t>new Date())return'Essa data não parece válida.';const h=new Date();let a=h.getFullYear()-y;if(h<new Date(h.getFullYear(),mo-1,dd))a--;return a<18?'É preciso ter 18 anos ou mais para financiar.':''};
+const VR={f_nom:v=>v.trim().split(/\s+/).filter(Boolean).length<2||/\d/.test(v)?'Digite seu nome completo (nome e sobrenome).':'',
+ f_tel:v=>{const d=v.replace(/\D/g,'');return d.length<10||d.length>11||(d.length===11&&d[2]!=='9')?'Digite o telefone com DDD, por exemplo (00) 90000-0000.':''},
+ f_cpf:v=>!v.trim()?'Informe o CPF.':cpfOk(v.replace(/\D/g,''))?'':'CPF inválido. Confira os números.',f_nas:dtOk};
+function vf(id){const e=$('#'+id),m=VR[id]?VR[id](e.value):'',s=$('#'+id+'_e');e.setAttribute('aria-invalid',!!m);e.setAttribute('aria-describedby',id+'_e');if(s)s.textContent=m;return!m}
+document.addEventListener('input',e=>{const t=e.target;if(t.getAttribute&&t.getAttribute('aria-invalid')==='true'&&VR[t.id]&&!VR[t.id](t.value))vf(t.id)});
+/* foco preso dentro do modal */
+addEventListener('keydown',e=>{if(e.key!=='Tab')return;const mo=$('#modal');if(mo.style.display!=='block'||document.querySelector('.lb'))return;
+  const f=[...mo.querySelectorAll('a[href],button,input,select,textarea,[tabindex="0"]')].filter(x=>!x.disabled&&x.offsetParent);if(!f.length)return;const a=f[0],z=f[f.length-1];
+  if(!mo.contains(document.activeElement)||(e.shiftKey&&document.activeElement===a)){e.preventDefault();z.focus()}else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}});
+/* ===== PAINEL: resumo, contatos, configurações do site ===== */
+const dr=(k,v)=>v?`<div class="pdr"><span>${k}</span><b>${esc(v)}</b></div>`:'';
+async function pResumo(){
+  $('#pn').innerHTML='<div class="kp kg">'+'<div class="sk" style="height:84px"></div>'.repeat(4)+'</div>';
+  const cn=q=>q.then(r=>r.count||0,()=>0),hd={count:'exact',head:true};
+  const[nl,np,nn,ls,ps]=await Promise.all([cn(sb.from('leads').select('id',hd)),cn(sb.from('pedidos_chat').select('id',hd).eq('completo',true)),cn(sb.from('pedidos_chat').select('id',hd).eq('completo',true).eq('status','novo')),
+    sb.from('leads').select().order('created_at',{ascending:false}).limit(5),sb.from('pedidos_chat').select().eq('completo',true).order('created_at',{ascending:false}).limit(5)]);
+  if(T!=='resumo')return;
+  const at=M.filter(m=>m.ativo).length,sf=M.filter(m=>!(m.fotos||[]).length).length,sp=M.filter(m=>!(m.planos||[]).length&&!(m.preco>0)).length;
+  const rec=[...(ls.data||[]).map(l=>({t:'Contato',n:l.nome||'Cliente',m:l.moto_nome,d:l.created_at,tel:l.telefone,k:TL[l.tipo]||l.tipo})),...(ps.data||[]).map(p=>({t:'Chat',n:p.nome_completo||p.nome||'Cliente',m:p.moto_nome,d:p.created_at,tel:p.telefone,k:({consorcio:'Consórcio',financiamento:'Financiamento',avista:'À vista',cartao:'Cartão'})[p.pagamento]}))].sort((a,b)=>new Date(b.d)-new Date(a.d)).slice(0,6);
+  $('#pn').innerHTML=`<div class="kp kg"><div><b>${at}</b><span>motos no site</span></div><div><b>${M.length}</b><span>motos cadastradas</span></div><div><b>${nl}</b><span>contatos</span></div><div class="n"><b>${np}</b><span>pedidos do chat${nn?` (${nn} novos)`:''}</span></div></div>
+  ${sf||sp?`<div class="hw">Pendências no catálogo: ${sf} sem foto · ${sp} sem planos ou preço. <a href="#" onclick="adm('motos');return false">Ver motos</a></div>`:''}
+  <button class="btn red" onclick="adm('motos');edit()">+ Nova moto</button><h3 style="margin:22px 0 4px">Solicitações recentes</h3>`+
+  (rec.map(r=>{const w=wlk(r.tel);return `<div class="it"><div class="g"><b>${esc(r.n)}</b> · ${esc(r.t)}${r.k?' · '+esc(r.k):''}<br><small>${esc(r.m||'Moto não informada')} · ${new Date(r.d).toLocaleString('pt-BR')}</small></div>${w?`<a class="sm" target="_blank" rel="noopener" style="text-decoration:none;color:inherit" href="${w}">WhatsApp</a>`:''}</div>`}).join('')||'<p class="mu">Nenhuma solicitação ainda.</p>')}
+let LD=[],LF='todos';const TL={whatsapp:'WhatsApp',consorcio:'Consórcio',financiamento:'Financiamento'};
+async function pLeads(){const{data}=await sb.from('leads').select().order('created_at',{ascending:false}).limit(300);LD=data||[];ldView()}
+function ldView(){
+  const st=LD.length>0&&'status' in LD[0],tp=[...new Set(LD.map(l=>l.tipo).filter(Boolean))],
+  fl=[['todos','Todos'],...(st?[['novo','Novos'],['atendido','Atendidos']]:[]),...tp.map(t=>[t,TL[t]||t])],
+  f=LD.filter(l=>LF==='todos'||(LF==='novo'||LF==='atendido'?(l.status||'novo')===LF:l.tipo===LF));
+  $('#pn').innerHTML=`<div class="pdf">${fl.map(o=>`<button class="${LF===o[0]?'on':''}" onclick="LF='${o[0]}';ldView()">${esc(o[1])}</button>`).join('')}</div>`+
+  (f.map(l=>{const k=l.status||'novo',w=wlk(l.telefone);return `<div class="pd"><div class="pdh"><div><b>${esc(l.nome||'Cliente')}</b><small>${esc(l.moto_nome||'Moto não informada')} · ${new Date(l.created_at).toLocaleString('pt-BR')}</small></div><span class="pdb ${st?(k==='novo'?'s-novo':'s-concluido'):''}">${esc(TL[l.tipo]||l.tipo||'')}${st?' · '+(k==='novo'?'Novo':'Atendido'):''}</span></div>
+  <div class="pdg">${dr('Telefone',l.telefone)}${dr('CPF',l.cpf)}${dr('Nascimento',l.nascimento)}${dr('Entrada',l.entrada)}${dr('Habilitação',l.habilitacao)}</div>${l.detalhes?`<details><summary>Detalhes</summary><pre>${esc(l.detalhes)}</pre></details>`:''}
+  <div class="pda">${w?`<a class="btn red" target="_blank" rel="noopener" href="${w}">WhatsApp</a>`:''}${st?`<button class="btn" onclick="ldSt('${l.id}','${k==='novo'?'atendido':'novo'}')">${k==='novo'?'Marcar como atendido':'Reabrir'}</button>`:''}<button class="btn" onclick="delL('${l.id}')">Excluir</button></div></div>`}).join('')||'<p class="mu">Nenhum contato aqui ainda.</p>')}
+async function ldSt(id,v){const{error}=await sb.from('leads').update({status:v}).eq('id',id);if(error)return toast('Erro: '+error.message);const l=LD.find(x=>x.id===id);if(l)l.status=v;ldView()}
+function pSite(){
+  if(!('config' in V)){$('#pn').innerHTML='<p class="mu">Para personalizar os textos do site, rode o SQL opcional (coluna config) no Supabase e recarregue a página.</p>';return}
+  const c=CF(),f=(k,l,ph)=>`<label class="l" for="c_${k}">${l}</label><input id="c_${k}" value="${esc(c[k]||'')}" placeholder="${ph}" maxlength="160">`;
+  $('#pn').innerHTML=`<p class="mu" style="font-size:13px">Estes textos aparecem no site. Campos em branco não aparecem.</p>${f('titulo','Título principal','Encontre sua próxima Honda')}${f('sub','Frase abaixo do título','Consórcio, financiamento e condições especiais diretamente com seu vendedor.')}${f('aviso','Aviso no topo do catálogo','')}${f('horario','Horário de atendimento','')}${f('endereco','Endereço','')}<button class="btn red" onclick="saveSite()">Salvar site</button>`}
+async function saveSite(){const config={...CF()};['titulo','sub','aviso','horario','endereco'].forEach(k=>{const v=$('#c_'+k).value.trim();v?config[k]=v:delete config[k]});
+  const{error}=await sb.from('vendedores').update({config}).eq('id',V.id);if(!error)V.config=config;toast(error?'Erro: '+error.message:'Site atualizado!')}
 
 init();
 </script>
