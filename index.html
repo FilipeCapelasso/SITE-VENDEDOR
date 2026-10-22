@@ -292,6 +292,35 @@ input[aria-invalid=true],select[aria-invalid=true]{border-color:#b00020;box-shad
 body.chopen .mb,body:has(#modal[style*="block"]) .mb{display:none}
 }
 </style>
+<style id="privcss">
+.ck{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:99999;max-width:760px;margin:0 auto;background:#14141a;color:#f3f3f5;border-radius:16px;padding:16px 18px;box-shadow:0 10px 40px rgba(0,0,0,.45);font:400 13px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;display:none}
+.ck b{display:block;font-size:14px;margin-bottom:4px}.ck p{margin:0 0 6px;color:#d7d7dd}.ck a{color:#fff;text-decoration:underline}
+.ck .r{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.ck button{background:#c80000;color:#fff;border:0;border-radius:999px;padding:10px 24px;font:700 14px Inter,system-ui,sans-serif;cursor:pointer}
+.ao{font-size:12.5px;color:#6b6b76;text-align:center;margin:12px 0 0;line-height:1.5}.ao a{color:inherit;text-decoration:underline}
+</style>
+<script id="privjs">
+/* >>> COLE AQUI o link do site dos Termos (Política de Privacidade). Vazio = mostra o resumo em janela. <<< */
+const POLITICA_URL='';
+function polAbrir(e){
+  if(e&&e.preventDefault)e.preventDefault();
+  if(POLITICA_URL){window.open(POLITICA_URL,'_blank','noopener');return false}
+  const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px';
+  d.innerHTML='<div style="background:#fff;color:#222;border-radius:16px;padding:22px;max-width:420px;line-height:1.5;font:14px Inter,system-ui,sans-serif"><b>Política de Privacidade</b><p>Os dados informados neste site, no formulário ou no chat (nome, telefone, CPF, data de nascimento, entrada e preferências de compra), são usados somente para a cotação e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button type="button" style="background:#c80000;color:#fff;border:0;border-radius:999px;padding:10px 24px;font:700 14px Inter,system-ui,sans-serif;cursor:pointer">Entendi</button></div>';
+  d.onclick=function(ev){if(ev.target===d||ev.target.tagName==='BUTTON')d.remove()};document.body.appendChild(d);return false}
+(function(){
+  const K='ck_ok_v1';
+  const lido=()=>{try{return localStorage.getItem(K)==='1'}catch(e){return false}};
+  function banner(){
+    if(lido()||document.getElementById('ckb'))return;
+    const d=document.createElement('div');d.id='ckb';d.className='ck';d.setAttribute('role','dialog');d.setAttribute('aria-label','Aviso de cookies e privacidade');
+    d.innerHTML='<b>Uso de Cookies</b><p>Este site utiliza cookies para melhorar sua experiência de navegação, personalizar conteúdos e analisar o tráfego. Ao continuar navegando, você concorda com o uso desses cookies.</p><p>Seus dados são tratados conforme a Lei Geral de Proteção de Dados (LGPD), com respeito à sua privacidade. Você pode gerenciar suas preferências a qualquer momento nas configurações do navegador.</p><div class="r"><button type="button" id="ckok">Aceitar</button><a href="#" id="ckpp">Política de Privacidade</a></div>';
+    document.body.appendChild(d);d.style.display='block';
+    document.getElementById('ckok').onclick=function(){try{localStorage.setItem(K,'1')}catch(e){}d.remove()};
+    document.getElementById('ckpp').onclick=polAbrir}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',banner);else banner();
+})();
+</script>
 </head>
 <body>
 <div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -570,7 +599,7 @@ const howT=()=>{const e=$('#hw');e.style.display=e.style.display==='none'?'block
 function fmtDesc(t){return esc(t).split('\n').map(l=>{const x=l.trim();if(!x)return'<div style="height:8px"></div>';
   if(x.length>8&&x===x.toUpperCase()&&/[A-ZÀ-Ú]{3}/.test(x))return`<div class="hl">${x}</div>`;
   const m=/^([^:]{2,40}):(.*)$/.exec(x);return m?`<div><b>${m[1]}:</b>${m[2]}</div>`:`<div>${x}</div>`}).join('')}
-function priv(){const d=document.createElement('div');d.className='lb pv';d.innerHTML=`<div style="background:#fff;border-radius:16px;padding:22px;max-width:420px;margin:16px;line-height:1.5;font-size:14px"><b>Política de Privacidade</b><p>Os dados informados neste site, no formulário ou no chat (nome, telefone, CPF, data de nascimento, entrada e preferências de compra), são usados somente para a cotação e para o contato do vendedor. Você pode pedir a exclusão dos seus dados ao vendedor a qualquer momento.</p><button class="btn red" onclick="this.closest('.lb').remove()">Entendi</button></div>`;d.onclick=e=>{if(e.target===d)d.remove()};document.body.appendChild(d)}
+function priv(){return polAbrir()}
 function zoom(){const u=(L[cur].fotos||[])[G];if(!u)return;const d=document.createElement('div');d.className='lb';d.setAttribute('role','dialog');d.setAttribute('aria-label','Foto ampliada');d.innerHTML=`<img src="${esc(u)}" alt="${esc(L[cur].nome)}">`;d.onclick=()=>d.remove();document.body.appendChild(d)}
 function shareM(){const m=L[cur],u=location.origin+location.pathname+location.search+'#moto='+m.id;
   if(navigator.share)navigator.share({title:m.nome,text:m.nome+' - '+V.nome,url:u}).catch(()=>{});
