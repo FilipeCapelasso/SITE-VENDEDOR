@@ -344,13 +344,15 @@ async function segSend(tab,row){
   const r=await segInsert(tab,row);
   if(!r.ok){const a=obxGet();a.push({slug:SLUG,tab,row,ts:Date.now(),n:0});obxSet(a)}
   return r.ok}
+function obxAdd(it){const a=obxGet().filter(x=>!(it.rpc&&x.rpc===it.rpc&&x.row&&x.row.p&&it.row&&it.row.p&&x.row.p.id===it.row.p.id));a.push(it);obxSet(a)}
 async function obxFlush(){
   try{if(typeof sb==='undefined'||!sb)return}catch(e){return}
   const a=obxGet();if(!a.length)return;const resto=[];
   for(const it of a){
     if(it.slug!==SLUG){resto.push(it);continue}
-    const r=await segInsert(it.tab,it.row);
-    if(!r.ok){it.n=(it.n||0)+1;if(it.n<30&&Date.now()-it.ts<3*864e5)resto.push(it)}}
+    let ok=false;
+    try{if(it.rpc){const r=await sb.rpc(it.rpc,it.row);ok=!(r&&r.error)}else{const r=await segInsert(it.tab,it.row);ok=r.ok}}catch(e){ok=false}
+    if(!ok){it.n=(it.n||0)+1;if(it.n<30&&Date.now()-it.ts<3*864e5)resto.push(it)}}
   obxSet(resto)}
 addEventListener('online',()=>obxFlush());setInterval(()=>obxFlush(),60000);setTimeout(()=>obxFlush(),2500);
 /* ===== PREENCHIMENTO EM ANDAMENTO: o que o cliente digita já chega ao vendedor, mesmo sem clicar em "Enviar" ===== */
@@ -363,9 +365,10 @@ function rascunho(origem,key,dados){
   try{if(typeof sb==='undefined'||!sb||typeof sb.rpc!=='function')return}catch(e){return}
   clearTimeout(_rt);
   _rt=setTimeout(()=>{const id=rascId(key);if(!id)return;
-    sb.rpc('registrar_rascunho',{p:{id,origem,nome:dados.nome,telefone:dados.telefone,moto_nome:dados.moto_nome,cor:dados.cor,dados}}).then(()=>{},()=>{})},1200)}
+    const p={id,origem,nome:dados.nome,telefone:dados.telefone,moto_nome:dados.moto_nome,cor:dados.cor,dados},fila=()=>obxAdd({slug:SLUG,rpc:'registrar_rascunho',row:{p},ts:Date.now(),n:0});
+    try{sb.rpc('registrar_rascunho',{p}).then(r=>{if(r&&r.error)fila()},()=>fila())}catch(e){fila()}},1200)}
 function rascCompleto(origem,key){
-  try{const id=rascId(key);if(id&&sb&&sb.rpc)sb.rpc('registrar_rascunho',{p:{id,origem,completo:true}}).then(()=>{},()=>{})}catch(e){}}
+  try{const id=rascId(key);if(id&&sb&&sb.rpc){const p={id,origem,completo:true};sb.rpc('registrar_rascunho',{p}).then(r=>{if(r&&r.error)obxAdd({slug:SLUG,rpc:'registrar_rascunho',row:{p},ts:Date.now(),n:0})},()=>{})}}catch(e){}}
 </script>
 </head>
 <body>
@@ -767,7 +770,12 @@ function msg(){const a=CH.ans,nd=a.pag==='financiamento'||a.pag==='consorcio',l=
  if(a.pag==='financiamento')l.push('Entrada: '+(a.entrada||'Sem entrada'));if(a.pag==='consorcio'&&a.parcela)l.push('Parcela desejada: '+a.parcela);if(a.pag==='avista'){l.push('Forma de pagamento: '+a.forma);l.push('Moto na troca: '+a.troca)}if(a.pag==='cartao')l.push('Parcelamento: '+a.cartao);
  if(nd){l.push('Data de nascimento: '+a.nasc);l.push('CPF: '+a.cpf)}l.push('Nome: '+(a.nomec||a.nome));l.push('Celular: +'+a.tel);if(a.cor)l.push('Cor da moto: '+a.cor);if(a.hab)l.push('Habilitação: '+a.hab);l.push('IA VENDEDOR VIRTUAL');return l.join('\n')}
 const uid=()=>window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&3|8).toString(16)});
-async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={id:CH.id,completo:!!done,moto_id:a.motoId||'',moto_nome:a.moto,pagamento:a.pag,nome:a.nome,nome_completo:a.nomec,telefone:'+'+a.tel,cpf:a.cpf,nascimento:a.nasc,entrada:a.entrada,parcela:a.parcela,forma_pagamento:a.forma,troca:a.troca,parcelamento_cartao:a.cartao,habilitacao:a.hab,cor:a.cor};if(done)p.mensagem=msg();Object.keys(p).forEach(k=>(p[k]===undefined||p[k]===null)&&delete p[k]);try{await sb.rpc('registrar_pedido_chat',{p})}catch(e){}}
+async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={id:CH.id,completo:!!done,moto_id:a.motoId||'',moto_nome:a.moto,pagamento:a.pag,nome:a.nome,nome_completo:a.nomec,telefone:'+'+a.tel,cpf:a.cpf,nascimento:a.nasc,entrada:a.entrada,parcela:a.parcela,forma_pagamento:a.forma,troca:a.troca,parcelamento_cartao:a.cartao,habilitacao:a.hab,cor:a.cor};if(done)p.mensagem=msg();Object.keys(p).forEach(k=>(p[k]===undefined||p[k]===null)&&delete p[k]);let err=null;try{const r=await sb.rpc('registrar_pedido_chat',{p});if(r&&r.error)err=r.error}catch(e){err=e}
+  if(!err)return;
+  /* o pedido NUNCA se perde: reenvia sozinho e, ao concluir, grava também como contato (tabela leads) com tudo que o cliente informou */
+  try{console.warn('Falha ao registrar o pedido do chat:',err&&err.message)}catch(e){}
+  obxAdd({slug:SLUG,rpc:'registrar_pedido_chat',row:{p},ts:Date.now(),n:0});
+  if(done&&!CH.fbLead){CH.fbLead=1;try{await segSend('leads',{tipo:'chat',moto_id:p.moto_id||null,moto_nome:p.moto_nome,nome:p.nome_completo||p.nome,telefone:p.telefone,cpf:p.cpf,nascimento:p.nascimento,entrada:p.entrada,habilitacao:p.habilitacao,cor:p.cor,detalhes:(p.mensagem||'')+' [pedido do chat; falha ao gravar: '+((err&&err.message)||'erro')+']'})}catch(e){}}}
 async function fim(){CH.step='fim';opts([]);lock(true);const a=CH.ans,m=msg(),nd=a.pag==='financiamento'||a.pag==='consorcio';CH.saved=true;sync(true);
  if(await say([nd?`Fechado, ${pn()}! Recebi seus dados para a pré-análise. O resultado final é passado pelo vendedor.`:`Fechado, ${pn()}! Já anotei tudo por aqui. O vendedor te passa os valores e as condições.`,'Clique no botão abaixo para continuar com o vendedor pelo WhatsApp.',{wa:m}])===false)return;opts(['Nova conversa']);CH.step='fim';chBk()}
 function partial(){}
@@ -887,8 +895,32 @@ function vdView(){
   const f=VD.filter(x=>(VF==='todos'||(VF==='novos'?vdNovo(x):x._s===VF))&&(!q||nz([x.nome,x.nome_completo,x.telefone,x.cpf,x.email,x.moto_nome].join(' ')).includes(q)));
   const hj=VD.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length;
   $('#vdk').innerHTML=`<div class="kp"><div class="n"><b>${c.novos}</b><span>novos</span></div><div><b>${hj}</b><span>hoje</span></div><div><b>${c.todos}</b><span>no total</span></div></div>`;
-  $('#vdf').innerHTML=fl.map(o=>`<button class="${VF===o[0]?'on':''}" onclick="VF='${o[0]}';vdView()">${esc(o[1])} (${c[o[0]]||0})</button>`).join('')+'<button onclick="pVendas()">↻ Atualizar</button>';
+  $('#vdf').innerHTML=fl.map(o=>`<button class="${VF===o[0]?'on':''}" onclick="VF='${o[0]}';vdView()">${esc(o[1])} (${c[o[0]]||0})</button>`).join('')+'<button onclick="pVendas()">↻ Atualizar</button><button onclick="testarEntrega()">🧪 Testar entrega</button>';
   $('#vdl').innerHTML=f.map(vdCard).join('')||'<p class="mu">Nenhuma venda ou preenchimento aqui ainda.</p>'}
+
+/* ===== TESTAR ENTREGA: faz exatamente o que um cliente do seu site faz e mostra o resultado (ou o erro exato) ===== */
+async function testarEntrega(){
+  const box=document.createElement('div');box.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
+  box.innerHTML='<div style="background:#fff;color:#222;border-radius:16px;padding:20px;max-width:540px;width:100%;max-height:90vh;overflow:auto;font:14px/1.5 Inter,system-ui,sans-serif"><b style="font-size:17px">🧪 Teste de entrega</b><p style="margin:6px 0;color:#666">Simulando um cliente no seu site…</p><div id="te_r"></div><button id="te_x" class="btn" style="margin-top:12px">Fechar</button></div>';
+  document.body.appendChild(box);box.querySelector('#te_x').onclick=()=>box.remove();
+  const rows=[],draw=()=>{box.querySelector('#te_r').innerHTML=rows.map(r=>`<div style="padding:7px 0;border-bottom:1px solid #eee">${r[1]?'✅':'❌'} <b>${esc(r[0])}</b>${r[2]?'<br><small style="color:#666;word-break:break-word">'+esc(r[2])+'</small>':''}</div>`).join('')};
+  const add=(n,ok,d)=>{rows.push([n,ok,d]);draw()};
+  try{
+    const anon=supabase.createClient(SU,SUPABASE_KEY.trim(),{global:{headers:{'x-vendedor':SLUG}},auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const tag='__TESTE_ENTREGA__',pid=uid();
+    let r=await anon.rpc('registrar_pedido_chat',{p:{id:pid,completo:true,nome:tag,nome_completo:tag,telefone:'+5568900000000',moto_nome:'TESTE',pagamento:'consorcio',mensagem:'teste de entrega'}});
+    add('Chat: cliente termina a conversa',!r.error,r.error?r.error.message:'pedido gravado');
+    r=await anon.from('leads').insert({tipo:'teste',nome:tag,telefone:'+5568900000000',moto_nome:'TESTE'});
+    add('Formulário de financiamento',!r.error,r.error?r.error.message:'contato gravado');
+    r=await anon.rpc('registrar_rascunho',{p:{id:uid(),origem:'financiamento',nome:tag,telefone:'(68) 90000-0000',moto_nome:'TESTE',dados:{nome:tag}}});
+    add('Cliente digitando (sem enviar)',!r.error,r.error?r.error.message:'enviado');
+    const rd=await sb.from('pedidos_chat').select('id').eq('id',pid);
+    add('Seu painel enxerga o que o cliente enviou',!!(rd.data&&rd.data.length),rd.error?rd.error.message:(rd.data&&rd.data.length?'sim':'o pedido foi gravado mas o painel não o enxerga'));
+    await sb.from('pedidos_chat').delete().eq('id',pid);await sb.from('leads').delete().eq('nome',tag);try{await sb.from('rascunhos').delete().eq('nome',tag)}catch(e){}
+    const falhou=rows.some(x=>!x[1]);
+    rows.push([falhou?'Resultado: HÁ FALHAS — tire um print desta tela e envie ao suporte':'Resultado: tudo certo, os pedidos chegam ao seu painel',!falhou,'']);draw();
+  }catch(e){add('Erro inesperado',false,String(e&&e.message||e))}
+}
 function vdCampos(x){return Object.keys(VLB).filter(k=>x[k]!=null&&String(x[k]).trim()!=='').map(k=>{let v=x[k];if(k==='cpf')v=pCpf(v);else if(k==='pagamento')v=VPG[v]||v;else if(k==='tipo')v=TL[v]||v;return[VLB[k],v]})}
 function vdCard(x){
   const s=x._s,k=x.status||'novo',stl=VST[s],nm=x.nome_completo||x.nome||'Cliente',w=wlk(x.telefone);
