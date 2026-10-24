@@ -370,6 +370,7 @@ function rascunho(origem,key,dados){
 function rascCompleto(origem,key){
   try{const id=rascId(key);if(id&&sb&&sb.rpc){const p={id,origem,completo:true};sb.rpc('registrar_rascunho',{p}).then(r=>{if(r&&r.error)obxAdd({slug:SLUG,rpc:'registrar_rascunho',row:{p},ts:Date.now(),n:0})},()=>{})}}catch(e){}}
 </script>
+<style id="corcss">.cores{margin:14px 0}.cores b{display:block;font-size:13px;margin-bottom:6px}.cor{display:inline-flex;align-items:center;gap:6px;border:1px solid #d9d9df;border-radius:999px;padding:4px 12px 4px 6px;margin:0 6px 6px 0;font-size:13px;background:#fff;color:#222}.cor i{width:16px;height:16px;border-radius:50%;border:1px solid rgba(0,0,0,.25);display:inline-block}</style>
 </head>
 <body>
 <div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -459,6 +460,12 @@ function home(){
 }
 function ytId(u){const r=/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/.exec(u||'');return r&&r[1]}
 function vid(u){if(!u)return'';const y=ytId(u);return y?`<iframe class="vid" src="https://www.youtube.com/embed/${y}" allowfullscreen></iframe>`:`<video class="vid" controls playsinline src="${esc(u)}"></video>`}
+
+/* ===== CORES DISPONÍVEIS (por moto) ===== */
+const COR_HEX={azul:'#1f3a8a',vermelho:'#c80000',branco:'#f4f4f4',preto:'#141414',prata:'#c3c7cc',cinza:'#7b7f85',verde:'#5d6b3a',roxo:'#5b2a86',bege:'#d9cdb0',amarelo:'#f2c500',laranja:'#f28c00',dourado:'#c9a227',grafite:'#3b3f45',tricolor:'linear-gradient(135deg,#f4f4f4 33%,#1f3a8a 33% 66%,#c80000 66%)'};
+function corChips(m){
+  const c=Array.isArray(m.cores)?m.cores.filter(Boolean):[];if(!c.length)return'';
+  return `<div class="cores"><b>Cores disponíveis</b><div>${c.map(n=>{const k=String(n).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();return `<span class="cor"><i style="background:${COR_HEX[k]||'#999'}"></i>${esc(n)}</span>`}).join('')}</div></div>`}
 function openM(i,v){
   cur=i;G=0;const m=L[i],f=m.fotos||[];let b='';
   const how=t=>`<div id="hw" class="hw" style="display:none">${t}</div>`;
@@ -466,7 +473,7 @@ function openM(i,v){
     ${f.length>1||m.video_url?`<div class="th">${f.length>1?f.map((u,k)=>`<img src="${esc(u)}" data-k="${k}" role="button" tabindex="0" alt="Ver foto ${k+1}" class="${k?'':'on'}" onclick="gShow(${k})" loading="lazy" decoding="async">`).join(''):''}${m.video_url?`<button class="vb" onclick="gVid()" aria-label="Vídeo">▶</button>`:''}</div>`:''}</div>
     ${m.preco>0?`<p class="pv">À vista <b>${brl(m.preco)}</b></p>`:''}<div class="acts"><button class="btn red" onclick="openM(cur,'con')">Consórcio</button><button class="btn red" onclick="openM(cur,'fin')">Financiamento</button>
     <a class="btn wa" target="_blank" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+hn(m)+'. Gostaria de saber mais sobre as condições (compra à vista).')}">Whatsapp</a></div>
-    ${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
+    ${corChips(m)}${m.descricao?`<div class="ft">Especificações/Ficha Técnica</div><div class="desc">${fmtDesc(m.descricao)}</div>`:''}
     <button class="btn" onclick="chatOpen(null,'${m.id}')">Tirar dúvidas no chat com o vendedor</button><button class="btn" onclick="shareM()">Compartilhar esta moto</button>`;
   if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howT()">▶ Como funciona?</button></div>
     ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
@@ -734,7 +741,7 @@ fin_tem:{q:()=>'Você tem entrada para o financiamento?',opts:()=>['Sim','Não']
 fin_val:{q:()=>'Qual o valor da entrada?',ph:'Ex.: 3000',mode:'decimal',run(v){const n=money(v);if(n<=0)return{err:'Digite só o valor, por exemplo 3000.'};return{show:brl(n),set:{entrada:brl(n)},say:()=>['Anotado!'],next:'nomec'}}},
 con_plano:{q:()=>moto()&&(moto().planos||[]).length?'Qual parcela do consórcio cabe melhor no seu bolso?':'Qual valor de parcela por mês cabe no seu bolso?',ph:'Ex.: 500',mode:'decimal',opts:()=>{const p=moto()?(moto().planos||[]):[];return p.length?[...p.map(x=>`${x.parcelas}x de ${brl(x.valor)}`),'Outro valor']:[]},run(v){const o=CH.opts,i=o.length?opt(v,o):-1;if(i>=0&&o[i]!=='Outro valor')return{show:o[i],set:{parcela:o[i]},next:'nomec'};if(i>=0)return{show:v,next:'con_outro'};const n=money(v);if(n<=0)return{err:'Toque em uma opção ou digite o valor da parcela 👇'};return{show:brl(n),set:{parcela:brl(n)+' por mês'},next:'nomec'}}},
 con_outro:{q:()=>'Digite o valor da parcela mensal que você prefere:',ph:'Ex.: 450',mode:'decimal',run(v){const n=money(v);if(n<=0)return{err:'Digite só o valor, por exemplo 450.'};return{show:brl(n),set:{parcela:brl(n)+' por mês'},next:'nomec'}}},
-av_forma:{q:()=>'Como pretende pagar?',opts:()=>['Pix','Dinheiro','Transferência'],run(v){const o=['Pix','Dinheiro','Transferência'],i=opt(v,o);if(i<0)return{err:'Toque em uma das opções abaixo 👇'};return{show:o[i],set:{forma:o[i]},next:'av_troca'}}},
+av_forma:{q:()=>'Como pretende pagar?',opts:()=>['Pix','Dinheiro','Transferência'],run(v){const o=['Pix','Dinheiro','Transferência'],i=opt(v,o);if(i<0)return{err:'Toque em uma das opções abaixo 👇'};return{show:o[i],set:{forma:o[i]},next:'fim'}}},
 av_troca:{q:()=>'Tem moto para dar na troca?',opts:()=>['Sim','Não'],run(v){const i=opt(v,['Sim','Não']);if(i<0)return{err:'Toque em Sim ou Não 👇'};return i===0?{show:'Sim',next:'troca'}:{show:'Não',set:{troca:'Não'},next:'fim'}}},
 troca:{q:()=>'Qual moto e de que ano ela é?',ph:'Ex.: CG 160 2020',run(v){if(norm(v).length<2)return{err:'Me diga qual moto é 🙂'};return{show:v,set:{troca:v.trim()},next:'fim'}}},
 cc_parc:{q:()=>'Em quantas vezes você pretende parcelar?',opts:()=>['1x','Até 6x','Até 12x','Mais de 12x'],run(v){const o=['1x','Até 6x','Até 12x','Mais de 12x'],i=opt(v,o);if(i<0)return{err:'Toque em uma das opções abaixo 👇'};return{show:o[i],set:{cartao:o[i]},next:'fim'}}},
@@ -767,7 +774,7 @@ async function submit(v){v=String(v||'').trim();if(!v||CH.busy||!ST[CH.step])ret
 const T={financiamento:'FINANCIAMENTO',consorcio:'CONSÓRCIO',avista:'COMPRA À VISTA',cartao:'COMPRA NO CARTÃO DE CRÉDITO'};
 function resumo(){const a=CH.ans,l=[];a.moto&&l.push('Moto: '+a.moto);a.pag&&l.push('Pagamento: '+T[a.pag]);a.entrada&&l.push('Entrada: '+a.entrada);a.parcela&&l.push('Parcela desejada: '+a.parcela);a.forma&&l.push('Forma: '+a.forma);a.troca&&l.push('Troca: '+a.troca);a.cartao&&l.push('Cartão: '+a.cartao);return l.join('\n')}
 function msg(){const a=CH.ans,nd=a.pag==='financiamento'||a.pag==='consorcio',l=[`Olá, vim do seu site e quero as condições de ${T[a.pag]} da ${(a.moto||'moto').toUpperCase()} que vi no seu site.`,nd?'Seguem os dados para APROVACAO:':'Seguem meus dados:'];
- if(a.pag==='financiamento')l.push('Entrada: '+(a.entrada||'Sem entrada'));if(a.pag==='consorcio'&&a.parcela)l.push('Parcela desejada: '+a.parcela);if(a.pag==='avista'){l.push('Forma de pagamento: '+a.forma);l.push('Moto na troca: '+a.troca)}if(a.pag==='cartao')l.push('Parcelamento: '+a.cartao);
+ if(a.pag==='financiamento')l.push('Entrada: '+(a.entrada||'Sem entrada'));if(a.pag==='consorcio'&&a.parcela)l.push('Parcela desejada: '+a.parcela);if(a.pag==='avista'){l.push('Forma de pagamento: '+a.forma);if(a.troca)l.push('Moto na troca: '+a.troca)}if(a.pag==='cartao')l.push('Parcelamento: '+a.cartao);
  if(nd){l.push('Data de nascimento: '+a.nasc);l.push('CPF: '+a.cpf)}l.push('Nome: '+(a.nomec||a.nome));l.push('Celular: +'+a.tel);if(a.cor)l.push('Cor da moto: '+a.cor);if(a.hab)l.push('Habilitação: '+a.hab);l.push('IA VENDEDOR VIRTUAL');return l.join('\n')}
 const uid=()=>window.crypto&&crypto.randomUUID?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:r&3|8).toString(16)});
 async function sync(done){const a=CH.ans;if(!sb||!a.tel||!CH.id)return;const p={id:CH.id,completo:!!done,moto_id:a.motoId||'',moto_nome:a.moto,pagamento:a.pag,nome:a.nome,nome_completo:a.nomec,telefone:'+'+a.tel,cpf:a.cpf,nascimento:a.nasc,entrada:a.entrada,parcela:a.parcela,forma_pagamento:a.forma,troca:a.troca,parcelamento_cartao:a.cartao,habilitacao:a.hab,cor:a.cor};if(done)p.mensagem=msg();Object.keys(p).forEach(k=>(p[k]===undefined||p[k]===null)&&delete p[k]);let err=null;try{const r=await sb.rpc('registrar_pedido_chat',{p});if(r&&r.error)err=r.error}catch(e){err=e}
