@@ -321,6 +321,52 @@ function polAbrir(e){
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',banner);else banner();
 })();
 </script>
+<script id="segjs">
+/* ===== ENVIO SEGURO: o dado do cliente nunca se perde ===== */
+const SEG_OBX='obx_v2';
+function obxGet(){try{return JSON.parse(localStorage.getItem(SEG_OBX)||'[]')}catch(e){return[]}}
+function obxSet(a){try{localStorage.setItem(SEG_OBX,JSON.stringify(a.slice(-40)))}catch(e){}}
+/* insere; se o banco recusar uma coluna que não existe (ex.: "cor"), tira a coluna e tenta de novo (o dado principal nunca é perdido) */
+async function segInsert(tab,row){
+  const r={...row};
+  for(let i=0;i<8;i++){
+    let q;try{q=await sb.from(tab).insert(r)}catch(e){return{ok:false,error:e}}
+    if(!q.error)return{ok:true,row:r};
+    const msg=q.error.message||'',m=/Could not find the '([a-z_0-9]+)' column/i.exec(msg)||/column "?([a-z_0-9]+)"? (?:of relation|does not exist)/i.exec(msg);
+    if(m&&Object.prototype.hasOwnProperty.call(r,m[1])&&m[1]!=='vendedor_id'&&m[1]!=='lgpd_aceite'){
+      const val=r[m[1]];delete r[m[1]];
+      if(val&&tab==='leads')r.detalhes=((r.detalhes?r.detalhes+' | ':'')+m[1]+': '+val);
+      continue}
+    return{ok:false,error:q.error}}
+  return{ok:false,error:{message:'tentativas esgotadas'}}}
+/* grava; se não der, guarda no aparelho e reenvia sozinho (ao abrir o site, ao voltar a internet e a cada minuto) */
+async function segSend(tab,row){
+  const r=await segInsert(tab,row);
+  if(!r.ok){const a=obxGet();a.push({slug:SLUG,tab,row,ts:Date.now(),n:0});obxSet(a)}
+  return r.ok}
+async function obxFlush(){
+  try{if(typeof sb==='undefined'||!sb)return}catch(e){return}
+  const a=obxGet();if(!a.length)return;const resto=[];
+  for(const it of a){
+    if(it.slug!==SLUG){resto.push(it);continue}
+    const r=await segInsert(it.tab,it.row);
+    if(!r.ok){it.n=(it.n||0)+1;if(it.n<30&&Date.now()-it.ts<3*864e5)resto.push(it)}}
+  obxSet(resto)}
+addEventListener('online',()=>obxFlush());setInterval(()=>obxFlush(),60000);setTimeout(()=>obxFlush(),2500);
+/* ===== PREENCHIMENTO EM ANDAMENTO: o que o cliente digita já chega ao vendedor, mesmo sem clicar em "Enviar" ===== */
+function rascId(key){
+  try{const k='rid_v1:'+SLUG+':'+key;let v=sessionStorage.getItem(k);
+    if(!v){v=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});sessionStorage.setItem(k,v)}
+    return v}catch(e){return null}}
+let _rt=null;
+function rascunho(origem,key,dados){
+  try{if(typeof sb==='undefined'||!sb||typeof sb.rpc!=='function')return}catch(e){return}
+  clearTimeout(_rt);
+  _rt=setTimeout(()=>{const id=rascId(key);if(!id)return;
+    sb.rpc('registrar_rascunho',{p:{id,origem,nome:dados.nome,telefone:dados.telefone,moto_nome:dados.moto_nome,cor:dados.cor,dados}}).then(()=>{},()=>{})},1200)}
+function rascCompleto(origem,key){
+  try{const id=rascId(key);if(id&&sb&&sb.rpc)sb.rpc('registrar_rascunho',{p:{id,origem,completo:true}}).then(()=>{},()=>{})}catch(e){}}
+</script>
 </head>
 <body>
 <div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -430,7 +476,7 @@ function openM(i,v){
     ${fld('f_nom','Nome completo','autocomplete="name"')}${fld('f_tel','Telefone com DDD (WhatsApp)','inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000"','tel')}${fld('f_cpf','CPF','inputmode="numeric" placeholder="000.000.000-00"','cpf')}${fld('f_nas','Data de nascimento','inputmode="numeric" autocomplete="bday" placeholder="DD/MM/AAAA"','dt')}${fld('f_ent','Valor de entrada (opcional)','inputmode="numeric" placeholder="Deixe em branco se não tiver"','rs')}
     ${(m.cores||[]).length?`<label class="l" for="f_cor">Cor da moto (opcional)</label><select id="f_cor"><option value="">Selecione a cor</option>${m.cores.map(c=>`<option>${esc(c)}</option>`).join('')}<option>Sem preferência</option></select>`:fld('f_cor','Cor da moto (opcional)','autocomplete="off" placeholder="Ex.: Vermelha"')}
     <label class="l" for="f_hab">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
-    <p class="mu" style="font-size:12px;border-top:1px solid var(--bd);padding-top:12px">Ao enviar, você concorda com nossa <a href="#" onclick="priv();return false">Política de Privacidade</a>.</p>
+    <p class="mu" style="font-size:12px;border-top:1px solid var(--bd);padding-top:12px">Ao preencher ou enviar, você concorda com nossa <a href="#" onclick="priv();return false">Política de Privacidade</a>. O que você digita já fica disponível ao vendedor, para ele poder te ajudar, mesmo que você não conclua o envio.</p>
     <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
   const mo=$('#modal');if(mo.style.display!=='block'){history.pushState({m:1},'');FO=document.activeElement}
   const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
@@ -440,19 +486,23 @@ function openM(i,v){
 }
 const nav=d=>{const j=(cur+d+L.length)%L.length;openM(j,soCon(L[j])?'con':'det')};
 const closeM=()=>history.state&&history.state.m?history.back():$('#modal').style.display='none';
-async function lead(tipo,x={}){const m=L[cur],r={tipo,moto_id:m.id,moto_nome:m.nome,...x};try{let q=await sb.from('leads').insert(r);if(q.error&&r.cor){const c=r.cor;delete r.cor;r.detalhes=(r.detalhes?r.detalhes+' | ':'')+'Cor: '+c;await sb.from('leads').insert(r)}}catch(e){}}
+async function lead(tipo,x={}){const m=L[cur],r={tipo,moto_id:m.id,moto_nome:m.nome,...x};try{return await segSend('leads',r)}catch(e){return false}}
 function conWa(rep){
   const m=L[cur],r=document.querySelector('input[name=pl]:checked'),p=r&&(m.planos||[])[r.value];
   const t=rep?`Olá! Quero um repasse de consórcio da ${hn(m)}.`:p?`Olá! Tenho interesse na ${hn(m)} no plano de ${p.parcelas} parcelas de ${brl(p.valor)}. Gostaria de fazer uma simulação.`:`Olá! Tenho interesse no consórcio da ${hn(m)}. Gostaria de fazer uma simulação.`;
   lead('consorcio',{detalhes:t});window.open(wa(t),'_blank');
 }
 let fsb=0;
+function vitRasc(e){const id=e.target&&e.target.id||'';if(!/^f_(nom|tel|cpf|nas|ent|hab|cor)$/.test(id))return;
+  try{const g=i=>(document.getElementById(i)||{value:''}).value.trim(),m=L[cur];
+    rascunho('financiamento','fin-'+m.id,{nome:g('f_nom'),telefone:g('f_tel'),cpf:g('f_cpf'),nascimento:g('f_nas'),entrada:g('f_ent'),habilitacao:g('f_hab'),cor:g('f_cor'),moto_nome:hn(m)})}catch(err){}}
+document.addEventListener('input',vitRasc,true);document.addEventListener('change',vitRasc,true);
 function finSend(){
   if(fsb)return;let bad=null;['f_nom','f_tel','f_cpf','f_nas'].forEach(i=>{if(!vf(i)&&!bad)bad=i});
   if(bad){$('#'+bad).focus();return toast('Confira os campos destacados')}
   const g=i=>$('#'+i).value.trim(),m=L[cur];
   const d={entrada:g('f_ent'),nascimento:g('f_nas'),cpf:g('f_cpf'),nome:g('f_nom'),telefone:g('f_tel'),habilitacao:$('#f_hab').value,cor:g('f_cor')};
-  fsb=1;setTimeout(()=>fsb=0,3000);lead('financiamento',d);
+  fsb=1;setTimeout(()=>fsb=0,3000);lead('financiamento',d).then(ok=>{rascCompleto('financiamento','fin-'+m.id);if(!ok)toast('Seu pedido foi guardado e será reenviado automaticamente. Confirme também pelo WhatsApp.')});
   const t=`Olá! Quero financiar a ${hn(m)}.\nNome: ${d.nome}\nTelefone: ${d.telefone}\nCPF: ${d.cpf}\nNascimento: ${d.nascimento}\nEntrada: ${d.entrada||'Sem entrada'}${d.cor?`\nCor da moto: ${d.cor}`:''}\nPossui habilitação: ${d.habilitacao}`;
   window.open(wa(t),'_blank');toast('Enviado ao vendedor!');
 }
@@ -479,10 +529,10 @@ async function up(file){file=await shrink(file);
 }
 function adm(t){
   if(t)T=t;
-  const tabs=['resumo','vendas','pedidos','motos','leads','site','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',vendas:'Vendas',site:'Site',perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}</button>`).join('');
+  const tabs=['resumo','vendas','pedidos','motos','leads','site','perfil'].map(k=>`<button class="btn ${T===k?'on':''}" onclick="adm('${k}')">${{resumo:'Resumo',vendas:'Vendas',site:'Site',perfil:'Perfil',motos:'Motos',pedidos:'Pedidos',leads:'Contatos'}[k]}${k==='pedidos'?'<span class="nb" id="nb" hidden></span>':''}${k==='vendas'?'<span class="nb" id="vdbg" hidden></span>':''}</button>`).join('');
   $('#app').innerHTML=`<div class="ad"><div style="display:flex;justify-content:space-between;align-items:center"><h1 style="margin:0">Painel</h1>
   <span><a class="sm" href="#" style="text-decoration:none;color:inherit">Ver site</a> <button class="sm" onclick="out()">Sair</button></span></div><div class="tabs">${tabs}</div><div id="pn"></div></div>`;
-  ({resumo:pResumo,vendas:pVendas,site:pSite,perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();nbSync();rt();
+  ({resumo:pResumo,vendas:pVendas,site:pSite,perfil:pPerfil,motos:pMotos,pedidos:pPedidos,leads:pLeads})[T]();vdLive();vdPaint();nbSync();rt();
 }
 function pPerfil(){
   $('#pn').innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
@@ -788,26 +838,48 @@ function ldView(){
 async function ldSt(id,v){const{error}=await sb.from('leads').update({status:v}).eq('id',id);if(error)return toast('Erro: '+error.message);const l=LD.find(x=>x.id===id);if(l)l.status=v;ldView()}
 /* ===== VENDAS: tudo que os clientes preencheram NESTE site (o banco só entrega as linhas deste vendedor) ===== */
 let VD=[],VF='todos',VQ='';
-const VSRC={chat:'Chat',ficha:'Ficha CDC',contrato:'Pré-contrato CNH',contato:'Contatos'};
-const VTAB={chat:'pedidos_chat',ficha:'fichas',contrato:'contratos',contato:'leads'};
+const VSRC={rascunho:'Em andamento',chat:'Chat',ficha:'Ficha CDC',contrato:'Pré-contrato CNH',contato:'Contatos'};
+const VTAB={rascunho:'rascunhos',chat:'pedidos_chat',ficha:'fichas',contrato:'contratos',contato:'leads'};
 const VST={chat:{novo:'Novo',atendimento:'Em atendimento',concluido:'Concluído',cancelado:'Cancelado'},
  ficha:{novo:'Novo',em_analise:'Em análise',aprovado:'Aprovado',recusado:'Recusado'},
  contrato:{novo:'Novo',em_analise:'Em análise',contrato_enviado:'Contrato enviado',assinado:'Assinado',recusado:'Recusado'},
- contato:{novo:'Novo',atendido:'Atendido'}};
+ contato:{novo:'Novo',atendido:'Atendido'},rascunho:{}};
 const VCL={novo:'s-novo',atendimento:'s-atendimento',em_analise:'s-atendimento',contrato_enviado:'s-atendimento',concluido:'s-concluido',atendido:'s-concluido',aprovado:'s-concluido',assinado:'s-concluido',cancelado:'s-cancelado',recusado:'s-cancelado'};
 const VLB={tipo:'Tipo',pagamento:'Modalidade',cor:'Cor da moto',telefone:'Telefone',email:'E-mail',cpf:'CPF',rg:'RG',rg_emissao:'Emissão do RG',nascimento:'Nascimento',cidade_nascimento:'Cidade de nascimento',pai:'Pai',mae:'Mãe',cep:'CEP',rua:'Rua',numero:'Número',bairro:'Bairro',cidade:'Cidade',estado:'Estado',telefone_recado:'Telefone de recado',ref_nome:'Referência',ref_telefone:'Tel. da referência',ocupacao:'Ocupação',renda:'Renda',entrada:'Entrada',parcela:'Parcela desejada',forma_pagamento:'Forma de pagamento',troca:'Moto na troca',parcelamento_cartao:'Parcelamento',habilitacao:'Habilitação',lance:'Lance',lance_valor:'Valor do lance'};
 const VPG={consorcio:'Consórcio',financiamento:'Financiamento',avista:'À vista',cartao:'Cartão de crédito'};
 const vdNovo=x=>(x.status||'novo')==='novo'&&(x._s!=='chat'||x.completo);
-async function pVendas(){
-  $('#pn').innerHTML='<div class="kp kg">'+'<div class="sk" style="height:84px"></div>'.repeat(3)+'</div>';
+async function vdLoad(){
   const q=t=>sb.from(t).select().order('created_at',{ascending:false}).limit(300);
-  const r=await Promise.all([q('pedidos_chat'),q('fichas'),q('contratos'),q('leads')]);
+  const r=await Promise.all([q('pedidos_chat'),q('fichas'),q('contratos'),q('leads'),sb.from('rascunhos').select().eq('completo',false).order('updated_at',{ascending:false}).limit(200)]);
   if(!M.length){try{const mr=await sb.from('motos').select().order('ordem');if(mr.data)M=mr.data}catch(e){}}
-  if(r.every(x=>x.error)){$('#pn').innerHTML='<p class="mu">Não consegui carregar as vendas. Rode o SQL atualizado no Supabase e recarregue a página.</p>';return}
+  if(r.slice(0,4).every(x=>x.error))return false;
   const tag=(x,k)=>(x.data||[]).map(o=>({...o,_s:k}));
-  VD=[...tag(r[0],'chat'),...tag(r[1],'ficha'),...tag(r[2],'contrato'),...tag(r[3],'contato')].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  $('#pn').innerHTML='<div id="vdk"></div><div class="pdf" id="vdf"></div><input type="search" id="vdq" placeholder="Buscar por nome, telefone, CPF ou moto" value="'+esc(VQ)+'" oninput="VQ=this.value;vdView()" style="margin-bottom:12px"><div id="vdl"></div>';
-  vdView()}
+  const rs=((r[4]&&r[4].data)||[]).map(o=>({...(o.dados||{}),...o,_s:'rascunho',created_at:o.updated_at}));
+  VD=[...tag(r[0],'chat'),...tag(r[1],'ficha'),...tag(r[2],'contrato'),...tag(r[3],'contato'),...rs].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  return true}
+async function pVendas(quiet){
+  if(!quiet)$('#pn').innerHTML='<div class="kp kg">'+'<div class="sk" style="height:84px"></div>'.repeat(3)+'</div>';
+  const ok=await vdLoad();
+  if(!ok){if(!quiet)$('#pn').innerHTML='<p class="mu">Não consegui carregar as vendas. Rode o SQL atualizado no Supabase e recarregue a página.</p>';return}
+  if(!quiet||!$('#vdl'))$('#pn').innerHTML='<div id="vdk"></div><div class="pdf" id="vdf"></div><input type="search" id="vdq" placeholder="Buscar por nome, telefone, CPF ou moto" value="'+esc(VQ)+'" oninput="VQ=this.value;vdView()" style="margin-bottom:12px"><div id="vdl"></div>';
+  vdView();vdSeenSet()}
+/* ===== NOVOS CLIENTES EM TEMPO REAL: contador na aba, aviso e atualização sozinha ===== */
+let VNEW=0,VLASTN=-1,VCH=null,VPOLL=null;
+const vdSeenKey=()=>'vd_seen_'+SLUG;
+function vdSeenGet(){try{return localStorage.getItem(vdSeenKey())||'1970-01-01T00:00:00Z'}catch(e){return'1970-01-01T00:00:00Z'}}
+function vdPaint(){const b=document.getElementById('vdbg');if(b){b.textContent=VNEW;b.hidden=!VNEW}document.title=(VNEW?'('+VNEW+') ':'')+'Painel'}
+function vdSeenSet(){try{localStorage.setItem(vdSeenKey(),new Date().toISOString())}catch(e){}VNEW=0;VLASTN=0;vdPaint()}
+function vdAviso(){toast('🔔 Novo cliente chegou!');try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.value=.08;o.start();setTimeout(()=>{o.stop();c.close()},180)}catch(e){}}
+async function vdBadge(){
+  if(!sb||!V.id)return;const since=vdSeenGet();
+  const cnt=async(t,col,f)=>{try{let q=sb.from(t).select('id',{count:'exact',head:true}).gt(col,since);if(f)q=f(q);const r=await q;return r.count||0}catch(e){return 0}};
+  const n=(await cnt('pedidos_chat','created_at',q=>q.eq('completo',true)))+(await cnt('fichas','created_at'))+(await cnt('contratos','created_at'))+(await cnt('leads','created_at'))+(await cnt('rascunhos','updated_at',q=>q.eq('completo',false)));
+  const subiu=VLASTN>=0&&n>VLASTN;VNEW=n;VLASTN=n;vdPaint();if(subiu)vdAviso()}
+async function vdEvento(){await vdBadge();if(T==='vendas'&&!document.hidden&&$('#vdl'))await pVendas(true)}
+function vdLive(){
+  if(VCH||!sb)return;
+  try{VCH=sb.channel('vd-live-'+SLUG);['pedidos_chat','leads','fichas','contratos','rascunhos'].forEach(t=>VCH.on('postgres_changes',{event:'*',schema:'public',table:t},()=>{vdEvento()}));VCH.subscribe()}catch(e){}
+  clearInterval(VPOLL);VPOLL=setInterval(vdEvento,45000);vdBadge()}
 function vdView(){
   const nz=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(),q=nz(VQ).trim();
   const c={todos:VD.length,novos:VD.filter(vdNovo).length};Object.keys(VSRC).forEach(k=>c[k]=VD.filter(x=>x._s===k).length);
@@ -832,7 +904,7 @@ function vdCp(s,id){const x=VD.find(o=>o.id===id&&o._s===s);if(!x)return;
 
 /* ===== MENSAGENS AO CLIENTE (aba Vendas): modelos com nome, moto, modelo, cor e modalidade já preenchidos ===== */
 let VM={};
-const VAS=[['parabens','Parabéns + pedir documentos'],['retorno','Primeiro contato / retorno da simulação'],['docs','Lembrete: enviar documentos'],['consorcio','Proposta de consórcio (planos e valores)'],['financ','Financiamento: análise em andamento'],['aprovado','Crédito aprovado: parabéns e próximos passos'],['followup','Follow-up (cliente sumiu)'],['livre','Mensagem em branco']];
+const VAS=[['parabens','Parabéns + pedir documentos'],['retorno','Primeiro contato / retorno da simulação'],['docs','Lembrete: enviar documentos'],['consorcio','Proposta de consórcio (planos e valores)'],['financ','Financiamento: análise em andamento'],['aprovado','Crédito aprovado: parabéns e próximos passos'],['continuar','Cliente começou e não terminou (ajudar a concluir)'],['followup','Follow-up (cliente sumiu)'],['livre','Mensagem em branco']];
 const VDOCS=[['aberto','📄','Foto do documento aberto (RG ou CNH, frente e verso)',1],['cpf','🔢','CPF',1],['end','🏠','Comprovante de endereço atualizado (conta de luz, água ou internet)',1],['renda','💰','Comprovante de renda',0],['selfie','🤳','Selfie segurando o documento',0]];
 const VUSA={parabens:1,docs:1,aprovado:1};
 function vdMoto(x){
@@ -842,6 +914,7 @@ function vdMoto(x){
   return m||null}
 function vdPagTxt(x){
   if(x._s==='ficha')return'Financiamento';if(x._s==='contrato')return'Consórcio';
+  if(x._s==='rascunho')return x.origem==='contrato'?'Consórcio':'Financiamento';
   const k=x._s==='chat'?x.pagamento:x.tipo;
   return({consorcio:'Consórcio',financiamento:'Financiamento',ficha:'Financiamento',contrato:'Consórcio',avista:'À vista',cartao:'Cartão de crédito'})[k]||''}
 function vdCtx(x){
@@ -865,6 +938,7 @@ function vdTpl(id,x){
     return`${ola} ${o}\n\nParabéns pela decisão de conquistar a sua ${sua}! 🎉\n\n`+(l?`Veja as opções de consórcio${c.emp?' ('+c.emp.toLowerCase()+')':''}:\n${l}\n\nQual parcela cabe melhor no seu bolso? Eu te ajudo a escolher o melhor plano e sigo com a sua adesão.`:`Me diga qual parcela mensal cabe no seu bolso que eu busco a melhor condição de consórcio para você.`)+`\n\n*Valores sujeitos a ajuste conforme a tabela do consórcio.*`}
   if(id==='financ')return`${ola} ${o} 😊\n\nA sua proposta de financiamento da ${sua} está em análise${c.entrada?' (entrada de '+c.entrada+')':''}. Estou consultando os bancos para trazer as melhores parcelas e te retorno assim que tiver o resultado.\n\nSe algo mudar (entrada, valor de parcela ou documento), me avise por aqui. 🤝`;
   if(id==='aprovado')return`${ola} 🎉 ${o}\n\nTenho uma ótima notícia: a sua análise foi *aprovada*! Parabéns pela dedicação, essa conquista é sua. 🏍️👏\n\n📋 *Resumo*\n${vdResumo(c)}\n\nPara finalizarmos, preciso de:\n${docs||'• (marque os documentos acima)'}\n\n${dn}\nDepois combinamos a assinatura e a retirada da sua moto. 🙌`;
+  if(id==='continuar')return`${ola} ${o} 😊\n\nVi que você começou a preencher a proposta da ${sua} e quis te ajudar a concluir. Falta pouco! Se preferir, me passe por aqui os dados que faltam ou me diga qualquer dúvida sobre valores, parcelas ou documentos. 🏍️🤝`;
   if(id==='followup')return`${ola} ${o}\n\nPassando para saber se você ainda tem interesse na ${sua}. 🏍️ Se tiver qualquer dúvida sobre valores, prazos ou documentos, é só falar. Fico à disposição! 🤝`;
   return ola+' '}
 function vdMsg(s,id){
