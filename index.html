@@ -473,6 +473,79 @@ body.adm-on,body{--rd:18px}
 .shell button,.shell .btn,.shell input,.shell select,.shell textarea,.shell pre,.shell summary{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
 
 </style>
+<style id="tema4">
+/* ===== TEMA 4: componentes (formulários, envio de mensagem, perfil, motos) ===== */
+input[type=checkbox],input[type=radio]{width:auto!important;height:auto!important;min-height:0;padding:0!important;margin:0;accent-color:#c80000;flex:none}
+a.btn,.shell a.btn,.vm a.btn{text-decoration:none}
+.mn .card2 .btn,.mn .card2>.btn{width:auto}
+.mn .card2 .btn.block{width:100%}
+/* envio de mensagem */
+.vdm{position:fixed;inset:0;z-index:9000;background:rgba(18,18,28,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:18px}
+.cmp{background:#fff;color:#17171c;width:min(680px,100%);max-height:94vh;display:flex;flex-direction:column;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.35);overflow:hidden;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}
+.cmp-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid #eeeef3;background:linear-gradient(180deg,#fff,#fafafc)}
+.cmp-h .cl-av{width:42px;height:42px;font-size:17px}.cmp-h b{display:block;font-size:16px;line-height:1.25}.cmp-h small{display:block;color:#7a7a88;font-size:12.5px;margin-top:2px}
+.cmp-x{margin-left:auto;width:36px;height:36px;border-radius:50%;border:0;background:#f0f0f4;color:#444;font-size:15px;cursor:pointer;flex:none}.cmp-x:hover{background:#e6e6ee}
+.cmp-b{padding:16px 18px;overflow:auto;display:flex;flex-direction:column;gap:6px}
+.cmp-l{font-size:12px;font-weight:700;color:#6a6a78;text-transform:uppercase;letter-spacing:.4px;margin:8px 0 2px}.cmp-l small{text-transform:none;letter-spacing:0;font-weight:500;color:#8a8a98}
+.cmp select,.cmp textarea{width:100%;box-sizing:border-box;border:1px solid #dcdce6;border-radius:13px;padding:12px 13px;font:15px/1.55 Inter,system-ui,sans-serif;background:#fff;color:#17171c}
+.cmp select:focus,.cmp textarea:focus{outline:0;border-color:#c80000;box-shadow:0 0 0 3px rgba(200,0,0,.12)}
+.cmp textarea{min-height:250px;resize:vertical}
+.cmp-docs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px;margin:2px 0 4px}
+.chk{display:flex;align-items:flex-start;gap:10px;border:1.5px solid #e3e3ec;border-radius:13px;padding:10px 12px;cursor:pointer;font-size:13.5px;line-height:1.4;background:#fff;transition:border-color .15s,background .15s;margin:0!important;font-weight:500}
+.chk:hover{border-color:#cfcfdc}.chk:has(input:checked){border-color:#c80000;background:#fff6f6}.chk input{margin-top:1px!important;width:18px!important;height:18px!important}.chk span{flex:1}
+.cmp-f{display:flex;gap:10px;flex-wrap:wrap;padding:14px 18px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #eeeef3;background:#fafafc;align-items:center}
+.cmp-f .btn{width:auto;padding:12px 22px}.cmp-n{margin:0;font-size:12.5px;color:#7a7a88;flex:1;min-width:180px}
+@media(max-width:640px){.vdm{align-items:flex-end;padding:0}.cmp{border-radius:22px 22px 0 0;max-height:96vh}.cmp textarea{min-height:200px}.cmp-docs{grid-template-columns:1fr}}
+/* perfil */
+.pf{display:flex;flex-direction:column;gap:22px}
+.pf-up{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.pf-c{display:flex;gap:14px;align-items:center;border:1px dashed #d9d9e3;border-radius:16px;padding:14px;background:#fafafc}
+.pf-c .ava,.pf-c img.ava{width:64px;height:64px;border-radius:50%;object-fit:cover;overflow:hidden;font-size:0;flex:none}.pf-c img.logo{width:64px;height:64px;object-fit:contain;border-radius:12px;background:#fff;border:1px solid #ececf2;flex:none}
+.pf-c b{display:block;font-size:14.5px}.pf-c small{display:block;color:#7a7a88;font-size:12.5px;margin:2px 0 8px}
+.upl{display:inline-flex;align-items:center;gap:6px;border:1px solid #dcdce6;background:#fff;border-radius:999px;padding:8px 14px;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}.upl:hover{background:#f3f4f8}.upl input{display:none}
+.pf h4{margin:0 0 10px;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:#7a7a88}
+.fg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px}.fg .full{grid-column:1/-1}.fg .l{margin-top:10px}
+.pf-s{display:flex;justify-content:flex-end}.pf-s .btn{width:auto;padding:13px 28px}
+@media(max-width:700px){.fg{grid-template-columns:1fr}.pf-s .btn{width:100%}}
+/* motos */
+.mt-bar{display:flex;gap:10px;margin-bottom:14px;align-items:center}.mt-bar input{flex:1;margin:0!important}.mt-bar .btn{width:auto;flex:none;padding:12px 20px}
+.mx{display:flex;gap:14px;align-items:center;background:#fff;border:1px solid #ebebf1;border-radius:16px;padding:12px 14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,20,40,.03)}
+.mx.off{opacity:.72;background:#fbfbfd}
+.mx-i{width:92px;height:68px;flex:none;border-radius:12px;background:#f4f5f9;display:grid;place-items:center;overflow:hidden}.mx-i img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.mx-t{flex:1;min-width:0}.mx-t b{display:block;font-size:15.5px;line-height:1.3}.mx-t small{display:block;color:#6a6a78;font-size:13px;margin-top:2px}
+.mx-g{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:7px}.mx-g .cdots{margin:0}
+.tag2{display:inline-block;border-radius:999px;font-size:11px;font-weight:700;padding:3px 9px;background:#eeeef3;color:#555}.tag2.ok{background:#e4f6ec;color:#16803c}.tag2.off{background:#ececf1;color:#666}.tag2.warn{background:#fff3df;color:#a35f00}
+.mx-a{display:flex;gap:8px;align-items:center;position:relative;flex:none}.mx-a .btn{width:auto;padding:9px 15px}
+.mx-m{position:relative}.mx-m>summary{list-style:none;cursor:pointer}.mx-m>summary::-webkit-details-marker{display:none}
+.mx-mm{position:absolute;right:0;top:calc(100% + 6px);z-index:20;background:#fff;border:1px solid #e3e3ec;border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.16);padding:6px;min-width:160px;display:flex;flex-direction:column}
+.mx-mm button{border:0;background:none;text-align:left;padding:10px 12px;border-radius:9px;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;color:#2b2b33}.mx-mm button:hover{background:#f3f4f8}.mx-mm button.dg{color:#b30000}
+.mx-sec{margin:26px 0 6px}
+@media(max-width:700px){.mx{flex-wrap:wrap}.mx-i{width:72px;height:56px}.mx-a{width:100%;justify-content:flex-end}.mt-bar{flex-wrap:wrap}.mt-bar .btn{width:100%}}
+/* teste de entrega */
+.te{background:#fff;color:#222;border-radius:22px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 24px 70px rgba(0,0,0,.35);font:14px/1.5 Inter,system-ui,sans-serif}
+.te h3{margin:0 0 4px;font-size:19px}.te .te-r{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f0f0f5}.te .te-r small{display:block;color:#6a6a78;word-break:break-word}.te .te-fin{margin-top:12px;padding:12px 14px;border-radius:12px;font-weight:700}.te .te-fin.ok{background:#e4f6ec;color:#16803c}.te .te-fin.er{background:#fdeaea;color:#b30000}
+.mx-m{border:0!important;padding:0!important;margin:0!important;background:none!important;box-shadow:none!important}
+.mx-m>summary{display:inline-flex;align-items:center;justify-content:center;min-width:40px}
+.mx-mm{min-width:200px;white-space:nowrap}
+.pf-c .logo{width:64px;height:64px;border-radius:12px;background:#fff;border:1px solid #ececf2;flex:none;object-fit:contain}
+
+
+/* ===== blindagem das caixas de marcar e editor de moto ===== */
+.shell input[type=checkbox],.shell input[type=radio],.cmp input[type=checkbox],.cmp input[type=radio]{width:18px!important;height:18px;min-width:18px;padding:0!important;margin:0!important;flex:none;transform:none;accent-color:#c80000}
+.cmp-docs label{display:flex!important;align-items:flex-start;gap:10px;justify-content:flex-start!important;text-align:left}
+.fm-top{display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}.fm-top h2{margin:0;font-size:20px}
+.fm-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.fm-grid .span2{grid-column:1/-1}.fld{margin:0 0 12px;min-width:0}.fld .l{margin:10px 0 4px}.fld input,.fld select{margin-top:0!important}.fm-h{margin:4px 0 12px;font-size:13px}
+.cor-row{display:flex;flex-wrap:wrap;gap:6px}
+.upl{display:inline-flex;align-items:center;gap:8px;background:#f3f4f8;border:1px dashed #c9cadb;border-radius:12px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer}.upl:hover{background:#eceef6}
+.ph{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px;margin:12px 0}.ph>div{position:relative;border:2px solid #ebebf1;border-radius:12px;background:#fafafc;overflow:hidden;aspect-ratio:4/3}.ph>div.cv{border-color:#c80000}.ph>div.cv::after{content:'Capa';position:absolute;left:6px;top:6px;background:#c80000;color:#fff;font-size:10.5px;font-weight:800;border-radius:99px;padding:2px 8px}
+.ph img{width:100%;height:100%;object-fit:contain;cursor:pointer;display:block}.ph i{position:absolute;right:6px;top:6px;width:24px;height:24px;border-radius:50%;background:rgba(20,20,28,.78);color:#fff;display:grid;place-items:center;font-style:normal;cursor:pointer;font-size:15px;line-height:1}
+.pr{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:6px}.pr .btn{width:auto;margin-bottom:12px}
+.fm-lock{background:#f6f6f9;border:1px solid #ececf2;border-radius:14px;padding:14px}.fm-pl{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.fm-pl span{background:#fff;border:1px solid #e3e3ec;border-radius:10px;padding:6px 10px;font-weight:700;font-size:14px}.fm-pl em{font-style:normal;color:#7a7a88;font-size:12px;margin-right:6px}
+.sw{display:flex;gap:14px;align-items:center;cursor:pointer}.sw input{position:absolute;opacity:0;width:0!important;height:0}.sw-t{width:46px;height:26px;border-radius:99px;background:#d4d4de;position:relative;flex:none;transition:background .2s}.sw-t::after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .2s}
+.sw input:checked+.sw-t{background:#16a34a}.sw input:checked+.sw-t::after{left:23px}.sw b{display:block}.sw small{display:block;color:#7a7a88;font-size:12.5px;margin-top:2px}.sw input:focus-visible+.sw-t{outline:3px solid #9bbcf5}
+.fm-bar{position:sticky;bottom:0;z-index:5;display:flex;gap:10px;justify-content:flex-end;background:linear-gradient(180deg,rgba(244,245,249,0),#f4f5f9 30%);padding:18px 0 4px;margin-top:6px}.fm-bar .btn{width:auto;padding:13px 26px}
+@media(max-width:900px){.fm-grid{grid-template-columns:1fr}.pr{grid-template-columns:1fr 1fr auto}.fm-bar{bottom:68px;padding-bottom:10px}.fm-bar .btn{flex:1}}
+</style>
 </head>
 <body>
 <div id="app"></div><div id="modal" role="dialog" aria-modal="true" aria-label="Detalhes da moto"></div><div id="toast" role="status" aria-live="polite"></div>
@@ -663,15 +736,11 @@ async function up(file){file=await shrink(file);
 }
 
 function pPerfil(){
-  $(PNS).innerHTML=`<div style="display:flex;gap:14px;align-items:center">${av(V.foto_url)}<div><label class="l">Foto de perfil</label><input type="file" accept="image/*" onchange="upV('foto_url',this)"></div></div>
-  <div style="display:flex;gap:14px;align-items:center;margin-top:10px">${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}">`:''}<div><label class="l">Logo da empresa</label><input type="file" accept="image/*" onchange="upV('logo_url',this)"></div></div>
-  <label class="l">Nome do vendedor</label><input id="v_n" value="${esc(V.nome)}">
-  <label class="l">Frase / bio</label><input id="v_b" value="${esc(V.bio)}">
-  <label class="l">WhatsApp (55 + DDD + número, só números)</label><input id="v_w" value="${esc(V.whatsapp)}" inputmode="numeric">
-  <label class="l">Instagram (sem @)</label><input id="v_i" value="${esc(V.instagram)}">
-  <label class="l">Facebook (usuário ou link, opcional)</label><input id="v_f" value="${esc(V.facebook)}">
-  <button class="btn red" onclick="saveV()">Salvar perfil</button>`;
-}
+  $(PNS).innerHTML=`<div class="pf"><div><h4>Foto e logo</h4><div class="pf-up"><div class="pf-c">${av(V.foto_url)}<div><b>Foto de perfil</b><small>Aparece no topo do seu site</small><label class="upl">Trocar foto<input type="file" accept="image/*" onchange="upV('foto_url',this)"></label></div></div>
+  <div class="pf-c">${V.logo_url?`<img class="logo" src="${esc(V.logo_url)}" alt="">`:'<div class="logo" style="display:grid;place-items:center;font-size:26px">🏢</div>'}<div><b>Logo da empresa</b><small>Opcional</small><label class="upl">Trocar logo<input type="file" accept="image/*" onchange="upV('logo_url',this)"></label></div></div></div></div>
+  <div><h4>Dados de contato</h4><div class="fg"><div><label class="l" for="v_n">Nome do vendedor</label><input id="v_n" value="${esc(V.nome)}"></div><div><label class="l" for="v_w">WhatsApp (55 + DDD + número)</label><input id="v_w" value="${esc(V.whatsapp)}" inputmode="numeric" placeholder="5568999990000"></div><div class="full"><label class="l" for="v_b">Frase de apresentação</label><input id="v_b" value="${esc(V.bio)}" placeholder="Ex.: Venha conquistar sua moto comigo!"></div></div></div>
+  <div><h4>Redes sociais</h4><div class="fg"><div><label class="l" for="v_i">Instagram (sem @)</label><input id="v_i" value="${esc(V.instagram)}"></div><div><label class="l" for="v_f">Facebook (usuário ou link)</label><input id="v_f" value="${esc(V.facebook)}"></div></div></div>
+  <div class="pf-s"><button class="btn red" onclick="saveV()">Salvar perfil</button></div></div>`}
 async function nbSync(){const b=$('#nb');if(!b)return;const{count}=await sb.from('pedidos_chat').select('id',{count:'exact',head:true}).eq('status','novo').eq('completo',true);b.hidden=!count;b.textContent=count||'';document.title=(count?`(${count}) `:'')+'Painel'}
 let RT=null;
 function rt(){if(RT)return;try{RT=sb.channel('pd').on('postgres_changes',{event:'*',schema:'public',table:'pedidos_chat'},e=>{
@@ -687,12 +756,15 @@ async function saveV(){
 const CAT=[['POP 110I ES +10%', 'Street', 'C', '80:216.59,60:280.54,48:345.55,36:455.23,24:669.58,18:887.60,12:1323.66'], ['BIZ 125 ES', 'Street', 'C', '80:273.75,60:354.56,48:436.72,36:575.35,24:846.25,18:1121.80,12:1672.91'], ['ELITE 125', 'Street', 'C', '80:287.34,60:372.16,48:458.40,36:603.92,24:888.27,18:1177.49,12:1755.97'], ['BIZ 125 EX', 'Street', 'C', '80:339.18,60:439.31,48:541.12,36:712.89,24:1048.54,18:1389.96,12:2072.81'], ['CG 160 START', 'Street', 'C', '80:349.24,60:452.34,48:557.16,36:734.03,24:1079.64,18:1431.17,12:2134.28'], ['PCX CBS', 'Street', 'C', '80:374.60,60:485.19,48:597.62,36:787.33,24:1158.04,18:1535.11,12:2289.27'], ['CG 160 FAN', 'Street', 'C', '80:381.06,60:493.56,48:607.93,36:800.91,24:1178.01,18:1561.58,12:2328.74'], ['CG 160 TITAN', 'Street', 'C', '80:404.82,60:524.33,48:645.83,36:850.85,24:1251.46,18:1658.94,12:2473.95'], ['PCX ABS', 'Street', 'C', '80:410.87,60:532.17,48:655.49,36:863.56,24:1270.17'], ['NXR160 BROS CBS', 'Adventure', 'C', '80:447.90,60:580.12,48:714.55,36:941.38,24:1384.62'], ['NXR160 BROS ABS', 'Adventure', 'C', '80:469.53,60:608.14,48:749.07,36:986.85,24:1451.51'], ['CRF 300F', 'Off Road', 'S', '80:439.74,60:569.56,48:701.54,36:924.24,24:1359.41'], ['XRE 190', 'Adventure', 'C', '80:469.31,60:607.86,48:748.72,36:986.40,24:1450.83'], ['HONDA ADV', 'Adventure', 'C', '80:504.99,60:654.08,48:805.64,36:1061.39,24:1561.13'], ['CB300F TWISTER ABS', 'Street', 'C', '80:512.68,60:664.03,48:817.90,36:1077.53,24:1584.88'], ['XR 300L TORNADO', 'Adventure', 'C', '80:602.02,60:779.75,48:960.44,36:1265.32,24:1861.08'], ['SAHARA 300', 'Adventure', 'C', '80:618.12,60:800.59,48:986.11,36:1299.14,24:1910.83'], ['SAHARA 300 ADV', 'Adventure', 'C', '80:638.80,60:827.38,48:1019.11,36:1342.61,24:1974.77'], ['CB 500 HORNET', 'Street', 'S', '72:779.89'], ['NX 500', 'Adventure', 'S', '72:829.67'], ['CB1000 HORNET ABS (70% DO VALOR)', 'Street', 'S', '72:955.38'], ['CB 750 HORNET', 'Street', 'S', '72:961.23'], ['TRX 420FM (4X4)', 'Off Road', 'S', '72:998.13'], ['NC 750X ABS MT', 'Adventure', 'S', '72:1014.82'], ['CB 650R E-CLUTCH', 'Street', 'S', '72:1065.03'], ['CRF 1100L AFRICA TWIN MT (70% DO VALOR)', 'Adventure', 'S', '72:1067.64'], ['XL 750 TRANSALP', 'Big Trail', 'S', '72:1171.81'], ['M&M ESSENCIAL', 'Motores e Máquinas', 'S', '18:126.04'], ['M&M ESSENCIAL+', 'Motores e Máquinas', 'S', '18:163.51'], ['M&M AVANÇADO', 'Motores e Máquinas', 'S', '18:204.39'], ['M&M AVANÇADO+', 'Motores e Máquinas', 'S', '18:245.27']];
 const pl=t=>t.split(',').map(x=>{const[p,v]=x.split(':');return{parcelas:+p,valor:+v}}),emp=c=>c[2]==='C'?'Com emplacamento':'Sem emplacamento';
 function pMotos(){
-  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0])),sem=M.filter(m=>CAT.some(c=>c[0]===(m.nome||'').trim().toUpperCase())&&!(m.planos||[]).length);
-  $('#pn').innerHTML=`<button class="btn red" onclick="edit()">+ Nova moto</button><input type="search" placeholder="Buscar na lista" oninput="const q=this.value.toLowerCase();document.querySelectorAll('#pn .it[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')">`+M.map(m=>`<div class="it" data-n="${esc((m.nome||'').toLowerCase())}">${img0(m)?`<img src="${esc(img0(m))}">`:'<div style="width:70px"></div>'}<div class="g"><b>${esc(m.nome)}</b><br><small>${esc(m.modelo||'')} ${m.ativo?'':'(oculta no site)'}</small>${(m.fotos||[]).length?'':'<br><small class="w">Sem foto</small>'}${(m.planos||[]).length||m.preco>0?'':'<br><small class="w">Sem planos</small>'}</div>
-  <button aria-label="Subir" onclick="mv('${m.id}',-1)">↑</button><button aria-label="Descer" onclick="mv('${m.id}',1)">↓</button><button onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button><button onclick="edit('${m.id}')">Editar</button><button onclick="dup('${m.id}')">Duplicar</button><button onclick="del('${m.id}')">Excluir</button></div>`).join('')+
-  (falta.length?`<h3 style="margin-top:26px">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px">Toque em "+ Adicionar": a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p>
-  <button class="btn" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="it"><div class="g"><b>${esc(c[0])}</b><br><small>${esc(c[1])}</small></div><button onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div>`).join(''):'');
-}
+  const tem=new Set(M.map(m=>(m.nome||'').trim().toUpperCase())),falta=CAT.filter(c=>!tem.has(c[0]));
+  const row=m=>{const pl=(m.planos||[]).filter(x=>x.valor>0),mn=pl.slice().sort((a,b)=>a.valor-b.valor)[0],fo=(m.fotos||[]).length;
+    return `<div class="mx ${m.ativo?'':'off'}" data-n="${esc((m.nome||'').toLowerCase())}"><div class="mx-i">${img0(m)?`<img src="${esc(img0(m))}" alt="">`:'<span style="font-size:22px">🏍️</span>'}</div>
+    <div class="mx-t"><b>${esc(m.nome)}${m.modelo?' '+esc(m.modelo):''}</b><small>${esc(m.categoria||'Sem categoria')}${mn?` · consórcio a partir de ${mn.parcelas}x ${brl(mn.valor)}`:''}${m.preco>0?` · à vista ${brl(m.preco)}`:''}</small>
+    <div class="mx-g"><span class="tag2 ${m.ativo?'ok':'off'}">${m.ativo?'No ar':'Oculta no site'}</span>${cdots(m)}${fo?'':'<span class="tag2 warn">Sem foto</span>'}${pl.length||m.preco>0?'':'<span class="tag2 warn">Sem planos</span>'}</div></div>
+    <div class="mx-a"><button class="btn red sm" onclick="edit('${m.id}')">Editar</button><button class="btn sm" onclick="tog('${m.id}')">${m.ativo?'Ocultar':'Publicar'}</button>
+    <details class="mx-m"><summary class="btn sm" aria-label="Mais ações">⋯</summary><div class="mx-mm"><button onclick="mv('${m.id}',-1)">↑ Subir na lista</button><button onclick="mv('${m.id}',1)">↓ Descer na lista</button><button onclick="dup('${m.id}')">Duplicar</button><button class="dg" onclick="del('${m.id}')">Excluir</button></div></details></div></div>`};
+  $('#pn').innerHTML=`<div class="mt-bar"><input type="search" placeholder="Buscar moto pelo nome" oninput="const q=this.value.toLowerCase();document.querySelectorAll('#pn .mx[data-n]').forEach(e=>e.style.display=e.dataset.n.includes(q)?'':'none')"><button class="btn red" onclick="edit()">+ Nova moto</button></div>`+(M.map(row).join('')||'<div class="empty2"><b>Você ainda não tem motos.</b><span>Toque em “+ Nova moto” para cadastrar a primeira.</span></div>')+
+  (falta.length?`<h3 class="mx-sec">Catálogo Honda pronto (${falta.length} motos)</h3><p class="mu" style="font-size:13px;margin-top:0">Toque em “+ Adicionar”: a moto entra no seu cadastro com nome e categoria, oculta no site até você completar e tocar em Publicar.</p><button class="btn" style="width:auto;margin-bottom:10px" onclick="addAll()">Adicionar todas (${falta.length})</button>`+falta.map(c=>`<div class="mx"><div class="mx-t"><b>${esc(c[0])}</b><small>${esc(c[1])}</small></div><div class="mx-a"><button class="btn sm" onclick="addCat(${CAT.indexOf(c)})">+ Adicionar</button></div></div>`).join(''):'')}
 async function mv(id,d){const i=M.findIndex(m=>m.id===id),j=i+d;if(j<0||j>=M.length)return;[M[i],M[j]]=[M[j],M[i]];
   await Promise.all(M.map((m,k)=>{if(m.ordem===k)return;m.ordem=k;return sb.from('motos').update({ordem:k}).eq('id',m.id)}));pMotos()}
 async function dup(id){const o=M.find(m=>m.id===id),{id:_a,created_at:_b,...c}=o;c.nome+=' (cópia)';c.ativo=false;c.ordem=M.length;
@@ -715,22 +787,25 @@ function edit(id){
   fm();
 }
 function fm(){
-  const f=(k,l,ph)=>`<label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value">`;
-  $('#pn').innerHTML=`<button class="sm" onclick="adm('motos')">← Voltar</button>${f('nome','Nome da moto','Ex: CB300F TWISTER ABS')}${f('modelo','Versão (ex: ABS, ES, CBS)')}${f('selo','Selo no card (opcional: Novo, Oferta, Mais vendida)')}<label class="l">Preço à vista (opcional, só números)</label><input type="number" step="0.01" value="${E.preco||''}" placeholder="Ex: 14990" oninput="E.preco=this.value?+this.value:null">
-  <label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Big Trail','Scooter','Esportiva','Motores e Máquinas'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select>
-  <label class="l">Ficha técnica: clique em pesquisar, copie do Google e cole aqui (uma linha por item, ex: Cilindrada: 109,5 cc)</label>
-  <textarea oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
-  <button class="sm" style="margin-top:8px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button>
-  <label class="l">Fotos (a primeira é a capa; toque numa foto para torná-la capa, × remove)</label><input type="file" accept="image/*" multiple onchange="upF(this)">
-  <div class="ph">${E.fotos.map((u,i)=>`<div><img src="${esc(u)}" onclick="E.fotos.unshift(E.fotos.splice(${i},1)[0]);fm()"><i onclick="E.fotos.splice(${i},1);fm()">×</i></div>`).join('')}</div>
-  <label class="l">Vídeo: link do YouTube ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value">
-  <input type="file" accept="video/*" onchange="upVid(this)">
-  ${E.catalogo_id?`<label class="l">Planos de consórcio</label><div class="mu" style="background:var(--bg,#f3f3f5);border:1px solid var(--bd,#e4e4ea);border-radius:12px;padding:10px 12px"><b>${esc(E.emplacamento||'Com emplacamento')}</b><br>${(E.planos||[]).map(p=>`${p.parcelas}x ${brl(p.valor)}`).join(' · ')||'Consulte as condições'}<br><small>🔒 Os valores do consórcio são atualizados automaticamente pelo site oficial e não podem ser alterados aqui.</small></div>`:`<label class="l">Planos de consórcio (parcelas e valor)</label><select onchange="E.emplacamento=this.value">${['Com emplacamento','Sem emplacamento'].map(o=>`<option ${(E.emplacamento||'Com emplacamento')===o?'selected':''}>${o}</option>`).join('')}</select>
-  ${E.planos.map((p,i)=>`<div class="pr"><input type="number" value="${p.parcelas}" placeholder="Parcelas" oninput="E.planos[${i}].parcelas=+this.value"><input type="number" step="0.01" value="${p.valor}" placeholder="Valor R$" oninput="E.planos[${i}].valor=+this.value"><button class="sm" onclick="E.planos.splice(${i},1);fm()">×</button></div>`).join('')}
-  <button class="sm" style="margin-top:8px" onclick="E.planos.push({parcelas:80,valor:0});fm()">+ Adicionar plano</button>`}
-  <label class="l"><input type="checkbox" style="width:auto" ${E.ativo?'checked':''} onchange="E.ativo=this.checked"> Mostrar no site</label>
-  <button class="btn red" onclick="saveM()">Salvar moto</button>`;
-}
+  const f=(k,l,ph,cls)=>`<div class="fld ${cls||''}"><label class="l">${l}</label><input value="${esc(E[k])}" placeholder="${ph||''}" oninput="E.${k}=this.value"></div>`;
+  const novo=!E.id,cs=Array.isArray(E.cores)?E.cores.filter(Boolean):[];
+  $('#pn').innerHTML=`<div class="fm"><div class="fm-top"><button type="button" class="btn sm" onclick="adm('motos')">← Voltar</button><h2>${novo?'Nova moto':esc((E.nome||'Editar moto')+(E.modelo?' '+E.modelo:''))}</h2></div>
+  <section class="card2"><h3>Dados da moto</h3><div class="fm-grid">${f('nome','Nome da moto','Ex: CB300F TWISTER ABS','span2')}${f('modelo','Versão','ABS, ES, CBS')}${f('selo','Selo no card (opcional)','Novo, Oferta, Mais vendida')}
+    <div class="fld"><label class="l">Preço à vista (opcional)</label><input type="number" step="0.01" value="${E.preco||''}" placeholder="Ex: 14990" oninput="E.preco=this.value?+this.value:null"></div>
+    <div class="fld"><label class="l">Categoria</label><select onchange="E.categoria=this.value">${['Street','Adventure','Off Road','Big Trail','Scooter','Esportiva','Motores e Máquinas'].map(c=>`<option ${E.categoria===c?'selected':''}>${c}</option>`).join('')}</select></div></div>
+    ${cs.length?`<div class="fld"><label class="l">Cores disponíveis <small>(definidas pelo catálogo geral)</small></label><div class="cor-row">${cs.map(n=>`<span class="cor"><i style="background:${corHex(n)}"></i>${esc(n)}</span>`).join('')}</div></div>`:''}</section>
+  <section class="card2"><h3>Fotos e vídeo</h3><p class="mu fm-h">A primeira foto é a capa. Toque numa foto para torná-la a capa e no × para remover.</p>
+    <label class="upl">📷 Adicionar fotos<input type="file" accept="image/*" multiple onchange="upF(this)" hidden></label>
+    <div class="ph">${E.fotos.map((u,i)=>`<div class="${i?'':'cv'}"><img src="${esc(u)}" alt="Foto ${i+1}" onclick="E.fotos.unshift(E.fotos.splice(${i},1)[0]);fm()"><i onclick="E.fotos.splice(${i},1);fm()" aria-label="Remover foto">×</i></div>`).join('')}</div>
+    <div class="fld"><label class="l">Vídeo (link do YouTube) ou envie o arquivo</label><input value="${esc(E.video_url)}" placeholder="https://youtube.com/watch?v=..." oninput="E.video_url=this.value"><label class="upl" style="margin-top:10px">🎬 Enviar vídeo<input type="file" accept="video/*" onchange="upVid(this)" hidden></label></div></section>
+  <section class="card2"><h3>Descrição e ficha técnica</h3><p class="mu fm-h">Uma linha por item (ex.: Cilindrada: 109,5 cc). Dica: pesquise no Google, copie e cole aqui.</p>
+    <textarea rows="7" oninput="E.descricao=this.value">${esc(E.descricao)}</textarea>
+    <button type="button" class="btn sm" style="margin-top:10px" onclick="window.open('https://www.google.com/search?q='+encodeURIComponent((E.nome+' '+(E.modelo||'')+' ficha técnica descrição Honda').trim()))">🔎 Pesquisar essa moto no Google</button></section>
+  <section class="card2"><h3>Planos de consórcio</h3>${E.catalogo_id?`<div class="fm-lock"><b>${esc(E.emplacamento||'Com emplacamento')}</b><div class="fm-pl">${(E.planos||[]).map(p=>`<span><em>${p.parcelas}x</em>${brl(p.valor)}</span>`).join('')||'<span>Consulte as condições</span>'}</div><small>🔒 Os valores do consórcio são atualizados automaticamente pelo site oficial e não podem ser alterados aqui.</small></div>`:`<div class="fld"><label class="l">Emplacamento</label><select onchange="E.emplacamento=this.value">${['Com emplacamento','Sem emplacamento'].map(o=>`<option ${(E.emplacamento||'Com emplacamento')===o?'selected':''}>${o}</option>`).join('')}</select></div>
+    ${E.planos.map((p,i)=>`<div class="pr"><div class="fld"><label class="l">Parcelas</label><input type="number" value="${p.parcelas}" placeholder="Parcelas" oninput="E.planos[${i}].parcelas=+this.value"></div><div class="fld"><label class="l">Valor da parcela (R$)</label><input type="number" step="0.01" value="${p.valor}" placeholder="Valor R$" oninput="E.planos[${i}].valor=+this.value"></div><button type="button" class="btn sm" onclick="E.planos.splice(${i},1);fm()" aria-label="Remover plano">×</button></div>`).join('')}
+    <button type="button" class="btn sm" style="margin-top:10px" onclick="E.planos.push({parcelas:80,valor:0});fm()">+ Adicionar plano</button>`}</section>
+  <section class="card2"><label class="sw"><input type="checkbox" ${E.ativo?'checked':''} onchange="E.ativo=this.checked"><span class="sw-t"></span><span><b>Mostrar no site</b><small>Desligue para ocultar esta moto dos clientes sem apagá-la.</small></span></label></section>
+  <div class="fm-bar"><button type="button" class="btn" onclick="adm('motos')">Cancelar</button><button type="button" class="btn red" onclick="saveM()">Salvar moto</button></div></div>`}
 async function upF(el){try{toast('Enviando fotos...');for(const f of el.files)E.fotos.push(await up(f));fm()}catch(e){toast('Erro: '+e.message)}}
 async function upVid(el){try{toast('Enviando vídeo...');E.video_url=await up(el.files[0]);fm();toast('Vídeo enviado')}catch(e){toast('Erro: '+e.message)}}
 async function saveM(){
@@ -1016,27 +1091,29 @@ function vdLive(){
 
 /* ===== TESTAR ENTREGA: faz exatamente o que um cliente do seu site faz e mostra o resultado (ou o erro exato) ===== */
 async function testarEntrega(){
-  const box=document.createElement('div');box.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px';
-  box.innerHTML='<div style="background:#fff;color:#222;border-radius:16px;padding:20px;max-width:540px;width:100%;max-height:90vh;overflow:auto;font:14px/1.5 Inter,system-ui,sans-serif"><b style="font-size:17px">🧪 Teste de entrega</b><p style="margin:6px 0;color:#666">Simulando um cliente no seu site…</p><div id="te_r"></div><button id="te_x" class="btn" style="margin-top:12px">Fechar</button></div>';
+  const gid=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
+  const box=document.createElement('div');box.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(18,18,28,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:16px';
+  box.innerHTML='<div class="te"><h3>🧪 Teste de entrega</h3><p class="mu" style="margin:0 0 10px">Simulando um cliente no seu site…</p><div id="te_r"></div><button id="te_x" class="btn" style="margin-top:14px;width:100%">Fechar</button></div>';
   document.body.appendChild(box);box.querySelector('#te_x').onclick=()=>box.remove();
-  const rows=[],draw=()=>{box.querySelector('#te_r').innerHTML=rows.map(r=>`<div style="padding:7px 0;border-bottom:1px solid #eee">${r[1]?'✅':'❌'} <b>${esc(r[0])}</b>${r[2]?'<br><small style="color:#666;word-break:break-word">'+esc(r[2])+'</small>':''}</div>`).join('')};
+  const rows=[],draw=()=>{box.querySelector('#te_r').innerHTML=rows.map(r=>r[3]?`<div class="te-fin ${r[1]?'ok':'er'}">${r[1]?'✅':'⚠️'} ${esc(r[0])}</div>`:`<div class="te-r"><span>${r[1]?'✅':'❌'}</span><div><b>${esc(r[0])}</b>${r[2]?'<small>'+esc(r[2])+'</small>':''}</div></div>`).join('')};
   const add=(n,ok,d)=>{rows.push([n,ok,d]);draw()};
   try{
     const anon=supabase.createClient(SU,SUPABASE_KEY.trim(),{global:{headers:{'x-vendedor':SLUG}},auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-    const tag='__TESTE_ENTREGA__',pid=uid();
+    const tag='__TESTE_ENTREGA__',pid=gid();
     let r=await anon.rpc('registrar_pedido_chat',{p:{id:pid,completo:true,nome:tag,nome_completo:tag,telefone:'+5568900000000',moto_nome:'TESTE',pagamento:'consorcio',mensagem:'teste de entrega'}});
     add('Chat: cliente termina a conversa',!r.error,r.error?r.error.message:'pedido gravado');
     r=await anon.from('leads').insert({tipo:'teste',nome:tag,telefone:'+5568900000000',moto_nome:'TESTE'});
     add('Formulário de financiamento',!r.error,r.error?r.error.message:'contato gravado');
-    r=await anon.rpc('registrar_rascunho',{p:{id:uid(),origem:'financiamento',nome:tag,telefone:'(68) 90000-0000',moto_nome:'TESTE',dados:{nome:tag}}});
+    r=await anon.rpc('registrar_rascunho',{p:{id:gid(),origem:'financiamento',nome:tag,telefone:'(68) 90000-0000',moto_nome:'TESTE',dados:{nome:tag}}});
     add('Cliente digitando (sem enviar)',!r.error,r.error?r.error.message:'enviado');
     const rd=await sb.from('pedidos_chat').select('id').eq('id',pid);
     add('Seu painel enxerga o que o cliente enviou',!!(rd.data&&rd.data.length),rd.error?rd.error.message:(rd.data&&rd.data.length?'sim':'o pedido foi gravado mas o painel não o enxerga'));
     await sb.from('pedidos_chat').delete().eq('id',pid);await sb.from('leads').delete().eq('nome',tag);try{await sb.from('rascunhos').delete().eq('nome',tag)}catch(e){}
     const falhou=rows.some(x=>!x[1]);
-    rows.push([falhou?'Resultado: HÁ FALHAS — tire um print desta tela e envie ao suporte':'Resultado: tudo certo, os pedidos chegam ao seu painel',!falhou,'']);draw();
+    rows.push([falhou?'Resultado: HÁ FALHAS. Tire um print desta tela e envie ao suporte.':'Resultado: tudo certo, os pedidos chegam ao seu painel.',!falhou,'',true]);draw();
   }catch(e){add('Erro inesperado',false,String(e&&e.message||e))}
 }
+
 function vdCampos(x){return Object.keys(VLB).filter(k=>x[k]!=null&&String(x[k]).trim()!=='').map(k=>{let v=x[k];if(k==='cpf')v=pCpf(v);else if(k==='pagamento')v=VPG[v]||v;else if(k==='tipo')v=TL[v]||v;return[VLB[k],v]})}
 
 async function vdSt(s,id,v){const{error}=await sb.from(VTAB[s]).update({status:v}).eq('id',id);if(error)return toast('Erro: '+error.message);const x=VD.find(o=>o.id===id&&o._s===s);if(x)x.status=v;vdView()}
@@ -1088,21 +1165,19 @@ function vdTpl(id,x){
 function vdMsg(s,id,pre){
   const x=VD.find(o=>o.id===id&&o._s===s);if(!x)return;vdFecha();
   VM={x,as:pre||'parabens',docs:Object.fromEntries(VDOCS.map(d=>[d[0],!!d[3]]))};
-  if(!document.getElementById('vdcss')){const st=document.createElement('style');st.id='vdcss';st.textContent='.vdm{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}.vdb{background:#fff;color:#17171c;width:min(640px,100%);max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}.vdb label{display:block;font-weight:600;font-size:13px;margin:12px 0 4px}.vdb select,.vdb textarea{width:100%;box-sizing:border-box;border:1px solid #d9d9df;border-radius:12px;padding:10px;font:15px/1.5 inherit;background:#fff;color:#17171c}.vdb textarea{min-height:260px;resize:vertical}.vdt{display:flex;justify-content:space-between;align-items:center;gap:10px}.vdk{display:flex;flex-direction:column;gap:6px;margin-top:8px}.vdk label{display:flex;gap:8px;align-items:flex-start;font-weight:400;margin:0}';document.head.appendChild(st)}
-  const nm=x.nome_completo||x.nome||'cliente',d=document.createElement('div');d.id='vdm';d.className='vdm';
+  const nm=x.nome_completo||x.nome||'cliente',f=faseDe(x),d=document.createElement('div');d.id='vdm';d.className='vdm';
   d.onclick=e=>{if(e.target===d)vdFecha()};
-  d.innerHTML=`<div class="vdb" role="dialog" aria-label="Mensagem ao cliente"><div class="vdt"><b>Mensagem para ${esc(nm)}</b><button class="sm" onclick="vdFecha()" aria-label="Fechar">✕</button></div>
-  <label for="vdas">Assunto</label><select id="vdas" onchange="VM.as=this.value;vdGera()">${vdOpts()}</select>
-  <div id="vddocs" class="vdk"></div>
-  <label for="vdtx">Mensagem (você pode editar antes de enviar)</label><textarea id="vdtx"></textarea>
-  <div class="pda" style="margin-top:12px"><button class="btn red" onclick="vdEnvia()">Enviar no WhatsApp</button><button class="btn" onclick="vdCopia()">Copiar</button></div>
-  <p class="mu" style="font-size:12px">${x.telefone?'Vai para o número '+esc(x.telefone):'Este cliente não informou telefone: use Copiar.'} Trocar o assunto ou os documentos refaz o texto.</p></div>`;
+  d.innerHTML=`<div class="cmp" role="dialog" aria-label="Mensagem ao cliente" style="--fc:${PB[f-1].cor}"><header class="cmp-h"><div class="cl-av" style="--fc:${PB[f-1].cor}">${esc(nm.trim().charAt(0).toUpperCase())}</div><div><b>Mensagem para ${esc(nm)}</b><small>Fase ${f} · ${esc(PB[f-1].nome)}${x.telefone?' · '+esc(x.telefone):' · sem telefone'}</small></div><button type="button" class="cmp-x" onclick="vdFecha()" aria-label="Fechar">✕</button></header>
+  <div class="cmp-b"><label class="cmp-l" for="vdas">Assunto</label><select id="vdas" onchange="VM.as=this.value;vdGera()">${vdOpts()}</select>
+  <div id="vddocs" class="cmp-docs"></div>
+  <label class="cmp-l" for="vdtx">Mensagem <small>(você pode editar antes de enviar)</small></label><textarea id="vdtx"></textarea></div>
+  <footer class="cmp-f"><button type="button" class="btn red" onclick="vdEnvia()">Enviar no WhatsApp</button><button type="button" class="btn" onclick="vdCopia()">Copiar</button><p class="cmp-n">${x.telefone?'Abre o WhatsApp com a conversa deste cliente.':'Cliente sem telefone: use Copiar.'} Trocar o assunto ou os documentos refaz o texto.</p></footer></div>`;
   document.body.appendChild(d);vdGera()}
 function vdGera(){
   const sel=document.getElementById('vdas');if(sel)sel.value=VM.as;
   const bx=document.getElementById('vddocs');
-  bx.style.display=VUSA[VM.as]?'flex':'none';
-  bx.innerHTML=VUSA[VM.as]?'<b style="font-size:13px">Documentos a pedir</b>'+VDOCS.map(d=>`<label><input type="checkbox" ${VM.docs[d[0]]?'checked':''} onchange="VM.docs['${d[0]}']=this.checked;vdGera()"> ${d[1]} ${esc(d[2])}</label>`).join(''):'';
+  bx.style.display=VUSA[VM.as]?'grid':'none';
+  bx.innerHTML=VUSA[VM.as]?VDOCS.map(d=>`<label class="chk"><input type="checkbox" ${VM.docs[d[0]]?'checked':''} onchange="VM.docs['${d[0]}']=this.checked;vdGera()"><span>${d[1]} ${esc(d[2])}</span></label>`).join(''):'';
   document.getElementById('vdtx').value=vdTpl(VM.as,VM.x)}
 function vdFecha(){const d=document.getElementById('vdm');if(d)d.remove()}
 function vdCopia(){const t=document.getElementById('vdtx').value;navigator.clipboard.writeText(t).then(()=>toast('Mensagem copiada!'),()=>toast('Não foi possível copiar'))}
