@@ -475,7 +475,7 @@ body.adm-on,body{--rd:18px}
 </style>
 <style id="tema4">
 /* ===== TEMA 4: componentes (formulários, envio de mensagem, perfil, motos) ===== */
-input[type=checkbox],input[type=radio]{width:auto!important;height:auto!important;min-height:0;padding:0!important;margin:0;accent-color:#c80000;flex:none}
+input[type=checkbox],input[type=radio]{width:auto!important;height:auto!important;min-height:0;padding:0!important;accent-color:#c80000;flex:none}
 a.btn,.shell a.btn,.vm a.btn{text-decoration:none}
 .mn .card2 .btn,.mn .card2>.btn{width:auto}
 .mn .card2 .btn.block{width:100%}
@@ -623,7 +623,7 @@ function home(){
   $('#app').innerHTML=`<header class="hero"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
   <div class="hin ${V.logo_url?'':'nl'}">${av(V.foto_url)}
   <div class="idt"><h1>${esc(V.nome)}<svg class="vf" viewBox="0 0 24 24" aria-label="Verificado" role="img"><circle cx="12" cy="12" r="11" fill="#1d9bf0"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>${V.bio?`<p>${esc(V.bio)}</p>`:''}</div>
-  <div class="ctas"><a class="cta w" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}" onclick="return chatOpen(event)">${IC.wa}Fale comigo</a>${CFG.video_como_funciona?`<button type="button" class="cta vd" onclick="comoFunciona()">▶ Como funciona</button>`:''}${V.instagram?`<a class="cta" target="_blank" rel="noopener" href="https://instagram.com/${esc(V.instagram)}">${IC.ig}Instagram</a>`:''}${V.facebook?`<a class="cta" target="_blank" rel="noopener" href="${esc(fbu(V.facebook))}">${IC.fb}Facebook</a>`:''}</div>
+  <div class="ctas"><a class="cta w" target="_blank" rel="noopener" href="${wa('Olá! Vim pelo seu site e quero uma moto.')}" onclick="return chatOpen(event)">${IC.wa}Fale comigo</a>${V.instagram?`<a class="cta" target="_blank" rel="noopener" href="https://instagram.com/${esc(V.instagram)}">${IC.ig}Instagram</a>`:''}${V.facebook?`<a class="cta" target="_blank" rel="noopener" href="${esc(fbu(V.facebook))}">${IC.fb}Facebook</a>`:''}</div>
   ${V.logo_url?`<img class="hlogo" src="${esc(V.logo_url)}" alt="Logo da empresa" decoding="async">`:''}
   <div class="stats"><div><b data-n="${AM.length}">${AM.length}</b><span>modelos para escolher</span></div>${mn?`<div><b data-n="${mn}" data-m="1">${brl(mn)}</b><span>parcela de consórcio a partir de</span></div>`:''}</div></div></header>
   ${AVISO()}<main class="wrap" id="catalogo"><ul class="tr"><li>${CK}Atendimento personalizado</li><li>${CK}Simulação rápida</li><li>${CK}Fale diretamente comigo</li></ul><div class="sec"><div><h2>${esc(CF().titulo||"Encontre sua próxima Honda")}</h2><p class="mu" style="margin:4px 0 0;font-size:14px">${esc(CF().sub||"Consórcio, financiamento e condições especiais diretamente com seu vendedor.")}</p></div><span class="nc" id="nc" aria-live="polite"></span></div>
@@ -677,9 +677,8 @@ function openM(i,v){
     ${f[0]?`<div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0;overflow:hidden"><img src="${esc(f[0])}" alt="${esc(m.nome)}" style="display:block;width:100%;${soCon(m)?'max-height:340px':'height:230px'};object-fit:contain"></div>`:''}
     <h3 style="text-align:center">${esc(m.emplacamento||'Com emplacamento')}</h3><div class="pl">${p.map((x,k)=>`<label><input type="radio" name="pl" value="${k}" ${k?'':'checked'}>${x.parcelas}x <b>${brl(x.valor)}</b><span class="tt">Total aprox. ${brl(x.parcelas*x.valor)}</span></label>`).join('')||'<p class="mu">Consulte os planos com o vendedor.</p>'}</div>
     <p class="mu" style="font-size:13px">*Os valores podem ser ajustados conforme tabela do consórcio.</p>
-    <button class="btn red" onclick="chatOpen(null,'${m.id}')">Simular e preencher meus dados</button><button class="btn wa" onclick="conWa(0)">Chamar no Whatsapp</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
-  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p><button class="btn red pill" onclick="howOrVideo()">▶ Como funciona?</button></div>${f[0]?`<img src="${esc(f[0])}" alt="${esc(m.nome)}" decoding="async">`:''}</div>
-    ${how('O vendedor simula seu financiamento em vários bancos e te responde pelo WhatsApp com as melhores parcelas.')}
+    <button class="btn red" onclick="chatOpen(null,'${m.id}')">Simular e preencher meus dados</button><button class="btn or" onclick="conWa(1)">QUERO UM REPASSE DE CONSÓRCIO</button>`}
+  if(v==='fin')b=`<div class="fin"><div><h3>Financiamento</h3><p class="mu">Preencha o formulário abaixo para que o vendedor possa trazer pra você as melhores cotações do mercado.</p></div>${f[0]?`<img src="${esc(f[0])}" alt="${esc(m.nome)}" decoding="async">`:''}</div>
     ${fld('f_nom','Nome completo','autocomplete="name"')}${fld('f_tel','Telefone com DDD (WhatsApp)','inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000"','tel')}${fld('f_cpf','CPF','inputmode="numeric" placeholder="000.000.000-00"','cpf')}${fld('f_nas','Data de nascimento','inputmode="numeric" autocomplete="bday" placeholder="DD/MM/AAAA"','dt')}${fld('f_ent','Valor de entrada (opcional)','inputmode="numeric" placeholder="Deixe em branco se não tiver"','rs')}
     ${(m.cores||[]).length?`<label class="l" for="f_cor">Cor da moto (opcional)</label><select id="f_cor"><option value="">Selecione a cor</option>${m.cores.map(c=>`<option>${esc(c)}</option>`).join('')}<option>Sem preferência</option></select>`:fld('f_cor','Cor da moto (opcional)','autocomplete="off" placeholder="Ex.: Vermelha"')}
     <label class="l" for="f_hab">Possui habilitação?</label><select id="f_hab"><option>Sim</option><option>Não</option></select>
