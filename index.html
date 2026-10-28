@@ -570,6 +570,11 @@ button.cor{font:inherit;cursor:pointer;color:inherit}.cor.on{border-color:#c8000
 /* ===== painel em tela cheia (usa as laterais) ===== */
 @media(min-width:1500px){#vdl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}#vdl .cl{margin:0}#vdl .empty2{grid-column:1/-1}.kp4,.kp3{gap:16px}}
 .fm{max-width:1180px}
+
+/* ===== adaptação a qualquer monitor: trava contra rolagem lateral e topo compacto em telas baixas ===== */
+html,body{max-width:100%;overflow-x:clip}
+@media(min-width:900px) and (max-height:700px){.hero{padding:14px 28px 16px}.mn{padding-top:18px}.mt2{margin-bottom:12px}.mt2 h1{font-size:23px}.hero2{padding:16px 22px}.hero2 h2{font-size:22px}.fn-r{padding:5px 12px}.kp4>div,.kp3>div{padding:12px}.card2{padding:16px}.cl{padding:14px}.sd{padding:14px 12px;gap:10px}.nv{padding:9px 12px}}
+@media(min-width:900px){.sd{overflow-y:auto}}
 </style>
 </head>
 <body>
@@ -1123,12 +1128,18 @@ async function vdLoad(){
   const rs=((r[4]&&r[4].data)||[]).map(o=>({...(o.dados||{}),...o,_s:'rascunho',created_at:o.updated_at}));
   VD=[...tag(r[0],'chat'),...tag(r[1],'ficha'),...tag(r[2],'contrato'),...tag(r[3],'contato'),...rs].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   return true}
+
+/* ===== o painel LEMBRA o que você abriu (Ver todos os dados / Detalhes) e só redesenha quando algo realmente mudou ===== */
+const VOPEN=new Set();let VSIG='';
+document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.k){if(d.open)VOPEN.add(d.dataset.k);else VOPEN.delete(d.dataset.k)}},true);
+const vdSig=()=>VD.map(o=>o._s+o.id+'|'+(o.status||'')+'|'+(o.fase||'')+'|'+(o.completo?1:0)+'|'+(o.updated_at||o.created_at)+'|'+(o.nome||'')+(o.telefone||'')).join(';');
 async function pVendas(quiet){
   if(!quiet)$('#pn').innerHTML='<div class="kp kg">'+'<div class="sk" style="height:84px"></div>'.repeat(3)+'</div>';
   const ok=await vdLoad();
   if(!ok){if(!quiet)$('#pn').innerHTML='<p class="mu">Não consegui carregar as vendas. Rode o SQL atualizado no Supabase e recarregue a página.</p>';return}
   if(!quiet||!$('#vdl'))$('#pn').innerHTML='<div id="vdk"></div><div class="pdf" id="vdf"></div><input type="search" id="vdq" placeholder="Buscar por nome, telefone, CPF ou moto" value="'+esc(VQ)+'" oninput="VQ=this.value;vdView()" style="margin-bottom:12px"><div id="vdl"></div>';
-  vdView();vdSeenSet()}
+  const sg=vdSig();if(quiet&&$('#vdl')&&sg===VSIG){vdSeenSet();return}
+  VSIG=sg;vdView();vdSeenSet()}
 /* ===== NOVOS CLIENTES EM TEMPO REAL: contador na aba, aviso e atualização sozinha ===== */
 let VNEW=0,VLASTN=-1,VCH=null,VPOLL=null;
 const vdSeenKey=()=>'vd_seen_'+SLUG;
@@ -1303,7 +1314,9 @@ function vdView(){
   const hj=VD.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length;
   $('#vdk').innerHTML=`<div class="kp3"><div class="${c.novos?'n':''}"><b>${c.novos}</b><span>novos</span></div><div><b>${hj}</b><span>hoje</span></div><div><b>${c.todos}</b><span>no total</span></div></div>`;
   $('#vdf').innerHTML=fl.map(o=>`<button class="${VF===o[0]?'on':''}" onclick="VF='${o[0]}';vdView()">${esc(o[1])} <em>${c[o[0]]||0}</em></button>`).join('')+`<select class="fs2" onchange="VFASE=+this.value;vdView()" aria-label="Filtrar por fase"><option value="0">Todas as fases</option>${PB.map(p=>`<option value="${p.n}" ${VFASE===p.n?'selected':''}>${p.n}. ${p.nome}</option>`).join('')}</select><button onclick="pVendas()">↻ Atualizar</button>`;
-  $('#vdl').innerHTML=f.map(vdCard).join('')||'<div class="empty2"><b>Nenhum cliente aqui ainda.</b><span>Quando alguém preencher dados no seu site, aparece neste lugar na hora.</span></div>'}
+  const sy=window.scrollY,mnt=document.querySelector('.mn'),sm=mnt?mnt.scrollTop:0;
+  $('#vdl').innerHTML=f.map(vdCard).join('')||'<div class="empty2"><b>Nenhum cliente aqui ainda.</b><span>Quando alguém preencher dados no seu site, aparece neste lugar na hora.</span></div>';
+  if(window.scrollY!==sy)window.scrollTo(0,sy);if(mnt&&mnt.scrollTop!==sm)mnt.scrollTop=sm}
 async function vdFase(s,id,f){
   f=parseInt(f,10);const x=VD.find(o=>o.id===id&&o._s===s);
   const r=await sb.from(VTAB[s]).update({fase:f}).eq('id',id);
@@ -1314,7 +1327,7 @@ function vdCard(x){
   return `<article class="cl ${novo?'is-new':''}" style="--fc:${ph.cor}"><div class="cl-h"><div class="cl-av">${esc(nm.trim().charAt(0).toUpperCase())}</div><div class="cl-m"><b>${esc(nm)}${novo?'<span class="nw">novo</span>':''}</b><small>${esc(x.moto_nome||'Moto não informada')}${x.cor?' · '+esc(x.cor):''}${pg?' · '+esc(pg):''}</small><small class="t">${esc(VSRC[s])} · ${ago(x.created_at)}${rasc?(x.concluido==='sim'?' · <u class="okc">terminou o chat</u>':' · <u>não concluiu o envio</u>'):''}</small></div></div>
   <div class="cl-f"><label>Fase da venda<select class="fs" onchange="vdFase('${s}','${x.id}',this.value)">${PB.map(p=>`<option value="${p.n}" ${p.n===f?'selected':''}>${p.n}. ${p.nome}</option>`).join('')}</select></label>${('status' in x&&Object.keys(stl).length)?`<label>Situação<select onchange="vdSt('${s}','${x.id}',this.value)">${Object.keys(stl).map(o=>`<option value="${o}" ${k===o?'selected':''}>${stl[o]}</option>`).join('')}</select></label>`:''}</div>
   <div class="cl-a">${w?`<a class="btn wa sm" target="_blank" rel="noopener" href="${w}">WhatsApp</a>`:''}<button class="btn red sm" onclick="vdMsg('${s}','${x.id}','pb:${f}:0')">📚 Script da fase ${f}</button><button class="btn sm" onclick="vdMsg('${s}','${x.id}')">✉ Mensagem</button></div>
-  <details class="cl-d"><summary>Ver todos os dados</summary><div class="pdg">${vdCampos(x).map(a=>dr(a[0],a[1])).join('')}</div>${x.detalhes?`<details><summary>Detalhes</summary><pre>${esc(x.detalhes)}</pre></details>`:''}${x.mensagem?`<details><summary>Mensagem enviada ao WhatsApp</summary><pre>${esc(x.mensagem)}</pre></details>`:''}<div class="cl-x"><button class="btn sm" onclick="vdCp('${s}','${x.id}')">Copiar dados</button><button class="btn sm" onclick="vdDel('${s}','${x.id}')">Excluir</button></div></details></article>`}
+  <details class="cl-d" data-k="${s}:${x.id}:d"${VOPEN.has(s+':'+x.id+':d')?' open':''}><summary>Ver todos os dados</summary><div class="pdg">${vdCampos(x).map(a=>dr(a[0],a[1])).join('')}</div>${x.detalhes?`<details data-k="${s}:${x.id}:t"${VOPEN.has(s+':'+x.id+':t')?' open':''}><summary>Detalhes</summary><pre>${esc(x.detalhes)}</pre></details>`:''}${x.mensagem?`<details data-k="${s}:${x.id}:m"${VOPEN.has(s+':'+x.id+':m')?' open':''}><summary>Mensagem enviada ao WhatsApp</summary><pre>${esc(x.mensagem)}</pre></details>`:''}<div class="cl-x"><button class="btn sm" onclick="vdCp('${s}','${x.id}')">Copiar dados</button><button class="btn sm" onclick="vdDel('${s}','${x.id}')">Excluir</button></div></details></article>`}
 const vdOpts=()=>`<optgroup label="Mensagens prontas">${VAS.map(a=>`<option value="${a[0]}">${esc(a[1])}</option>`).join('')}</optgroup>`+PB.map(p=>`<optgroup label="Fase ${p.n} · ${esc(p.nome)}">${p.s.map((s,i)=>`<option value="pb:${p.n}:${i}">${i+1}. ${esc(s[0])}</option>`).join('')}</optgroup>`).join('');
 
 /* ---- Playbook ---- */
