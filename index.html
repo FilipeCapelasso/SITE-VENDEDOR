@@ -1308,15 +1308,15 @@ async function pInicio(){
 
 /* ---- Clientes ---- */
 function vdView(){
+  const sy=window.scrollY,mnt=document.querySelector('.mn'),sm=mnt?mnt.scrollTop:0;
   const q=nzs(VQ).trim(),c={todos:VD.length,novos:VD.filter(vdNovo).length};Object.keys(VSRC).forEach(k=>c[k]=VD.filter(x=>x._s===k).length);
   const fl=[['todos','Todos'],['novos','Novos'],...Object.entries(VSRC)];
   const f=VD.filter(x=>(VF==='todos'||(VF==='novos'?vdNovo(x):x._s===VF))&&(!VFASE||faseDe(x)===VFASE)&&(!q||nzs([x.nome,x.nome_completo,x.telefone,x.cpf,x.email,x.moto_nome].join(' ')).includes(q)));
   const hj=VD.filter(x=>new Date(x.created_at).toDateString()===new Date().toDateString()).length;
   $('#vdk').innerHTML=`<div class="kp3"><div class="${c.novos?'n':''}"><b>${c.novos}</b><span>novos</span></div><div><b>${hj}</b><span>hoje</span></div><div><b>${c.todos}</b><span>no total</span></div></div>`;
   $('#vdf').innerHTML=fl.map(o=>`<button class="${VF===o[0]?'on':''}" onclick="VF='${o[0]}';vdView()">${esc(o[1])} <em>${c[o[0]]||0}</em></button>`).join('')+`<select class="fs2" onchange="VFASE=+this.value;vdView()" aria-label="Filtrar por fase"><option value="0">Todas as fases</option>${PB.map(p=>`<option value="${p.n}" ${VFASE===p.n?'selected':''}>${p.n}. ${p.nome}</option>`).join('')}</select><button onclick="pVendas()">↻ Atualizar</button>`;
-  const sy=window.scrollY,mnt=document.querySelector('.mn'),sm=mnt?mnt.scrollTop:0;
   $('#vdl').innerHTML=f.map(vdCard).join('')||'<div class="empty2"><b>Nenhum cliente aqui ainda.</b><span>Quando alguém preencher dados no seu site, aparece neste lugar na hora.</span></div>';
-  if(window.scrollY!==sy)window.scrollTo(0,sy);if(mnt&&mnt.scrollTop!==sm)mnt.scrollTop=sm}
+  if(window.scrollY!==sy)window.scrollTo({top:sy,left:0,behavior:'instant'});if(mnt&&mnt.scrollTop!==sm)mnt.scrollTop=sm}
 async function vdFase(s,id,f){
   f=parseInt(f,10);const x=VD.find(o=>o.id===id&&o._s===s);
   const r=await sb.from(VTAB[s]).update({fase:f}).eq('id',id);
