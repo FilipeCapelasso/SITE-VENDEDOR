@@ -610,7 +610,7 @@ html,body{max-width:100%;overflow-x:clip}
 .hf-b{border:0;background:#fff;color:#14141b;font:700 14px Inter,system-ui,sans-serif;border-radius:12px;padding:10px 16px;cursor:pointer;transition:transform .2s}.hf-b:hover{transform:translateX(3px)}
 .hf-d{display:flex;gap:8px;justify-content:center;margin-top:16px}.hf-d button{width:9px;height:9px;border-radius:99px;border:0;padding:0;background:#ffffff40;cursor:pointer;transition:width .3s,background .3s}.hf-d button.on{width:28px;background:#ff3b3b}
 /* ---------- MENU FLUTUANTE ---------- */
-.tnav{position:fixed;top:0;left:0;right:0;z-index:30;transform:translateY(-110%);transition:transform .4s cubic-bezier(.2,.8,.2,1);background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border-bottom:1px solid #0000000f;box-shadow:0 10px 30px -22px #000}
+.tnav{position:fixed;top:0;left:0;right:0;z-index:9;transform:translateY(-110%);transition:transform .4s cubic-bezier(.2,.8,.2,1);background:rgba(255,255,255,.84);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border-bottom:1px solid #0000000f;box-shadow:0 10px 30px -22px #000}
 .tnav.on{transform:none}
 .tn-in{max-width:1440px;margin:0 auto;padding:10px 32px;display:flex;align-items:center;gap:18px}
 .tn-b{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink,#14141b);font-weight:800;white-space:nowrap}.tn-b img,.tn-b .ava{width:34px!important;height:34px!important;border-radius:50%;object-fit:cover}
@@ -712,6 +712,28 @@ video.en-vid{pointer-events:none}.en-v.auto.stuck .en-pl{display:grid;z-index:5;
 .en-nv.l{left:8px}.en-nv.r{right:8px}.en-w:hover .en-nv{opacity:1}.en-nv:hover{transform:translateY(-50%) scale(1.08)}
 @media(hover:none){.en-nv{display:none}}
 .en-cont{margin:12px 0 0;font-size:13px;color:#4b4b57}
+
+/* ===== botão do topo da janela da moto ===== */
+.wab{background:#fff!important;color:#a00000!important;border:1.5px solid #ecc9c9!important;font-weight:700;cursor:pointer;border-radius:99px;padding:10px 16px;font-size:14px;font-family:inherit;white-space:nowrap;box-shadow:none!important}.wab:hover{background:#fff3f3!important}
+.wab .ws{display:none}@media(max-width:560px){.wab .wl{display:none}.wab .ws{display:inline}.wab{padding:9px 13px;font-size:13px}}
+.dt-bar .btn{font-size:13.5px;padding-left:8px;padding-right:8px}
+/* ===== vídeo de arquivo: rola mudo, som no mouse, clique = tela maior ===== */
+.en-mp{flex:0 0 min(380px,86vw);aspect-ratio:9/16;max-height:86vh;background:#000}
+.en-mp.land{flex-basis:min(640px,92vw);aspect-ratio:16/9}
+.en-mp .en-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;display:block;border:0}
+.en-mp.land .en-vid{object-fit:contain}
+.en-big{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;cursor:zoom-in;z-index:2;padding:0}
+.en-ico{position:absolute;top:14px;right:14px;z-index:3;background:#000b;color:#fff;border-radius:99px;padding:7px 12px;font-size:14px;pointer-events:none}
+.en-tip{position:absolute;top:14px;left:14px;z-index:3;background:#000a;color:#fff;border-radius:99px;padding:6px 12px;font-size:11.5px;font-weight:700;pointer-events:none}
+.en-tip .tp-t{display:none}@media(hover:none){.en-tip .tp-h{display:none}.en-tip .tp-t{display:inline}}
+.en-mp figcaption{z-index:3;pointer-events:none}
+.vmb-big{position:relative;width:auto;max-width:96vw;padding:0;background:transparent;box-shadow:none;border-radius:0}
+.vmb-big h3{display:none}
+.vid-big{display:block;max-width:96vw;height:86vh;width:auto;min-width:min(96vw,320px);margin:0 auto;border-radius:14px;background:#000;aspect-ratio:auto;object-fit:contain}
+.vm-cap{color:#fff;text-align:center;margin-top:12px}.vm-cap b{display:block;font-size:18px}.vm-cap span{opacity:.8;font-size:14px}
+.vmb-big .vmx{top:-16px;right:-8px;z-index:5}
+.pv-th video{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block}
+.en-it.off{opacity:.62}
 </style>
 </head>
 <body>
@@ -834,7 +856,8 @@ const vEmb=u=>{const k=vKind(u);return k==='ig'?vIg(u):k==='fb'?vFb(u):k==='tt'?
 const vPlay=u=>['yt','vimeo','mp4'].includes(vKind(u))||!!vEmb(u);
 const VK_L={yt:'YouTube',vimeo:'Vimeo',mp4:'Vídeo',ig:'Instagram',fb:'Facebook',tt:'TikTok',link:'Link'};
 const vThumb=u=>{const y=ytId(u);return y?'https://i.ytimg.com/vi/'+y+'/hqdefault.jpg':''};
-const VPUB=()=>(CF().videos||[]).filter(x=>x&&x.u&&x.on!==false);
+const mp4Ok=u=>vKind(u)==='mp4';
+const VPUB=()=>(CF().videos||[]).filter(x=>x&&x.u&&x.on!==false&&mp4Ok(x.u));
 function playVideo(u,t){
   if(!/^https?:\/\//i.test(u||''))return;
   if(!vPlay(u)){window.open(u,'_blank','noopener');return}
@@ -845,37 +868,35 @@ function playVideo(u,t){
   document.body.appendChild(o)}
 function playVideoI(i){const x=VPUB()[i];if(x)playVideo(x.u,x.t)}
 function playVideoM(i){const m=L[i];if(m&&m.video_url)playVideo(m.video_url,m.nome)}
+/* cartão de vídeo (arquivo enviado): roda sozinho e mudo; som ao passar o mouse; clique abre em tela maior */
+function vcard(u,nome,sub){return `<figure class="en en-mp" data-u="${esc(u)}"><video class="en-vid" src="${esc(u)}#t=0.1" muted loop playsinline preload="metadata" disablepictureinpicture></video><button type="button" class="en-big" aria-label="Assistir em tela maior${nome?': '+nome.replace(/<[^>]+>/g,''):''}"></button><span class="en-tip"><span class="tp-h">🔊 Passe o mouse para ouvir</span><span class="tp-t">👆 Toque para ampliar</span></span><span class="en-ico" aria-hidden="true">🔇</span><figcaption><b>${nome}</b>${sub?`<span>${sub}</span>`:''}</figcaption></figure>`}
 const vidsH=()=>{const L2=VPUB();if(!L2.length)return'';
-  return `<section class="vids" id="videos"><div class="sec"><div><span class="eyb ey2">VÍDEOS</span><h2>Assista e conheça</h2><p class="mu" style="margin:4px 0 0;font-size:14px">Veja de perto como funciona e o que eu preparei para você.</p></div></div><div class="vd-g">${L2.map((x,i)=>{const k=vKind(x.u),th=vThumb(x.u),ext=!vPlay(x.u);return `<button type="button" class="vd-c" onclick="playVideoI(${i})" aria-label="${ext?'Abrir':'Assistir'} ${esc(x.t||'vídeo')}"><span class="vd-t"${th?` style="background-image:url('${esc(th)}')"`:''}><i class="vd-p" aria-hidden="true">${ext?'↗':'▶'}</i><em>${VK_L[k]}</em></span><b>${esc(x.t||'Assistir vídeo')}</b><small>${ext?'Abrir no '+VK_L[k]:'Assistir agora'}</small></button>`}).join('')}</div></section>`};
-const EN_AUTO=['yt','vimeo','mp4'],EN_MAXV=7,EN_MAXF=8;
-const enCont=L2=>({v:L2.filter(x=>x&&x.u&&!x.f).length,f:L2.filter(x=>x&&x.f).length});
+  return `<section class="vids" id="videos"><div class="sec"><div><span class="eyb ey2">VÍDEOS</span><h2>Assista e conheça</h2><p class="mu" style="margin:4px 0 0;font-size:14px">Veja de perto como funciona e o que eu preparei para você.</p></div></div><div class="en-w"><div class="en-s">${L2.map(x=>vcard(x.u,esc(x.t||'Assista'),'')).join('')}</div><button type="button" class="en-nv l" aria-label="Anterior" onclick="enNav(this,-1)">‹</button><button type="button" class="en-nv r" aria-label="Próximo" onclick="enNav(this,1)">›</button></div></section>`};
+const EN_MAXV=7,EN_MAXF=8;
+const enOk=x=>!!(x&&(x.f||(x.u&&mp4Ok(x.u))));
+const enCont=L2=>({v:L2.filter(x=>x&&x.u&&!x.f&&mp4Ok(x.u)).length,f:L2.filter(x=>x&&x.f).length});
 const entCard=x=>{const nm=x.t==='c'?'Contemplado(a): '+esc(x.n):'Parabéns, '+esc(x.n)+'!';
-  if(x.u&&!x.f){const k=vKind(x.u),pl=vPlay(x.u),au=EN_AUTO.includes(k);return `<figure class="en en-v${au?' en-auto':''}${pl&&k==='ig'?' en-emb':''}" data-u="${esc(x.u)}"><button type="button" class="en-pl" onclick="enPlay(this)" aria-label="${pl?'Assistir':'Abrir'} vídeo de ${esc(x.n)}"><i class="vd-p" aria-hidden="true">${pl?'▶':'↗'}</i><em>${VK_L[k]}</em></button><figcaption><b>${nm}</b>${x.m?`<span>${esc(x.m)}</span>`:''}</figcaption></figure>`}
+  if(x.u&&!x.f)return vcard(x.u,nm,esc(x.m||''));
   return `<figure class="en"><img src="${esc(x.f)}" alt="${x.t==='c'?'Contemplação de ':'Parabéns, '}${esc(x.n)}" loading="lazy" decoding="async"><figcaption><b>${nm}</b>${x.m?`<span>${esc(x.m)}</span>`:''}</figcaption></figure>`};
-/* player limpo que toca sozinho (mudo, em loop) quando o cartão aparece na tela; botão de som */
-function enAuto(f,u,k){f.classList.add('on','auto');let m='';const id=ytId(u);
-  if(k==='mp4')m=`<video class="en-vid" src="${esc(u)}" muted loop playsinline autoplay preload="auto"></video>`;
-  else if(k==='yt')m=`<iframe class="en-vid" src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0&enablejsapi=1" title="Vídeo" allow="autoplay; encrypted-media" referrerpolicy="origin-when-cross-origin"></iframe>`;
-  else{const vm=/vimeo\.com\/(?:video\/)?(\d+)/.exec(u);m=`<iframe class="en-vid" src="https://player.vimeo.com/video/${vm?vm[1]:''}?autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&playsinline=1" title="Vídeo" allow="autoplay; fullscreen"></iframe>`}
-  f.insertAdjacentHTML('afterbegin',m+`<button type="button" class="en-snd" data-on="0" aria-label="Ativar o som" onclick="enSom(this)">🔇 Ativar som</button>`);
-  if(k==='mp4')setTimeout(()=>{const vv=f.querySelector('video');if(vv&&vv.paused&&vv.readyState>=0&&f.getBoundingClientRect().top<innerHeight&&f.getBoundingClientRect().bottom>0)f.classList.add('stuck')},2200)}
-const enMedia=f=>f.querySelector('video.en-vid,iframe.en-vid');
-function enCmd(m,cmd){
-  if(m.tagName==='VIDEO'){if(cmd==='pause')m.pause();else if(cmd==='play'){const r=m.play();if(r&&r.catch)r.catch(()=>{})}else m.muted=(cmd==='mute');return}
-  const w=m.contentWindow;if(!w)return;
-  if(/vimeo/.test(m.src)){w.postMessage(JSON.stringify({pause:{method:'pause'},play:{method:'play'},unmute:{method:'setVolume',value:1},mute:{method:'setVolume',value:0}}[cmd]),'*');return}
-  w.postMessage(JSON.stringify({event:'command',func:{pause:'pauseVideo',play:'playVideo',unmute:'unMute',mute:'mute'}[cmd],args:''}),'*');
-  if(cmd==='unmute')w.postMessage(JSON.stringify({event:'command',func:'setVolume',args:[100]}),'*')}
-function enSom(btn){const f=btn.closest('.en-v'),m=f&&enMedia(f);if(!m)return;const on=btn.dataset.on==='1';enCmd(m,on?'mute':'unmute');btn.dataset.on=on?'0':'1';btn.textContent=on?'🔇 Ativar som':'🔊 Som ligado';btn.setAttribute('aria-label',on?'Ativar o som':'Desligar o som')}
-function enPlay(btn){const f=btn.closest('.en-v'),u=f&&f.dataset.u;if(!u||!/^https?:\/\//i.test(u))return;if(!vPlay(u)){window.open(u,'_blank','noopener');return}
-  const k=vKind(u);if(EN_AUTO.includes(k)){if(!f.classList.contains('on'))enAuto(f,u,k);else{const m=enMedia(f);if(m){enCmd(m,'play');f.classList.remove('stuck')}}return}
-  f.classList.add('on');f.innerHTML=vid(u).replace('class="vid','class="en-if vid')}
-function enAct(f){const u=f.dataset.u,k=vKind(u);if(f.classList.contains('on')){if(f.classList.contains('auto')){const m=enMedia(f);if(m)enCmd(m,'play')}return}
-  if(EN_AUTO.includes(k))enAuto(f,u,k);else if(vEmb(u)){const b=f.querySelector('.en-pl');if(b)enPlay(b)}}
-function enObs(){if(!window.IntersectionObserver||window.__enManual||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const io=new IntersectionObserver(es=>es.forEach(e=>{const f=e.target;if(e.isIntersecting&&e.intersectionRatio>=.35)enAct(f);else if(e.intersectionRatio<.15&&f.classList.contains('auto')){const m=enMedia(f);if(m)enCmd(m,'pause')}}),{threshold:[0,.15,.35,.6]});
-  document.querySelectorAll('.en-v').forEach(f=>io.observe(f))}
-
+const enPlayV=v=>{const r=v.play();if(r&&r.catch)r.catch(()=>{})};
+function enFmt(f,v){if(v.videoWidth&&v.videoHeight)f.classList.toggle('land',v.videoWidth>v.videoHeight*1.15)}
+function enObs(){const cards=[...document.querySelectorAll('.en-mp')];if(!cards.length)return;
+  cards.forEach(f=>{const v=f.querySelector('video'),ic=f.querySelector('.en-ico');v.addEventListener('loadedmetadata',()=>enFmt(f,v));if(v.readyState>=1)enFmt(f,v);
+    if(matchMedia('(hover:hover)').matches){
+      f.addEventListener('pointerenter',()=>{v.muted=false;enPlayV(v);setTimeout(()=>{if(v.paused&&!document.getElementById('vm')){v.muted=true;enPlayV(v)}if(ic)ic.textContent=v.muted?'🔇':'🔊'},150)});
+      f.addEventListener('pointerleave',()=>{v.muted=true;if(ic)ic.textContent='🔇'})}});
+  if(window.__enManual||matchMedia('(prefers-reduced-motion:reduce)').matches||!window.IntersectionObserver)return;
+  const io=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target.querySelector('video');if(!v||document.getElementById('vm'))return;if(e.isIntersecting&&e.intersectionRatio>=.35)enPlayV(v);else if(e.intersectionRatio<.15)v.pause()}),{threshold:[0,.15,.35,.6]});
+  cards.forEach(f=>io.observe(f))}
+/* tela maior: o vídeo com controles e som */
+function enBig(btn){const f=btn.closest('.en-mp'),u=f&&f.dataset.u;if(!u||!/^https?:\/\//i.test(u))return;const c=f.querySelector('figcaption'),v0=f.querySelector('video');if(v0){v0.pause();v0.muted=true}
+  const old=document.getElementById('vm');if(old)old.remove();
+  const o=document.createElement('div');o.id='vm';o.className='vm';o.onclick=e=>{if(e.target===o)enFecha()};
+  o.innerHTML=`<div class="vmb vmb-big" role="dialog" aria-label="Vídeo"><button type="button" class="vmx" aria-label="Fechar" onclick="enFecha()">✕</button><video class="vid vid-big" src="${esc(u)}" controls autoplay playsinline></video>${c?`<div class="vm-cap">${c.innerHTML}</div>`:''}</div>`;
+  document.body.appendChild(o);window.__enBig=f;document.addEventListener('keydown',enEsc);const bv=o.querySelector('video');enPlayV(bv)}
+function enEsc(e){if(e.key==='Escape')enFecha()}
+function enFecha(){const o=document.getElementById('vm');if(o)o.remove();document.removeEventListener('keydown',enEsc);const f=window.__enBig;window.__enBig=null;if(f){const v=f.querySelector('video');if(v){v.muted=true;enPlayV(v)}}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.en-big');if(b)enBig(b)});
 /* rolagem lenta e automática das fotos e vídeos (vai até o fim e volta); pausa ao tocar/passar o mouse */
 function enSlow(){document.querySelectorAll('.en-w').forEach(w=>{const s=w.querySelector('.en-s');if(!s||w.dataset.slow)return;w.dataset.slow='1';
   if(matchMedia('(prefers-reduced-motion:reduce)').matches||window.__enManual)return;
@@ -891,7 +912,7 @@ function enSlow(){document.querySelectorAll('.en-w').forEach(w=>{const s=w.query
     if(dir>0&&pos>=max-1){dir=-1;pausa=Date.now()+2500}else if(dir<0&&pos<=0){dir=1;pausa=Date.now()+2500}}
   if(window.IntersectionObserver)new IntersectionObserver(es=>{vis=es[0].isIntersecting;if(vis){last=0;requestAnimationFrame(tick)}},{threshold:.1}).observe(w);else{vis=true;requestAnimationFrame(tick)}})}
 function enNav(btn,d){const s=btn.parentElement.querySelector('.en-s');if(s)s.scrollBy({left:d*Math.max(260,s.clientWidth*.8),behavior:'smooth'})}
-const entH=()=>{const all=(CF().entregas||[]).filter(x=>x&&(x.f||x.u)),en=all.filter(x=>x.t!=='c'),ct=all.filter(x=>x.t==='c');let h='';
+const entH=()=>{const all=(CF().entregas||[]).filter(enOk),en=all.filter(x=>x.t!=='c'),ct=all.filter(x=>x.t==='c');let h='';
   if(en.length)h+=`<section class="ent" id="entregas"><div class="sec"><div><span class="eyb ey2">CLIENTES FELIZES</span><h2>Mais um sonho realizado</h2><p class="mu" style="margin:4px 0 0;font-size:14px">Quem já saiu de moto nova com a gente.</p></div></div><div class="en-w"><div class="en-s">${en.map(entCard).join('')}</div><button type="button" class="en-nv l" aria-label="Anterior" onclick="enNav(this,-1)">‹</button><button type="button" class="en-nv r" aria-label="Próximo" onclick="enNav(this,1)">›</button></div></section>`;
   if(ct.length)h+=`<section class="ent" id="contemplacoes"><div class="sec"><div><span class="eyb ey2">REGISTROS DE CONTEMPLAÇÃO</span><h2>Conquistas compartilhadas</h2><p class="mu" style="margin:4px 0 0;font-size:14px">Confira os registros compartilhados.</p></div></div><div class="en-w"><div class="en-s">${ct.map(entCard).join('')}</div><button type="button" class="en-nv l" aria-label="Anterior" onclick="enNav(this,-1)">‹</button><button type="button" class="en-nv r" aria-label="Próximo" onclick="enNav(this,1)">›</button></div></section>`;
   return h};
@@ -953,13 +974,12 @@ function openM(i,v){
     ${mn?`<div class="dt-pr"><small>Consórcio a partir de</small><b>${mn.parcelas}x ${brl(mn.valor)}</b><em>${esc(m.emplacamento||'Com emplacamento')}</em></div>`:'<div class="dt-pr"><small>Consulte as condições com o vendedor</small></div>'}
     ${m.preco>0?`<p class="pv">À vista <b>${brl(m.preco)}</b></p>`:''}
     ${corPick(m)}
-    <div class="dt-cta"><button class="btn red" onclick="openM(cur,'con')">Simular consórcio</button><button class="btn red2" onclick="openM(cur,'fin')">Simular financiamento</button><a class="btn wa" target="_blank" rel="noopener" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+hn(m)+corTxt(m)+'. Gostaria de saber mais sobre as condições.')}">Fale comigo</a></div>
-    ${CFG.video_como_funciona?`<button type="button" class="btn ghost" onclick="comoFunciona()">▶ Como funciona o consórcio</button>`:''}
+    <div class="dt-cta"><button class="btn red" onclick="openM(cur,'con')">Simular consórcio</button><button class="btn red2" onclick="openM(cur,'fin')">Simular financiamento</button></div>
   </div></div>
   ${pl.length?`<div class="dt-sec"><h3>Planos de consórcio</h3><div class="dt-pl">${pl.map(x=>`<div><b>${x.parcelas}x</b><span>${brl(x.valor)}</span></div>`).join('')}</div><p class="mu" style="font-size:12.5px;margin-top:10px">${esc(m.emplacamento||'Com emplacamento')} · valores sujeitos a ajuste conforme a tabela do consórcio. <a href="#" onclick="openM(cur,'con');return false">Simular com um plano →</a></p></div>`:''}
   ${m.descricao?`<div class="dt-sec"><h3>Descrição e ficha técnica</h3><div class="desc">${fmtDesc(m.descricao)}</div></div>`:''}
   <div class="dt-sec dt-end"><button class="btn" onclick="chatOpen(null,'${m.id}')">Tirar dúvidas no chat com o vendedor</button><button class="btn" onclick="shareM()">Compartilhar esta moto</button></div>
-  <div class="dt-bar"><button class="btn red" onclick="openM(cur,'con')">Simular</button><a class="btn wa" target="_blank" rel="noopener" onclick="lead('whatsapp')" href="${wa('Olá! Tenho interesse na '+hn(m)+corTxt(m)+'. Gostaria de saber mais sobre as condições.')}">Fale comigo</a></div>`}
+  <div class="dt-bar"><button class="btn red" onclick="openM(cur,'con')">Simular consórcio</button><button class="btn red2" onclick="openM(cur,'fin')">Simular financiamento</button></div>`}
   if(v==='con'){const p=m.planos||[];b=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3>Tabela de consórcio</h3><button class="btn red pill" onclick="howOrVideo()">▶ Como funciona?</button></div>
     ${how('Você entra em um grupo e paga parcelas mensais sem juros (há taxa de administração). A moto é liberada por sorteio ou lance. Fale com o vendedor para tirar suas dúvidas.')}
     ${f[0]?`<div style="border:1px solid var(--bd);border-radius:14px;margin:12px 0;overflow:hidden"><img src="${esc(f[0])}" alt="${esc(m.nome)}" style="display:block;width:100%;${soCon(m)?'max-height:340px':'height:230px'};object-fit:contain"></div>`:''}
@@ -974,7 +994,7 @@ function openM(i,v){
     <button class="btn wa" onclick="finSend()">Enviar para o vendedor</button>`;
   const mo=$('#modal');if(mo.style.display!=='block'){history.pushState({m:1},'');FO=document.activeElement}
   const lg=V.logo_url?`<img class="ava s" style="object-fit:contain;background:#fff" src="${esc(V.logo_url)}">`:'';
-  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div><a class="wab" target="_blank" href="${wa('Olá!')}">WhatsApp</a></div>
+  mo.innerHTML=`<div class="sheet"><div class="mh"><div class="mp">${lg}${av(V.foto_url,'s')}<div><small style="color:var(--tx)">${tel()}</small><br><small>${V.instagram?'@'+esc(V.instagram):''}</small></div></div>${(v==='det'&&CFG.video_como_funciona)?`<button type="button" class="wab" onclick="comoFunciona()"><span class="wl">▶ Como funciona o consórcio</span><span class="ws">▶ Como funciona</span></button>`:''}</div>
   <div class="mt"><div><h2>${esc(m.nome)}</h2><small>${[m.categoria,m.modelo].filter(Boolean).map(esc).join(' · ')}</small>${m.selo?`<span class="sb2">${esc(m.selo)}</span>`:''}</div><span><b role="button" tabindex="0" aria-label="Moto anterior" onclick="nav(-1)">‹</b><b role="button" tabindex="0" aria-label="Próxima moto" onclick="nav(1)">›</b><b role="button" tabindex="0" aria-label="Fechar" onclick="closeM()">✕</b></span></div>${b}</div>`;
   mo.style.display='block';mo.scrollTop=0;bindSwipe();{const x=mo.querySelector('[aria-label=Fechar]');x&&x.focus({preventScroll:true})}
 }
@@ -1610,47 +1630,39 @@ function pbCopia(f,i){cpTxt(pbFill(PB[f-1].s[i][1],pbCli()))}
 /* ---- "Meus vídeos": o vendedor cola o link (ou envia o arquivo) e publica no site ---- */
 function pVideos(){
   if(!('config' in V)){$(PNS).innerHTML='<p class="mu">Para publicar vídeos, rode o SQL único (coluna config) no Supabase e recarregue a página.</p>';return}
-  const L2=CF().videos||[];
-  $(PNS).innerHTML=`<h3 style="margin-top:0">Meus vídeos</h3><p class="mu">Cole o link de um vídeo (YouTube, Vimeo, Instagram, Facebook ou TikTok) ou envie um arquivo. Ele aparece na seção “Assista” do seu site. Até 7 vídeos. <b>Dica:</b> o Instagram não permite tocar sozinho; para isso use o arquivo MP4 ou um link do YouTube.</p>
-  <div class="fm-grid"><div class="fld span2"><label class="l" for="pv_t">Título (opcional)</label><input id="pv_t" maxlength="60" placeholder="Ex.: Como funciona o consórcio"></div><div class="fld span2"><label class="l" for="pv_u">Link do vídeo</label><input id="pv_u" inputmode="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=..."></div></div>
-  <div class="pv-act"><button type="button" class="btn red" onclick="pvAdd()">Publicar vídeo</button><label class="upl">🎬 Ou enviar um arquivo (MP4)<input type="file" accept="video/mp4,video/webm" onchange="pvFile(this)" hidden></label></div>
-  <div class="pv-adm">${L2.map((x,i)=>{const k=vKind(x.u),th=vThumb(x.u);return `<div class="pv-it${x.on===false?' off':''}"><span class="pv-th"${th?` style="background-image:url('${esc(th)}')"`:''}>${th?'':'🎬'}</span><div class="pv-m"><b>${esc(x.t||'Vídeo sem título')}</b><small>${VK_L[k]} · ${x.on===false?'<u>oculto no site</u>':'<span class="ok">publicado</span>'}</small></div><label class="sw pv-sw" title="Mostrar no site"><input type="checkbox" ${x.on===false?'':'checked'} onchange="pvTog(${i},this.checked)"><span class="sw-t"></span></label><button type="button" class="btn sm" aria-label="Subir" onclick="pvMove(${i},-1)" ${i?'':'disabled'}>↑</button><button type="button" class="btn sm" aria-label="Descer" onclick="pvMove(${i},1)" ${i<L2.length-1?'':'disabled'}>↓</button><button type="button" class="btn sm" onclick="pvDel(${i})">Remover</button></div>`}).join('')||'<p class="mu" style="margin-top:14px">Nenhum vídeo publicado ainda.</p>'}</div>`}
+  const L2=CF().videos||[],nv=L2.filter(x=>x&&x.u&&mp4Ok(x.u)).length;
+  $(PNS).innerHTML=`<h3 style="margin-top:0">Meus vídeos</h3><p class="mu">Baixe o vídeo (do Instagram ou do celular) e envie o arquivo aqui, em <b>MP4</b> (até 50 MB). Ele aparece na seção “Assista e conheça” do seu site: <b>roda sozinho e sem som</b>; ao <b>passar o mouse</b> o <b>som liga</b>; ao <b>clicar</b> abre em <b>tela maior</b>. Até 7 vídeos.</p>
+  <div class="fm-grid"><div class="fld span2"><label class="l" for="pv_t">Título (opcional)</label><input id="pv_t" maxlength="60" placeholder="Ex.: Como funciona o consórcio"></div></div>
+  <div class="pv-act"><label class="upl">🎬 Enviar vídeo (MP4, até 50 MB)<input type="file" accept="video/mp4,video/webm" onchange="pvFile(this)" hidden></label></div>
+  <p class="en-cont"><b>Vídeos:</b> ${nv}/7</p>
+  <div class="pv-adm">${L2.map((x,i)=>{const leg=!mp4Ok(x.u);return `<div class="pv-it${x.on===false||leg?' off':''}"><span class="pv-th">${leg?'🎬':`<video src="${esc(x.u)}#t=0.5" muted preload="metadata" playsinline></video>`}</span><div class="pv-m"><b>${esc(x.t||'Vídeo sem título')}</b><small>${leg?'<u>link antigo: não aparece mais no site</u>':(x.on===false?'<u>oculto no site</u>':'<span class="ok">publicado</span>')}</small></div>${leg?'':`<label class="sw pv-sw" title="Mostrar no site"><input type="checkbox" ${x.on===false?'':'checked'} onchange="pvTog(${i},this.checked)"><span class="sw-t"></span></label>`}<button type="button" class="btn sm" aria-label="Subir" onclick="pvMove(${i},-1)" ${i?'':'disabled'}>↑</button><button type="button" class="btn sm" aria-label="Descer" onclick="pvMove(${i},1)" ${i<L2.length-1?'':'disabled'}>↓</button><button type="button" class="btn sm" onclick="pvDel(${i})">Remover</button></div>`}).join('')||'<p class="mu" style="margin-top:14px">Nenhum vídeo publicado ainda.</p>'}</div>`}
 async function pvSave(L2){const config={...CF(),videos:L2};const{error}=await sb.from('vendedores').update({config}).eq('id',V.id);if(error)throw error;V.config=config}
-async function pvAdd(){const u=($('#pv_u').value||'').trim(),t=($('#pv_t').value||'').trim();
-  if(!/^https?:\/\/\S+$/i.test(u))return toast('Cole um link que comece com https://');
-  const L2=[...(CF().videos||[])];if(L2.length>=7)return toast('Limite de 7 vídeos: remova algum antes');
-  try{L2.push({t,u,on:true});await pvSave(L2);pVideos();toast('Vídeo publicado no seu site!')}catch(e){toast('Erro: '+(e&&e.message||e))}}
-async function pvFile(el){const f=el.files&&el.files[0];if(!f)return;if(f.size>50*1024*1024){el.value='';return toast('O vídeo passa de 50 MB: use um link (YouTube, por exemplo)')}
-  const L2=[...(CF().videos||[])];if(L2.length>=7){el.value='';return toast('Limite de 7 vídeos: remova algum antes')}
+async function pvFile(el){const f=el.files&&el.files[0];if(!f)return;if(!/^video\/(mp4|webm)$/i.test(f.type||'')&&!/\.(mp4|webm)$/i.test(f.name)){el.value='';return toast('Envie o vídeo em MP4 ou WebM')}if(f.size>50*1024*1024){el.value='';return toast('O vídeo passa de 50 MB: reduza o tamanho do arquivo e envie de novo')}
+  const L2=[...(CF().videos||[])];if(L2.filter(x=>x&&x.u&&mp4Ok(x.u)).length>=7){el.value='';return toast('Limite de 7 vídeos: remova algum antes')}
   try{toast('Enviando vídeo...');const u=await up(f);L2.push({t:($('#pv_t').value||'').trim()||f.name.replace(/\.[^.]+$/,'').slice(0,60),u,on:true});await pvSave(L2);pVideos();toast('Vídeo publicado no seu site!')}catch(e){el.value='';toast('Erro: '+(e&&e.message||e))}}
 async function pvTog(i,on){const L2=[...(CF().videos||[])];if(!L2[i])return;L2[i]={...L2[i],on};try{await pvSave(L2);pVideos();toast(on?'Vídeo publicado':'Vídeo oculto do site')}catch(e){toast('Erro: '+(e&&e.message||e))}}
 async function pvMove(i,d){const L2=[...(CF().videos||[])],j=i+d;if(j<0||j>=L2.length)return;[L2[i],L2[j]]=[L2[j],L2[i]];try{await pvSave(L2);pVideos()}catch(e){toast('Erro: '+(e&&e.message||e))}}
 async function pvDel(i){if(!confirm('Remover este vídeo do site?'))return;const L2=[...(CF().videos||[])];L2.splice(i,1);try{await pvSave(L2);pVideos();toast('Vídeo removido')}catch(e){toast('Erro: '+(e&&e.message||e))}}
 
 function pEntregas(){
-  if(!('config' in V)){$(PNS).innerHTML='<p class="mu">Para publicar fotos de clientes, rode o SQL único (coluna config) no Supabase e recarregue a página.</p>';return}
-  const L2=(CF().entregas||[]);
+  if(!('config' in V)){$(PNS).innerHTML='<p class="mu">Para publicar fotos e vídeos de clientes, rode o SQL único (coluna config) no Supabase e recarregue a página.</p>';return}
+  const L2=(CF().entregas||[]),ct=enCont(L2);
   $(PNS).innerHTML=`<h3 style="margin-top:0">Mais um sonho realizado</h3><p class="mu">Fotos e vídeos de clientes (entrega da moto ou contemplação). Eles aparecem no seu site como prova social. Só publique com a autorização do cliente.</p>
   <div class="fm-grid"><div class="fld span2"><label class="l" for="en_t">Tipo do registro</label><select id="en_t"><option value="e">Entrega da moto</option><option value="c">Contemplação</option></select></div><div class="fld"><label class="l" for="en_n">Nome do cliente</label><input id="en_n" maxlength="40" placeholder="Ex.: Rodson"></div><div class="fld"><label class="l" for="en_m">Moto entregue</label><input id="en_m" maxlength="50" placeholder="Ex.: CG 160 Titan"></div></div>
-  <div class="fld"><label class="l" for="en_u">Link do vídeo (opcional): Instagram, Facebook, TikTok ou YouTube</label><input id="en_u" inputmode="url" autocomplete="off" placeholder="https://www.instagram.com/reel/..."></div>
   <label class="chk" style="margin:6px 0 14px"><input type="checkbox" id="en_ok"><span>Tenho a autorização do cliente para publicar a foto ou o vídeo no meu site</span></label>
-  <div class="pv-act"><button type="button" class="btn red" onclick="enAddLink()">▶ Publicar vídeo pelo link</button><label class="upl">📷 Ou escolher uma foto e publicar<input type="file" accept="image/*" onchange="enAdd(this)" hidden></label></div>
-  <div class="pv-act" style="margin-top:2px"><label class="upl">🎬 Enviar vídeo (MP4, até 50 MB)<input type="file" accept="video/mp4,video/webm" onchange="enAddVideo(this)" hidden></label></div>
-  <div class="pv-dica"><b>Como o vídeo aparece no site</b><br>▶ <b>MP4 enviado ou link do YouTube (Shorts):</b> toca <b>sozinho</b>, grande e limpo, assim que a pessoa chega nele (começa sem som, com botão para ligar).<br>▶ <b>Link do Instagram, Facebook ou TikTok:</b> o vídeo aparece carregado, mas essas redes <b>não deixam tocar sozinho</b> nem esconder o perfil delas: a pessoa precisa tocar no ▶. O post precisa ser <b>público</b>.</div>
-  <p class="en-cont"><b>Fotos:</b> ${enCont(L2).f}/${EN_MAXF} · <b>Vídeos:</b> ${enCont(L2).v}/${EN_MAXV}</p>
-  <div class="en-adm">${L2.map((e,i)=>`<div class="en-it">${e.f?`<img src="${esc(e.f)}" alt="">`:`<span class="en-vi" aria-hidden="true">🎬</span>`}<div><b>${esc(e.n)}</b><small>${e.t==='c'?'Contemplação · ':'Entrega · '}${e.u&&!e.f?VK_L[vKind(e.u)]+' · ':''}${esc(e.m||'')}</small></div><button type="button" class="btn sm" onclick="enDel(${i})">Remover</button></div>`).join('')||'<p class="mu" style="margin-top:14px">Nenhuma foto publicada ainda.</p>'}</div>`}
+  <div class="pv-act"><label class="upl">📷 Escolher uma foto e publicar<input type="file" accept="image/*" onchange="enAdd(this)" hidden></label><label class="upl">🎬 Enviar vídeo (MP4, até 50 MB)<input type="file" accept="video/mp4,video/webm" onchange="enAddVideo(this)" hidden></label></div>
+  <div class="pv-dica"><b>Como os vídeos aparecem no site</b><br>Baixe o vídeo (do Instagram ou do celular) e envie o arquivo aqui, em <b>MP4</b> (até 50 MB). No site ele <b>roda sozinho e sem som</b>, numa fila que rola devagar. Quando o cliente <b>passa o mouse</b>, o <b>som liga</b>. Ao <b>clicar</b>, o vídeo abre em <b>tela maior</b>.</div>
+  <p class="en-cont"><b>Fotos:</b> ${ct.f}/${EN_MAXF} · <b>Vídeos:</b> ${ct.v}/${EN_MAXV}</p>
+  <div class="en-adm">${L2.map((e,i)=>{const leg=e.u&&!e.f&&!mp4Ok(e.u);return `<div class="en-it${leg?' off':''}">${e.f?`<img src="${esc(e.f)}" alt="">`:`<span class="en-vi" aria-hidden="true">🎬</span>`}<div><b>${esc(e.n)}</b><small>${e.t==='c'?'Contemplação':'Entrega'} · ${leg?'link antigo: não aparece mais no site (remova e envie o arquivo do vídeo)':(e.u&&!e.f?'Vídeo · ':'')+esc(e.m||'')}</small></div><button type="button" class="btn sm" onclick="enDel(${i})">Remover</button></div>`}).join('')||'<p class="mu" style="margin-top:14px">Nenhum registro publicado ainda.</p>'}</div>`}
 async function enSave(L2){const config={...CF(),entregas:L2};const{error}=await sb.from('vendedores').update({config}).eq('id',V.id);if(error)throw error;V.config=config}
 async function enAdd(el){const f=el.files&&el.files[0];if(!f)return;const n=($('#en_n').value||'').trim(),m=($('#en_m').value||'').trim();
   if(!n){el.value='';return toast('Informe o nome do cliente')}if(!$('#en_ok').checked){el.value='';return toast('Confirme que você tem a autorização do cliente')}
   const L2=[...(CF().entregas||[])];if(enCont(L2).f>=EN_MAXF){el.value='';return toast('Limite de '+EN_MAXF+' fotos: remova alguma antes')}
   try{toast('Enviando foto...');const u=await up(f);L2.unshift({f:u,n,m,t:($('#en_t')&&$('#en_t').value==='c')?'c':'e'});await enSave(L2);pEntregas();toast('Foto publicada no seu site!')}catch(e){el.value='';toast('Erro: '+(e&&e.message||e))}}
-async function enAddLink(){const u=($('#en_u').value||'').trim(),n=($('#en_n').value||'').trim(),m=($('#en_m').value||'').trim();
-  if(!n)return toast('Informe o nome do cliente');if(!/^https?:\/\/\S+$/i.test(u))return toast('Cole um link que comece com https://');if(!$('#en_ok').checked)return toast('Confirme que você tem a autorização do cliente');
-  const L2=[...(CF().entregas||[])];if(enCont(L2).v>=EN_MAXV)return toast('Limite de '+EN_MAXV+' vídeos: remova algum antes');
-  try{L2.unshift({u,n,m,t:($('#en_t')&&$('#en_t').value==='c')?'c':'e'});await enSave(L2);pEntregas();toast('Vídeo publicado no seu site!')}catch(e){toast('Erro: '+(e&&e.message||e))}}
 async function enAddVideo(el){const f=el.files&&el.files[0];if(!f)return;const n=($('#en_n').value||'').trim(),m=($('#en_m').value||'').trim();
   if(!n){el.value='';return toast('Informe o nome do cliente')}if(!$('#en_ok').checked){el.value='';return toast('Confirme que você tem a autorização do cliente')}
-  if(f.size>50*1024*1024){el.value='';return toast('O vídeo passa de 50 MB: use um link do YouTube (Shorts)')}
+  if(!/^video\/(mp4|webm)$/i.test(f.type||'')&&!/\.(mp4|webm)$/i.test(f.name)){el.value='';return toast('Envie o vídeo em MP4 ou WebM')}
+  if(f.size>50*1024*1024){el.value='';return toast('O vídeo passa de 50 MB: reduza o tamanho do arquivo e envie de novo')}
   const L2=[...(CF().entregas||[])];if(enCont(L2).v>=EN_MAXV){el.value='';return toast('Limite de '+EN_MAXV+' vídeos: remova algum antes')}
   try{toast('Enviando vídeo...');const u=await up(f);L2.unshift({u,n,m,t:($('#en_t')&&$('#en_t').value==='c')?'c':'e'});await enSave(L2);pEntregas();toast('Vídeo publicado no seu site!')}catch(e){el.value='';toast('Erro: '+(e&&e.message||e))}}
 async function enDel(i){if(!confirm('Remover esta foto do site?'))return;const L2=[...(CF().entregas||[])];L2.splice(i,1);try{await enSave(L2);pEntregas();toast('Foto removida')}catch(e){toast('Erro: '+(e&&e.message||e))}}
