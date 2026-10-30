@@ -736,9 +736,6 @@ video.en-vid{pointer-events:none}.en-v.auto.stuck .en-pl{display:grid;z-index:5;
 .en-it.off{opacity:.62}
 
 /* ===== TOPO: logo no canto esquerdo, vendedor em destaque ===== */
-.brandbar{position:absolute;top:22px;left:clamp(14px,3vw,44px);z-index:6;display:flex;align-items:center}
-.blogo{display:block;height:108px;width:auto;max-width:380px;object-fit:contain;background:#fff;border-radius:22px;padding:14px 26px;box-shadow:0 16px 36px -14px #000c,0 0 0 1px #ffffff22}
-.hero.hl{padding-top:172px}
 .hero .ava{width:clamp(128px,11vw,172px);height:clamp(128px,11vw,172px);border:4px solid #ffffff4d;box-shadow:0 0 0 9px #ffffff12,0 0 64px -6px #e0141466,0 26px 54px -12px #000d}
 .hero .idt h1{font-size:clamp(28px,3vw,42px);line-height:1.05;letter-spacing:-.02em}
 .hero .idt h1 .vf{width:.62em;height:.62em;margin-left:.22em}
@@ -747,7 +744,6 @@ video.en-vid{pointer-events:none}.en-v.auto.stuck .en-pl{display:grid;z-index:5;
 .stats b{font-size:clamp(26px,2.4vw,34px)}
 .hero .hin.hin .idt{align-self:center}
 @media(max-width:980px){
- .hero.hl{padding-top:128px}.brandbar{top:16px}.blogo{height:80px;max-width:280px;padding:10px 18px;border-radius:18px}
  .hero .ava{width:clamp(108px,30vw,132px);height:clamp(108px,30vw,132px);border-width:3px;box-shadow:0 0 0 7px #ffffff12,0 0 48px -6px #e0141466,0 20px 40px -12px #000d}
  .hero .idt h1{font-size:clamp(26px,7.4vw,34px)}
 }
@@ -946,8 +942,7 @@ function home(){
   mkK();
   const AM=A.filter(m=>!soCon(m)),vs=AM.flatMap(m=>(m.planos||[]).map(p=>p.valor)).filter(v=>v>0),mn=vs.length?Math.min(...vs):0;
   const bxd=(()=>{try{return sessionStorage.getItem('bx')}catch(e){return''}})();
-  $('#app').innerHTML=`${tnavH()}<header class="hero${V.logo_url?' hl':''}"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
-  ${V.logo_url?`<div class="brandbar"><img class="blogo" src="${esc(V.logo_url)}" alt="Logo da empresa" decoding="async" fetchpriority="high"></div>`:''}
+  $('#app').innerHTML=`${tnavH()}<header class="hero"><span class="glow"></span><div class="spd"><i></i><i></i><i></i><i></i></div>
   <div class="hin ${V.logo_url?'':'nl'}">${av(V.foto_url)}
   <div class="idt"><h1>${esc(V.nome)}<svg class="vf" viewBox="0 0 24 24" aria-label="Verificado" role="img"><circle cx="12" cy="12" r="11" fill="#1d9bf0"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></h1>${V.bio?`<p>${esc(V.bio)}</p>`:''}</div>
   <h2 class="hhead"><span class="eyb">ENCONTRE A SUA HONDA</span>${hhead()}</h2>
