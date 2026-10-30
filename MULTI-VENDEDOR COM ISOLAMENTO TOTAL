@@ -1,0 +1,1324 @@
+-- =====================================================================
+--  MULTI-VENDEDOR COM ISOLAMENTO TOTAL (RLS)  —  Vitrine + Ficha + Pré-contrato + BOT TELEGRAM (v10)
+--  v10: remove triggers antigos que bloqueavam a cópia do catálogo (erro "Sem permissão para gravar neste vendedor"),
+--       copia o catálogo modelo (motos, motores, fotos, descrição, preços, consórcio, financiamento) para todo vendedor novo
+--       e para os que estão sem motos. Depois da cópia, cada vendedor mexe só nas linhas dele.
+--  Rode no Supabase: SQL Editor > New query > colar tudo > Run.
+--  Pode rodar de novo sem medo (idempotente). Compatível com os 3 index.html limpos.
+--
+--  MODELO DE SEGURANÇA
+--   * 1 vendedor = 1 usuário em auth.users + 1 linha em public.vendedores (slug único).
+--   * Todo dado de negócio carrega vendedor_id. O vendedor_id NUNCA vem do navegador:
+--     é preenchido por trigger a partir (a) do cabeçalho x-vendedor (site público) ou
+--     (b) do login (painel). Qualquer valor enviado pelo cliente é sobrescrito.
+--   * Painel: acesso = (login é dono da linha) E (cabeçalho do site == esse vendedor).
+--     Logo, o vendedor A logado no site do B não enxerga nada de A nem de B.
+--   * Público (anon): só INSERE leads/fichas/contratos/pedidos e LÊ motos ativas do slug.
+--   * Dono da plataforma (tabela donos): só gerencia a tabela vendedores. Não lê leads.
+-- =====================================================================
+
+-- ---------- 0. EXTENSÃO (aviso por Telegram) ----------
+do $$ begin create extension if not exists pg_net; exception when others then
+  raise notice 'pg_net indisponível: avisos do Telegram ficam desativados'; end $$;
+
+-- ---------- 1. TABELAS ----------
+create table if not exists public.vendedores(
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid unique not null references auth.users(id) on delete cascade,
+  slug text unique not null,
+  nome text not null default 'Vendedor',
+  created_at timestamptz not null default now());
+alter table public.vendedores
+  add column if not exists bio text, add column if not exists whatsapp text,
+  add column if not exists instagram text, add column if not exists facebook text,
+  add column if not exists foto_url text, add column if not exists logo_url text,
+  add column if not exists suspenso boolean not null default false;
+do $$ begin
+  alter table public.vendedores add constraint vendedores_slug_fmt
+    check (slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and length(slug) between 3 and 40);
+exception when duplicate_object then null; end $$;
+
+create table if not exists public.donos(user_id uuid primary key references auth.users(id) on delete cascade);
+
+create table if not exists public.vendedor_segredos(   -- segredos: nenhuma policy = invisível pela API
+  vendedor_id uuid primary key references public.vendedores(id) on delete cascade,
+  telegram_token text, telegram_chat_id text);
+
+create table if not exists public.motos(
+  id uuid primary key default gen_random_uuid(),
+  vendedor_id uuid references public.vendedores(id) on delete cascade,
+  nome text not null, modelo text, categoria text, selo text, preco numeric, descricao text,
+  fotos jsonb not null default '[]', video_url text, planos jsonb not null default '[]',
+  emplacamento text, ordem int not null default 0, ativo boolean not null default true,
+  created_at timestamptz not null default now());
+
+create table if not exists public.leads(
+  id uuid primary key default gen_random_uuid(),
+  vendedor_id uuid references public.vendedores(id) on delete cascade,
+  tipo text, moto_id text, moto_nome text, nome text, telefone text, cpf text, nascimento text,
+  entrada text, habilitacao text, detalhes text, created_at timestamptz not null default now());
+
+create table if not exists public.fichas(
+  id uuid primary key default gen_random_uuid(),
+  vendedor_id uuid references public.vendedores(id) on delete cascade,
+  moto_id text, moto_nome text, nome text, nascimento text, cidade_nascimento text, pai text, mae text,
+  telefone text, email text, cpf text, rg text, rg_emissao text, cep text, rua text, numero text,
+  bairro text, cidade text, estado text, ref_nome text, ref_telefone text, ocupacao text, renda text,
+  entrada text, habilitacao text, lgpd_aceite boolean not null default false,
+  status text not null default 'novo' check (status in ('novo','em_analise','aprovado','recusado')),
+  created_at timestamptz not null default now());
+
+create table if not exists public.contratos(
+  id uuid primary key default gen_random_uuid(),
+  vendedor_id uuid references public.vendedores(id) on delete cascade,
+  moto_id text, moto_nome text, nome text, telefone text, email text, cpf text, rg text, rg_emissao text,
+  nascimento text, cidade_nascimento text, pai text, mae text, cep text, rua text, numero text,
+  bairro text, cidade text, estado text, telefone_recado text, ocupacao text, renda text,
+  lance text, lance_valor text, lgpd_aceite boolean not null default false,
+  status text not null default 'novo'
+    check (status in ('novo','em_analise','contrato_enviado','assinado','recusado')),
+  created_at timestamptz not null default now());
+
+create table if not exists public.pedidos_chat(
+  id uuid primary key,                                   -- gerado pelo chat (UUID)
+  vendedor_id uuid references public.vendedores(id) on delete cascade,
+  completo boolean not null default false, moto_id text, moto_nome text, pagamento text,
+  nome text, nome_completo text, telefone text, cpf text, nascimento text, entrada text, parcela text,
+  forma_pagamento text, troca text, parcelamento_cartao text, habilitacao text, mensagem text,
+  status text not null default 'novo' check (status in ('novo','atendimento','concluido','cancelado')),
+  created_at timestamptz not null default now(), updated_at timestamptz not null default now());
+
+-- Se vinha de um banco antigo: garante a coluna em tabelas já existentes
+alter table public.motos        add column if not exists vendedor_id uuid references public.vendedores(id) on delete cascade;
+alter table public.leads        add column if not exists vendedor_id uuid references public.vendedores(id) on delete cascade;
+alter table public.fichas       add column if not exists vendedor_id uuid references public.vendedores(id) on delete cascade;
+alter table public.contratos    add column if not exists vendedor_id uuid references public.vendedores(id) on delete cascade;
+alter table public.pedidos_chat add column if not exists vendedor_id uuid references public.vendedores(id) on delete cascade;
+
+create index if not exists i_motos_v  on public.motos(vendedor_id, ordem);
+create index if not exists i_leads_v  on public.leads(vendedor_id, created_at desc);
+create index if not exists i_fichas_v on public.fichas(vendedor_id, created_at desc);
+create index if not exists i_contr_v  on public.contratos(vendedor_id, created_at desc);
+create index if not exists i_ped_v    on public.pedidos_chat(vendedor_id, created_at desc);
+
+-- ---------- 2. FUNÇÕES AUXILIARES ----------
+create or replace function public.slug_ctx() returns text language sql stable as $$
+  select nullif(lower(btrim(coalesce(nullif(current_setting('request.headers', true),'')::json->>'x-vendedor',''))),'') $$;
+
+create or replace function public.vendedor_ctx() returns uuid language sql stable security definer set search_path=public as $$
+  select id from public.vendedores where slug = public.slug_ctx() $$;
+
+create or replace function public.meu_vendedor() returns uuid language sql stable security definer set search_path=public as $$
+  select id from public.vendedores where user_id = auth.uid() $$;
+
+create or replace function public.vendedor_ativo(vid uuid) returns boolean language sql stable security definer set search_path=public as $$
+  select exists(select 1 from public.vendedores where id = vid and not suspenso) $$;
+
+create or replace function public.eh_dono() returns boolean language sql stable security definer set search_path=public as $$
+  select exists(select 1 from public.donos where user_id = auth.uid()) $$;
+
+-- Painel: login é dono do registro E o site aberto é o do mesmo vendedor E conta não suspensa
+create or replace function public.pode_gerir(vid uuid) returns boolean language sql stable security definer set search_path=public as $$
+  select vid is not null and vid = public.meu_vendedor() and public.vendedor_ativo(vid)
+         and (public.slug_ctx() is null or vid = public.vendedor_ctx()) $$;
+
+-- ---------- 3. TRIGGERS (vendedor_id nunca vem do navegador) ----------
+create or replace function public.tg_vendedor_publico() returns trigger language plpgsql as $$
+begin
+  if current_user not in ('anon','authenticated') then return new; end if;  -- SQL Editor/service_role: livre
+  new.vendedor_id := public.vendedor_ctx();
+  if new.vendedor_id is null then raise exception 'Site sem vendedor (use ?v=slug)'; end if;
+  return new; end $$;
+
+create or replace function public.tg_vendedor_gestor() returns trigger language plpgsql as $$
+begin
+  if current_user not in ('anon','authenticated') then return new; end if;
+  new.vendedor_id := public.meu_vendedor();
+  if new.vendedor_id is null then raise exception 'Login sem vendedor cadastrado'; end if;
+  return new; end $$;
+
+create or replace function public.tg_trava_vendedor() returns trigger language plpgsql as $$
+begin
+  if new.vendedor_id is distinct from old.vendedor_id then raise exception 'vendedor_id é imutável'; end if;
+  return new; end $$;
+
+create or replace function public.tg_guard_vendedores() returns trigger language plpgsql as $$
+begin   -- vendedor comum só edita perfil; slug, user_id e suspensão são do dono
+  if current_user in ('anon','authenticated') and not public.eh_dono() then
+    new.user_id := old.user_id; new.slug := old.slug; new.suspenso := old.suspenso; new.id := old.id; end if;
+  return new; end $$;
+
+-- v10: REMOVE triggers/funções antigas de versões anteriores nas tabelas de negócio.
+--      (ex.: tg_set_vendedor_admin, que barrava a cópia do catálogo). Os triggers corretos são recriados logo abaixo e nas seções 7 e 12.
+drop function if exists public.tg_set_vendedor_admin() cascade;
+do $$ declare r record; begin
+  for r in select c.relname, t.tgname from pg_trigger t join pg_class c on c.oid = t.tgrelid
+           where c.relnamespace = 'public'::regnamespace and not t.tgisinternal
+             and c.relname in ('motos','leads','fichas','contratos','pedidos_chat') loop
+    execute format('drop trigger if exists %I on public.%I', r.tgname, r.relname);
+  end loop;
+end $$;
+
+do $$ declare t text; begin
+  foreach t in array array['leads','fichas','contratos'] loop
+    execute format('drop trigger if exists a_vend_ins on public.%I', t);
+    execute format('create trigger a_vend_ins before insert on public.%I for each row execute function public.tg_vendedor_publico()', t);
+  end loop;
+  foreach t in array array['motos','leads','fichas','contratos','pedidos_chat'] loop
+    execute format('drop trigger if exists b_vend_upd on public.%I', t);
+    execute format('create trigger b_vend_upd before update on public.%I for each row execute function public.tg_trava_vendedor()', t);
+  end loop;
+end $$;
+drop trigger if exists a_vend_ins on public.motos;
+create trigger a_vend_ins before insert on public.motos for each row execute function public.tg_vendedor_gestor();
+-- remove QUALQUER trigger antigo da tabela vendedores (ex.: "Campo protegido ...") e recria só o nosso
+do $$ declare r record; begin
+  for r in select tgname from pg_trigger where tgrelid = 'public.vendedores'::regclass and not tgisinternal loop
+    execute format('drop trigger %I on public.vendedores', r.tgname);
+  end loop;
+end $$;
+create trigger a_guard before update on public.vendedores for each row execute function public.tg_guard_vendedores();
+
+-- ---------- 4. VIEW PÚBLICA (só campos seguros, só o vendedor do cabeçalho) ----------
+drop view if exists public.vendedor_publico;
+create view public.vendedor_publico as
+  select id, slug, nome, bio, whatsapp, instagram, facebook, foto_url, logo_url, suspenso
+  from public.vendedores where slug = public.slug_ctx();   -- roda como dono da view de propósito; 1 linha no máximo
+grant select on public.vendedor_publico to anon, authenticated;
+
+-- ---------- 5. RLS: limpa policies antigas (evita brechas herdadas) e recria ----------
+do $$ declare r record; begin
+  for r in select schemaname, tablename, policyname from pg_policies
+           where schemaname='public' and tablename in
+           ('vendedores','donos','vendedor_segredos','motos','leads','fichas','contratos','pedidos_chat') loop
+    execute format('drop policy %I on %I.%I', r.policyname, r.schemaname, r.tablename);
+  end loop;
+end $$;
+
+alter table public.vendedores         enable row level security;
+alter table public.donos              enable row level security;
+alter table public.vendedor_segredos  enable row level security;
+alter table public.motos              enable row level security;
+alter table public.leads              enable row level security;
+alter table public.fichas             enable row level security;
+alter table public.contratos          enable row level security;
+alter table public.pedidos_chat       enable row level security;
+
+-- vendedores
+create policy v_sel on public.vendedores for select to authenticated using (user_id = auth.uid() or public.eh_dono());
+create policy v_upd on public.vendedores for update to authenticated using (user_id = auth.uid()) with check (user_id = auth.uid());
+create policy v_dono on public.vendedores for all to authenticated using (public.eh_dono()) with check (public.eh_dono());
+
+-- motos: público lê só ativas do slug; vendedor gerencia as dele
+create policy m_pub on public.motos for select to anon, authenticated
+  using (ativo and vendedor_id = public.vendedor_ctx() and public.vendedor_ativo(vendedor_id));
+create policy m_sel on public.motos for select to authenticated using (public.pode_gerir(vendedor_id));
+create policy m_ins on public.motos for insert to authenticated with check (public.pode_gerir(vendedor_id));
+create policy m_upd on public.motos for update to authenticated using (public.pode_gerir(vendedor_id)) with check (public.pode_gerir(vendedor_id));
+create policy m_del on public.motos for delete to authenticated using (public.pode_gerir(vendedor_id));
+
+-- leads / fichas / contratos: público só insere; vendedor lê/edita/apaga os dele
+do $$ declare t text; begin
+  foreach t in array array['leads','fichas','contratos'] loop
+    execute format($f$create policy %1$s_ins on public.%1$I for insert to anon, authenticated
+      with check (vendedor_id = public.vendedor_ctx() and public.vendedor_ativo(vendedor_id))$f$, t);
+    execute format('create policy %1$s_sel on public.%1$I for select to authenticated using (public.pode_gerir(vendedor_id))', t);
+    execute format('create policy %1$s_upd on public.%1$I for update to authenticated using (public.pode_gerir(vendedor_id)) with check (public.pode_gerir(vendedor_id))', t);
+    execute format('create policy %1$s_del on public.%1$I for delete to authenticated using (public.pode_gerir(vendedor_id))', t);
+  end loop;
+end $$;
+-- fichas e contratos exigem aceite LGPD
+drop policy fichas_ins on public.fichas;
+create policy fichas_ins on public.fichas for insert to anon, authenticated
+  with check (lgpd_aceite and vendedor_id = public.vendedor_ctx() and public.vendedor_ativo(vendedor_id));
+drop policy contratos_ins on public.contratos;
+create policy contratos_ins on public.contratos for insert to anon, authenticated
+  with check (lgpd_aceite and vendedor_id = public.vendedor_ctx() and public.vendedor_ativo(vendedor_id));
+
+-- pedidos_chat: SEM insert direto; entra só pela função registrar_pedido_chat
+create policy p_sel on public.pedidos_chat for select to authenticated using (public.pode_gerir(vendedor_id));
+create policy p_upd on public.pedidos_chat for update to authenticated using (public.pode_gerir(vendedor_id)) with check (public.pode_gerir(vendedor_id));
+create policy p_del on public.pedidos_chat for delete to authenticated using (public.pode_gerir(vendedor_id));
+
+-- privilégios mínimos (defesa em profundidade além da RLS)
+revoke all on public.vendedores, public.donos, public.vendedor_segredos, public.motos, public.leads,
+              public.fichas, public.contratos, public.pedidos_chat from anon, authenticated;
+grant select, update on public.vendedores to authenticated;
+grant insert, delete on public.vendedores to authenticated;              -- insert/delete só passam para o dono (policy v_dono)
+grant select on public.motos to anon;
+grant select, insert, update, delete on public.motos, public.leads, public.fichas, public.contratos, public.pedidos_chat to authenticated;
+grant insert on public.leads, public.fichas, public.contratos to anon;
+
+-- ---------- 6. PEDIDOS DO CHAT (upsert seguro, cada pedido preso ao seu vendedor) ----------
+create or replace function public.jtxt(p jsonb, k text, n int default 300) returns text language sql immutable as $$
+  select left(nullif(btrim(p->>k),''), n) $$;
+
+drop function if exists public.registrar_pedido_chat(jsonb);
+create function public.registrar_pedido_chat(p jsonb) returns void language plpgsql security definer set search_path=public as $$
+declare v uuid := public.vendedor_ctx(); pid uuid := nullif(p->>'id','')::uuid;
+begin
+  if v is null or not public.vendedor_ativo(v) then raise exception 'Site sem vendedor'; end if;
+  if pid is null then raise exception 'id obrigatório'; end if;
+  insert into public.pedidos_chat as t(id, vendedor_id, completo, moto_id, moto_nome, pagamento, nome, nome_completo,
+      telefone, cpf, nascimento, entrada, parcela, forma_pagamento, troca, parcelamento_cartao, habilitacao, mensagem)
+  values (pid, v, coalesce((p->>'completo')::boolean,false), jtxt(p,'moto_id',64), jtxt(p,'moto_nome'), jtxt(p,'pagamento',30),
+      jtxt(p,'nome'), jtxt(p,'nome_completo'), jtxt(p,'telefone',30), jtxt(p,'cpf',20), jtxt(p,'nascimento',20),
+      jtxt(p,'entrada',60), jtxt(p,'parcela',60), jtxt(p,'forma_pagamento',60), jtxt(p,'troca',200),
+      jtxt(p,'parcelamento_cartao',60), jtxt(p,'habilitacao',30), jtxt(p,'mensagem',3000))
+  on conflict (id) do update set
+      completo = excluded.completo, moto_id = coalesce(excluded.moto_id,t.moto_id), moto_nome = coalesce(excluded.moto_nome,t.moto_nome),
+      pagamento = coalesce(excluded.pagamento,t.pagamento), nome = coalesce(excluded.nome,t.nome),
+      nome_completo = coalesce(excluded.nome_completo,t.nome_completo), telefone = coalesce(excluded.telefone,t.telefone),
+      cpf = coalesce(excluded.cpf,t.cpf), nascimento = coalesce(excluded.nascimento,t.nascimento),
+      entrada = coalesce(excluded.entrada,t.entrada), parcela = coalesce(excluded.parcela,t.parcela),
+      forma_pagamento = coalesce(excluded.forma_pagamento,t.forma_pagamento), troca = coalesce(excluded.troca,t.troca),
+      parcelamento_cartao = coalesce(excluded.parcelamento_cartao,t.parcelamento_cartao),
+      habilitacao = coalesce(excluded.habilitacao,t.habilitacao), mensagem = coalesce(excluded.mensagem,t.mensagem),
+      updated_at = now()
+    where t.vendedor_id = v and t.completo = false;   -- só o MESMO vendedor, e só enquanto incompleto
+end $$;
+revoke all on function public.registrar_pedido_chat(jsonb) from public;
+grant execute on function public.registrar_pedido_chat(jsonb) to anon, authenticated;
+
+-- ---------- 7. AVISO NO TELEGRAM (token de cada vendedor, nunca exposto) ----------
+create or replace function public.tg_aviso_pedido() returns trigger language plpgsql security definer set search_path=public as $$
+declare s record;
+begin
+  if not new.completo or (tg_op = 'UPDATE' and old.completo) then return new; end if;
+  select telegram_token, telegram_chat_id into s from public.vendedor_segredos where vendedor_id = new.vendedor_id;
+  if s.telegram_token is null or s.telegram_chat_id is null then return new; end if;
+  begin
+    perform net.http_post(
+      url := 'https://api.telegram.org/bot' || s.telegram_token || '/sendMessage',
+      body := jsonb_build_object('chat_id', s.telegram_chat_id, 'text',
+        'Novo pedido' || E'\n' || coalesce(new.moto_nome,'-') || E'\n' || coalesce(new.nome_completo,new.nome,'-') ||
+        E'\n' || coalesce(new.telefone,'-') || E'\n' || coalesce(new.pagamento,'-')),
+      headers := '{"Content-Type":"application/json"}'::jsonb);
+  exception when others then null;   -- aviso nunca derruba o pedido
+  end;
+  return new; end $$;
+drop trigger if exists c_aviso on public.pedidos_chat;
+create trigger c_aviso after insert or update on public.pedidos_chat for each row execute function public.tg_aviso_pedido();
+
+-- realtime do painel (respeita RLS)
+alter table public.pedidos_chat replica identity full;
+do $$ begin alter publication supabase_realtime add table public.pedidos_chat;
+exception when duplicate_object then null; when undefined_object then null; end $$;
+
+-- ---------- 8. STORAGE: bucket "midia" (leitura pública por URL, escrita só na própria pasta) ----------
+insert into storage.buckets(id, name, public, file_size_limit, allowed_mime_types)
+values ('midia','midia',true,52428800, array['image/png','image/jpeg','image/webp','image/gif','video/mp4','video/webm'])
+on conflict (id) do update set public = true, file_size_limit = excluded.file_size_limit, allowed_mime_types = excluded.allowed_mime_types;
+
+do $$ declare r record; begin
+  for r in select policyname from pg_policies where schemaname='storage' and tablename='objects'
+           and (coalesce(qual,'') || coalesce(with_check,'')) ilike '%midia%' loop
+    execute format('drop policy %I on storage.objects', r.policyname);
+  end loop;
+end $$;
+-- caminho do upload é <vendedor_id>/arquivo (o painel já faz isso)
+create policy midia_ins on storage.objects for insert to authenticated
+  with check (bucket_id='midia' and (storage.foldername(name))[1] = public.meu_vendedor()::text and public.vendedor_ativo(public.meu_vendedor()));
+create policy midia_upd on storage.objects for update to authenticated
+  using (bucket_id='midia' and (storage.foldername(name))[1] = public.meu_vendedor()::text);
+create policy midia_del on storage.objects for delete to authenticated
+  using (bucket_id='midia' and (storage.foldername(name))[1] = public.meu_vendedor()::text);
+create policy midia_sel on storage.objects for select to authenticated   -- listar só a própria pasta
+  using (bucket_id='midia' and (storage.foldername(name))[1] = public.meu_vendedor()::text);
+
+-- ---------- 9. COMANDOS DA EQUIPE (só SQL Editor / service_role) ----------
+-- 9.1 cadastrar vendedor: crie antes o usuário em Authentication > Users, depois rode:
+--     select public.cadastrar_vendedor('email@dele.com', 'slug-dele', 'Nome Dele', '5568999990000');
+create or replace function public.cadastrar_vendedor(p_email text, p_slug text, p_nome text, p_whatsapp text default null)
+returns uuid language plpgsql security definer set search_path=public as $$
+declare u uuid; v uuid;
+begin
+  select id into u from auth.users where lower(email) = lower(btrim(p_email));
+  if u is null then raise exception 'Usuário % não existe. Crie em Authentication > Users (Add user, com Auto Confirm).', p_email; end if;
+  insert into public.vendedores(user_id, slug, nome, whatsapp)
+  values (u, lower(btrim(p_slug)), btrim(p_nome), regexp_replace(coalesce(p_whatsapp,''),'\D','','g')) returning id into v;
+  return v; end $$;
+
+-- 9.2 Telegram do vendedor:  select public.definir_telegram('slug-dele','<token do bot>','<chat id>');
+create or replace function public.definir_telegram(p_slug text, p_token text, p_chat text) returns void
+language sql security definer set search_path=public as $$
+  insert into public.vendedor_segredos(vendedor_id, telegram_token, telegram_chat_id)
+  select id, p_token, p_chat from public.vendedores where slug = lower(p_slug)
+  on conflict (vendedor_id) do update set telegram_token = excluded.telegram_token, telegram_chat_id = excluded.telegram_chat_id $$;
+
+-- 9.3 dono da plataforma (painel "Vendedores"):  select public.promover_dono('seu@email.com');
+create or replace function public.promover_dono(p_email text) returns void language sql security definer set search_path=public as $$
+  insert into public.donos(user_id) select id from auth.users where lower(email) = lower(p_email) on conflict do nothing $$;
+
+revoke all on function public.cadastrar_vendedor(text,text,text,text), public.definir_telegram(text,text,text),
+                       public.promover_dono(text) from public, anon, authenticated;
+
+-- 9.4 suspender / reativar:  update public.vendedores set suspenso = true where slug = 'slug-dele';
+
+-- ---------- 10. MIGRAÇÃO (só se já existiam dados do modelo antigo sem vendedor_id) ----------
+-- update public.motos set vendedor_id = (select id from public.vendedores where slug='slug-dele') where vendedor_id is null;
+-- (repita para leads, fichas, contratos, pedidos_chat) e depois trave:
+-- alter table public.motos alter column vendedor_id set not null;   -- idem nas outras 4
+
+-- ---------- 11. AUDITORIA (rode quando quiser: tudo deve dar OK) ----------
+create or replace view public.auditoria_isolamento as
+  select c.relname as tabela, c.relrowsecurity as rls_ligada,
+         (select count(*) from pg_policies p where p.schemaname='public' and p.tablename=c.relname) as policies,
+         case when c.relrowsecurity then 'OK' else 'RISCO: RLS DESLIGADA' end as status
+  from pg_class c join pg_namespace n on n.oid=c.relnamespace
+  where n.nspname='public' and c.relkind='r'
+    and c.relname in ('vendedores','donos','vendedor_segredos','motos','leads','fichas','contratos','pedidos_chat');
+revoke all on public.auditoria_isolamento from anon, authenticated;
+-- select * from public.auditoria_isolamento;
+
+-- ---------- 12. CADASTRO RÁPIDO, LINKS, TELEGRAM E PROTEÇÕES (v5) ----------
+-- =====================================================================
+--  v5 — CADASTRO RÁPIDO + LINKS + TELEGRAM + PROTEÇÕES   (pode rodar várias vezes)
+-- =====================================================================
+
+-- ---------- Configuração da plataforma (endereços dos sites e Telegram do dono) ----------
+create table if not exists public.plataforma_config(chave text primary key, valor text not null);
+alter table public.plataforma_config enable row level security;
+revoke all on public.plataforma_config from anon, authenticated;
+insert into public.plataforma_config(chave, valor) values
+  ('url_vitrine','https://hondastarmotos-one.vercel.app/'),
+  ('url_cdc','https://sitecdc.vercel.app/'),
+  ('url_cnh','https://sitecnh.vercel.app/')
+on conflict (chave) do nothing;
+-- vitrine oficial (sobrescreve o valor antigo salvo no banco)
+update public.plataforma_config set valor = 'https://hondastarmotos-one.vercel.app/' where chave = 'url_vitrine';
+-- trocar endereço: update public.plataforma_config set valor='https://novo.vercel.app/' where chave='url_vitrine';
+
+create or replace function public.links_vendedor(p_slug text) returns table(etiqueta text, endereco text)
+language sql stable security definer set search_path = public as $$
+  with c as (select max(valor) filter (where chave='url_vitrine') vit, max(valor) filter (where chave='url_cdc') cdc,
+                    max(valor) filter (where chave='url_cnh') cnh from public.plataforma_config),
+       s as (select lower(btrim(p_slug)) as slug)
+  select x.etiqueta, x.endereco from (
+    select 1 o, 'Vitrine de motos'::text etiqueta, c.vit || '?v=' || s.slug endereco from c, s
+    union all select 2, 'Painel do vendedor (admin)', c.vit || '?v=' || s.slug || '#admin' from c, s
+    union all select 3, 'Ficha CDC (financiamento)', c.cdc || '?v=' || s.slug from c, s
+    union all select 4, 'Pré-contrato CNH (consórcio)', c.cnh || '?v=' || s.slug from c, s
+  ) x order by x.o $$;
+
+-- ---------- Telegram do DONO (recebe os acessos de cada vendedor novo) ----------
+create or replace function public.tg_dono(p_texto text) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare tk text; ch text;
+begin
+  select valor into tk from public.plataforma_config where chave = 'telegram_dono_token';
+  select valor into ch from public.plataforma_config where chave = 'telegram_dono_chat';
+  if tk is null or ch is null then return false; end if;
+  perform net.http_post(url := 'https://api.telegram.org/bot' || tk || '/sendMessage',
+    body := jsonb_build_object('chat_id', ch, 'text', left(p_texto, 4000), 'disable_web_page_preview', true),
+    headers := '{"Content-Type":"application/json"}'::jsonb);
+  return true;
+exception when others then return false; end $$;
+
+-- ---------- CADASTRO: login + vendedor + links + Telegram ----------
+drop function if exists public.novo_vendedor(text,text,text,text,text,boolean);
+drop function if exists public.novo_vendedor(text,text,text,text,text,boolean,text,text);
+drop function if exists public.novo_vendedor(text,text,text,text,text,boolean,text,text,boolean);
+create function public.novo_vendedor(
+  p_nome text, p_email text, p_senha text, p_slug text,
+  p_whatsapp text default null, p_assumir boolean default false,
+  p_tg_token text default null, p_tg_chat text default null, p_avisar boolean default true)
+returns table(etiqueta text, endereco text) language plpgsql security definer set search_path = public, extensions, auth as $$
+declare
+  e text := lower(btrim(p_email)); s text := lower(btrim(p_slug)); n text := btrim(p_nome);
+  w text := regexp_replace(coalesce(p_whatsapp,''), '\D', '', 'g');
+  u uuid; v uuid; dono uuid; acao text; msg text; tg text; cat text;
+begin
+  if s !~ '^[a-z0-9]+(-[a-z0-9]+)*$' or length(s) not between 3 and 40 then
+    raise exception 'Slug inválido "%": use 3 a 40 caracteres, só minúsculas, números e hífen (ex: joao-motos).', s; end if;
+  if e !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then raise exception 'E-mail inválido: %', e; end if;
+  if length(coalesce(p_senha,'')) < 8 then raise exception 'A senha precisa ter pelo menos 8 caracteres.'; end if;
+  if length(coalesce(n,'')) < 2 then raise exception 'Informe o nome do vendedor.'; end if;
+  if length(w) in (10,11) then w := '55' || w; end if;
+
+  select id into u from auth.users where lower(email) = e;
+  if u is null then
+    u := gen_random_uuid();
+    insert into auth.users(instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+        raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+        confirmation_token, recovery_token, email_change, email_change_token_new)
+    values ('00000000-0000-0000-0000-000000000000', u, 'authenticated', 'authenticated', e,
+        crypt(p_senha, gen_salt('bf')), now(),
+        '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
+    insert into auth.identities(id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+    values (gen_random_uuid(), u, u::text, 'email',
+        jsonb_build_object('sub', u::text, 'email', e, 'email_verified', true), now(), now(), now());
+    acao := 'login criado';
+  else
+    update auth.users set encrypted_password = crypt(p_senha, gen_salt('bf')),
+           email_confirmed_at = coalesce(email_confirmed_at, now()), updated_at = now() where id = u;
+    acao := 'login já existia (senha redefinida)';
+  end if;
+
+  select id, user_id into v, dono from public.vendedores where slug = s;
+  if v is not null and dono is distinct from u then
+    if not p_assumir then
+      raise exception 'O slug "%" já pertence a outro login (%). Use outro slug, ou rode com p_assumir => true para transferir esse vendedor (e os dados dele) para %.',
+        s, (select email from auth.users where id = dono), e; end if;
+    if exists(select 1 from public.vendedores where user_id = u and id <> v) then
+      raise exception 'O login % já tem outro vendedor cadastrado. Veja: select * from public.equipe_vendedores;', e; end if;
+    update public.vendedores set user_id = u where id = v;
+  end if;
+  if v is null then
+    select id into v from public.vendedores where user_id = u;
+    if v is null then
+      insert into public.vendedores(user_id, slug, nome, whatsapp) values (u, s, n, nullif(w,'')) returning id into v;
+      acao := acao || ', vendedor criado';
+      begin cat := public.copiar_catalogo(s);   -- catálogo pronto (fotos, preços, consórcio...) copiado do vendedor modelo
+      exception when others then cat := 'catálogo não copiado: ' || sqlerrm; end;
+    else
+      update public.vendedores set slug = s, nome = n, whatsapp = coalesce(nullif(w,''), whatsapp) where id = v;
+      acao := acao || ', slug/nome atualizados (links antigos deixam de valer)';
+    end if;
+  else
+    update public.vendedores set nome = n, whatsapp = coalesce(nullif(w,''), whatsapp), suspenso = false where id = v;
+    acao := acao || ', vendedor atualizado';
+  end if;
+
+  if p_tg_token is not null and p_tg_chat is not null then perform public.definir_telegram(s, p_tg_token, p_tg_chat); end if;
+
+  -- aviso para o dono, com e-mail + senha + links
+  select string_agg(l.etiqueta || ': ' || l.endereco, E'\n') into tg from public.links_vendedor(s) l;
+  msg := E'🆕 Vendedor cadastrado\nNome: ' || n || E'\nE-mail: ' || e || E'\nSenha: ' || p_senha || E'\n\n' || tg;
+  return query select 'Status'::text, acao;
+  return query select 'Login (e-mail)'::text, e;
+  if cat is not null then return query select 'Catálogo'::text, cat; end if;
+  return query select * from public.links_vendedor(s);
+  if p_avisar then
+    return query select 'Telegram'::text, case when public.tg_dono(msg)
+      then 'acesso enviado ao seu Telegram' else 'NÃO enviado (rode antes: select public.ativar_bot(token, chat_id);)' end;
+  end if;
+end $$;
+
+-- ---------- AVISO DE FICHA / PRÉ-CONTRATO no Telegram do vendedor (sem CPF na mensagem) ----------
+create or replace function public.tg_aviso_cadastro() returns trigger language plpgsql security definer set search_path = public as $$
+declare s record; j jsonb := to_jsonb(new);
+begin
+  select telegram_token, telegram_chat_id into s from public.vendedor_segredos where vendedor_id = new.vendedor_id;
+  if s.telegram_token is null or s.telegram_chat_id is null then return new; end if;
+  begin
+    perform net.http_post(url := 'https://api.telegram.org/bot' || s.telegram_token || '/sendMessage',
+      body := jsonb_build_object('chat_id', s.telegram_chat_id, 'text',
+        case tg_table_name when 'fichas' then 'Nova ficha CDC (financiamento)' else 'Novo pré-contrato CNH (consórcio)' end
+        || E'\n' || coalesce(j->>'nome','-') || E'\n' || coalesce(j->>'telefone','-') || E'\n' || coalesce(j->>'moto_nome','-')),
+      headers := '{"Content-Type":"application/json"}'::jsonb);
+  exception when others then null; end;
+  return new; end $$;
+
+-- ---------- ANTI-SPAM: no máximo 30 envios por minuto por vendedor ----------
+create or replace function public.tg_throttle() returns trigger language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  execute format('select count(*) from public.%I where vendedor_id = $1 and created_at > now() - interval ''1 minute''', tg_table_name)
+    into n using new.vendedor_id;
+  if n >= 30 then raise exception 'Muitas solicitações em pouco tempo. Tente novamente em instantes.'; end if;
+  return new; end $$;
+
+do $$ declare t text; begin
+  foreach t in array array['leads','fichas','contratos'] loop
+    execute format('drop trigger if exists d_throttle on public.%I', t);
+    execute format('create trigger d_throttle before insert on public.%I for each row execute function public.tg_throttle()', t);
+  end loop;
+  foreach t in array array['fichas','contratos'] loop
+    execute format('drop trigger if exists e_aviso on public.%I', t);
+    execute format('create trigger e_aviso after insert on public.%I for each row execute function public.tg_aviso_cadastro()', t);
+  end loop;
+end $$;
+
+-- ---------- FERRAMENTAS DA EQUIPE ----------
+create or replace function public.suspender_vendedor(p_slug text, p_suspenso boolean default true) returns text
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.vendedores set suspenso = p_suspenso where slug = lower(btrim(p_slug));
+  if not found then raise exception 'Slug "%" não existe.', p_slug; end if;
+  return case when p_suspenso then 'Site suspenso (cliente vê "indisponível").' else 'Site reativado.' end; end $$;
+
+create or replace function public.trocar_senha(p_email text, p_senha text) returns text
+language plpgsql security definer set search_path = public, extensions, auth as $$
+begin
+  if length(coalesce(p_senha,'')) < 8 then raise exception 'A senha precisa ter pelo menos 8 caracteres.'; end if;
+  update auth.users set encrypted_password = crypt(p_senha, gen_salt('bf')), updated_at = now() where lower(email) = lower(btrim(p_email));
+  if not found then raise exception 'E-mail não encontrado.'; end if;
+  return 'Senha alterada.'; end $$;
+
+create or replace view public.equipe_vendedores as
+  select v.slug, v.nome, u.email, v.whatsapp, v.suspenso, v.created_at, v.id as vendedor_id,
+    (select count(*) from public.motos m where m.vendedor_id = v.id) as motos,
+    (select count(*) from public.pedidos_chat p where p.vendedor_id = v.id and p.completo) as pedidos,
+    (select count(*) from public.fichas f where f.vendedor_id = v.id) as fichas,
+    (select count(*) from public.contratos c where c.vendedor_id = v.id) as contratos
+  from public.vendedores v left join auth.users u on u.id = v.user_id order by v.created_at;
+
+-- ---------- permissões: nada disso é acessível pelos sites ----------
+revoke all on function public.links_vendedor(text), public.tg_dono(text),
+  public.novo_vendedor(text,text,text,text,text,boolean,text,text,boolean), public.suspender_vendedor(text,boolean),
+  public.trocar_senha(text,text), public.tg_aviso_cadastro(), public.tg_throttle() from public, anon, authenticated;
+revoke all on public.equipe_vendedores from anon, authenticated;
+
+-- ---------- BOT DO TELEGRAM (/cadastrar): estado da conversa + permissões do service_role ----------
+create table if not exists public.bot_sessoes(
+  chat_id bigint primary key, etapa text not null, dados jsonb not null default '{}', atualizado timestamptz not null default now());
+alter table public.bot_sessoes enable row level security;          -- sem policies: só a Edge Function (service_role) acessa
+revoke all on public.bot_sessoes from anon, authenticated;
+grant all on public.bot_sessoes to service_role;
+grant execute on function public.novo_vendedor(text,text,text,text,text,boolean,text,text,boolean),
+  public.links_vendedor(text), public.suspender_vendedor(text,boolean) to service_role;
+grant select on public.equipe_vendedores to service_role;
+
+-- =====================================================================
+--  (Opcional, sem o bot) cadastro direto por SQL — preencha e rode
+-- =====================================================================
+-- select * from public.novo_vendedor(p_nome=>'Nome', p_email=>'email@dele.com', p_senha=>'SenhaForte123', p_slug=>'slug-dele', p_whatsapp=>'68999990000');
+-- Ferramentas:  select * from public.equipe_vendedores;  |  select * from public.links_vendedor('slug');
+--               select public.trocar_senha('email','NovaSenha123');  |  select public.suspender_vendedor('slug', true);
+
+
+-- =====================================================================
+--  13. BOT DO TELEGRAM DENTRO DO BANCO  (só precisa de TOKEN + CHAT ID)
+--  O Telegram chama direto o Postgres (sem Edge Function, sem secrets manuais):
+--     Telegram  ->  /rest/v1/rpc/telegram_webhook  ->  telegram_processar()  ->  bot_processar()
+--  A resposta volta no próprio retorno do webhook (o Telegram executa o "method" devolvido).
+-- =====================================================================
+
+-- log curto para diagnóstico (guarda só o COMANDO, nunca o texto digitado: senhas ficam de fora)
+create table if not exists public.bot_log(
+  id bigint generated always as identity primary key,
+  ts timestamptz not null default now(),
+  chat_id bigint, de_id bigint, comando text, resultado text);
+alter table public.bot_log enable row level security;
+revoke all on public.bot_log from anon, authenticated;
+grant all on public.bot_log to service_role;
+
+-- ---------- helpers ----------
+create or replace function public.bot_esc(t text) returns text language sql immutable as $$
+  select replace(replace(replace(coalesce(t,''), '&', '&amp;'), '<', '&lt;'), '>', '&gt;') $$;
+
+create or replace function public.bot_slugify(t text) returns text language sql immutable as $$
+  select btrim(left(btrim(regexp_replace(
+    translate(lower(coalesce(t,'')), 'áàâãäéèêëíìîïóòôõöúùûüçñ', 'aaaaaeeeeiiiiooooouuuucn'),
+    '[^a-z0-9]+', '-', 'g'), '-'), 40), '-') $$;
+
+create or replace function public.bot_gerar_senha() returns text language sql volatile
+set search_path = public, extensions as $$
+  select string_agg(substr(x.a, 1 + (get_byte(x.b, i) % length(x.a)), 1), '')
+  from (select 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'::text as a, gen_random_bytes(10) as b) x,
+       generate_series(0, 9) i $$;
+
+create or replace function public.bot_resposta(p_chat bigint, p_texto text) returns jsonb language sql immutable as $$
+  select jsonb_build_object('method', 'sendMessage', 'chat_id', p_chat, 'text', left(p_texto, 4000),
+                            'parse_mode', 'HTML', 'disable_web_page_preview', true) $$;
+
+-- chamada genérica à API do Telegram com o token do dono (assíncrona, nunca derruba quem chamou)
+create or replace function public.tg_api(p_metodo text, p_corpo jsonb) returns boolean
+language plpgsql security definer set search_path = public as $$
+declare tk text;
+begin
+  select valor into tk from public.plataforma_config where chave = 'telegram_dono_token';
+  if tk is null then return false; end if;
+  perform net.http_post(url := 'https://api.telegram.org/bot' || tk || '/' || p_metodo,
+    body := p_corpo, headers := '{"Content-Type":"application/json"}'::jsonb);
+  return true;
+exception when others then return false; end $$;
+
+-- ---------- CATÁLOGO MODELO: todo vendedor novo já nasce com as motos/motores prontos ----------
+-- Copia TODAS as colunas da tabela motos (nome, foto, descrição, preço, planos de consórcio, categoria, ordem...),
+-- mesmo as que você adicionar no futuro. Cada vendedor recebe linhas NOVAS e independentes (editar não afeta o modelo).
+-- ---------------------------------------------------------------------------------------------
+--  CONSÓRCIOS / PLANOS PADRÃO  (fonte: vendedor modelo = plataforma_config.vendedor_modelo, hoje "shayron")
+--  Nunca altera o modelo. Só preenche o que está VAZIO no vendedor de destino (personalizações ficam intactas).
+-- ---------------------------------------------------------------------------------------------
+
+-- quantidade de planos de um jsonb (0 se vazio/nulo/não-array)
+create or replace function public.plano_qtd(j jsonb) returns int language sql immutable as $$
+  select case when jsonb_typeof(j) = 'array' then jsonb_array_length(j) else 0 end $$;
+
+-- colunas copiáveis de uma tabela (ignora PK com default, identity, geradas e as listadas em p_excl)
+create or replace function public.cols_copia(p_rel regclass, p_excl text[]) returns text[]
+language sql stable set search_path = public as $$
+  select coalesce(array_agg(a.attname::text order by a.attnum), '{}'::text[])
+    from pg_attribute a
+   where a.attrelid = p_rel and a.attnum > 0 and not a.attisdropped
+     and a.attgenerated = '' and a.attidentity = ''
+     and a.attname::text <> all (p_excl)
+     and not (a.atthasdef and a.attnum = any (array(select unnest(conkey) from pg_constraint where conrelid = p_rel and contype = 'p'))) $$;
+
+create or replace function public.carregar_planos_padrao(p_slug text, p_substituir boolean default false) returns text
+language plpgsql security definer set search_path = public as $$
+declare
+  modelo text; mid uuid; did uuid;
+  n_upd int := 0; n_pres int := 0; n_falta int := 0; n int; n_std int := 0;
+  fk record; tb record; colunas text[]; hv boolean; ins text; sel text; msg text := '';
+  sistema constant text[] := array['vendedores','vendedor_segredos','motos','leads','fichas','contratos','pedidos_chat','bot_sessoes','bot_log','plataforma_config','donos'];
+begin
+  select valor into modelo from public.plataforma_config where chave = 'vendedor_modelo';
+  if modelo is null then return 'Sem vendedor modelo definido (use /modelo slug).'; end if;
+  select id into mid from public.vendedores where slug = modelo;
+  if mid is null then return format('O vendedor modelo "%s" não existe mais.', modelo); end if;
+  select id into did from public.vendedores where slug = lower(btrim(p_slug));
+  if did is null then raise exception 'Slug "%" não existe.', p_slug; end if;
+  if did = mid then return 'Esse é o próprio vendedor modelo (nada a fazer).'; end if;
+
+  -- 0) tabela de planos padrão (planos_padrao): preenche as motos sem plano, pelo nome
+  n_std := public.aplicar_planos_padrao(p_slug, p_substituir, false);
+
+  -- A) planos que ficam dentro da própria moto (motos.planos / emplacamento / preco), casando pelo NOME da moto
+  if not p_substituir then
+    select count(*) into n_pres from public.motos t
+     where t.vendedor_id = did and public.plano_qtd(t.planos) > 0
+       and exists (select 1 from public.motos m where m.vendedor_id = mid and public.plano_qtd(m.planos) > 0
+                    and upper(btrim(m.nome)) = upper(btrim(t.nome)));
+  end if;
+  with par as (
+    select distinct on (t.id) t.id as tid, m.planos, m.emplacamento, m.preco
+      from public.motos t join public.motos m on upper(btrim(m.nome)) = upper(btrim(t.nome))
+     where t.vendedor_id = did and m.vendedor_id = mid and public.plano_qtd(m.planos) > 0
+     order by t.id, m.ordem, m.id)
+  update public.motos t set
+         planos = par.planos,
+         emplacamento = case when p_substituir or coalesce(btrim(t.emplacamento), '') = '' then coalesce(par.emplacamento, t.emplacamento) else t.emplacamento end,
+         preco = case when p_substituir or coalesce(t.preco, 0) = 0 then coalesce(par.preco, t.preco) else t.preco end
+    from par
+   where t.id = par.tid and (p_substituir or public.plano_qtd(t.planos) = 0);
+  get diagnostics n_upd = row_count;
+
+  select count(*) into n_falta from public.motos m
+   where m.vendedor_id = mid and not exists (select 1 from public.motos t where t.vendedor_id = did
+         and upper(btrim(t.nome)) = upper(btrim(m.nome)));
+
+  msg := format('planos da tabela padrão aplicados: %s; planos copiados do modelo: %s; já tinham plano (preservados): %s', n_std, n_upd, n_pres);
+  if n_falta > 0 then msg := msg || format('; %s moto(s) do modelo ainda não existem nesse vendedor', n_falta); end if;
+
+  -- B) tabelas filhas ligadas à moto por chave estrangeira (ex.: uma tabela de planos com moto_id)
+  for fk in
+    select c.conrelid as relid, cl.relname as tbl, a.attname::text as col
+      from pg_constraint c
+      join pg_class cl on cl.oid = c.conrelid
+      join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+     where c.contype = 'f' and c.confrelid = 'public.motos'::regclass and array_length(c.conkey, 1) = 1
+       and cl.relnamespace = 'public'::regnamespace and cl.relname <> all (sistema)
+  loop
+    begin
+      colunas := public.cols_copia(fk.relid, array[fk.col, 'vendedor_id', 'created_at', 'updated_at']);
+      hv := exists (select 1 from pg_attribute where attrelid = fk.relid and attname = 'vendedor_id' and not attisdropped);
+      ins := quote_ident(fk.col) || case when hv then ', vendedor_id' else '' end
+             || (select coalesce(', ' || string_agg(quote_ident(x), ', '), '') from unnest(colunas) x);
+      sel := 'p.tid' || case when hv then ', $2' else '' end
+             || (select coalesce(', ' || string_agg('s.' || quote_ident(x), ', '), '') from unnest(colunas) x);
+      if p_substituir then
+        execute format('delete from public.%I where %I in (select id from public.motos where vendedor_id = $1)', fk.tbl, fk.col) using did;
+      end if;
+      execute format($f$
+        insert into public.%1$I (%2$s)
+        select %3$s from public.%1$I s
+          join (select distinct on (t.id) t.id as tid, m.id as mid_moto
+                  from public.motos t join public.motos m on upper(btrim(m.nome)) = upper(btrim(t.nome))
+                 where t.vendedor_id = $2 and m.vendedor_id = $1
+                 order by t.id, m.ordem, m.id) p on p.mid_moto = s.%4$I
+         where not exists (select 1 from public.%1$I x where x.%4$I = p.tid)$f$, fk.tbl, ins, sel, fk.col) using mid, did;
+      get diagnostics n = row_count;
+      msg := msg || format('; tabela %s: %s linha(s) copiada(s)', fk.tbl, n);
+    exception when others then
+      msg := msg || format('; tabela %s: ERRO (%s)', fk.tbl, sqlerrm);
+    end;
+  end loop;
+
+  -- C) tabelas de consórcio por vendedor (têm vendedor_id, nome de consórcio/plano) — NUNCA tabelas de clientes
+  for tb in
+    select cl.oid as relid, cl.relname as tbl from pg_class cl
+     where cl.relnamespace = 'public'::regnamespace and cl.relkind = 'r' and cl.relname <> all (sistema)
+       and cl.relname ~* '(consorc|plano|tabela|credito|parcela|taxa)'
+       and cl.relname !~* '(cliente|venda|lead|pedido|ficha|contrato|simul|proposta|cpf)'
+       and exists (select 1 from pg_attribute where attrelid = cl.oid and attname = 'vendedor_id' and not attisdropped)
+       and not exists (select 1 from pg_constraint c where c.conrelid = cl.oid and c.contype = 'f' and c.confrelid = 'public.motos'::regclass)
+  loop
+    begin
+      if p_substituir then
+        execute format('delete from public.%I where vendedor_id = $1', tb.tbl) using did;
+      else
+        execute format('select count(*) from public.%I where vendedor_id = $1', tb.tbl) into n using did;
+        if n > 0 then msg := msg || format('; tabela %s: já tinha %s linha(s) (preservadas)', tb.tbl, n); continue; end if;
+      end if;
+      colunas := public.cols_copia(tb.relid, array['vendedor_id', 'created_at', 'updated_at']);
+      execute format('insert into public.%1$I (vendedor_id%2$s) select $2%3$s from public.%1$I s where s.vendedor_id = $1', tb.tbl,
+        (select coalesce(', ' || string_agg(quote_ident(x), ', '), '') from unnest(colunas) x),
+        (select coalesce(', ' || string_agg('s.' || quote_ident(x), ', '), '') from unnest(colunas) x)) using mid, did;
+      get diagnostics n = row_count;
+      msg := msg || format('; tabela %s: %s linha(s) copiada(s)', tb.tbl, n);
+    exception when others then
+      msg := msg || format('; tabela %s: ERRO (%s)', tb.tbl, sqlerrm);
+    end;
+  end loop;
+
+  return format('Planos padrão (modelo %s) → %s: %s.', modelo, lower(btrim(p_slug)), msg);
+end $$;
+
+-- todos os vendedores já criados (só preenche o que está vazio)
+create or replace function public.carregar_planos_padrao_todos() returns text
+language plpgsql security definer set search_path = public as $$
+declare modelo text; r record; txt text := ''; k int := 0;
+begin
+  select valor into modelo from public.plataforma_config where chave = 'vendedor_modelo';
+  if modelo is null then return 'Sem vendedor modelo definido (use /modelo slug).'; end if;
+  for r in select slug from public.vendedores where slug <> modelo order by created_at loop
+    txt := txt || E'\n' || public.carregar_planos_padrao(r.slug, false); k := k + 1;
+  end loop;
+  return case when k = 0 then 'Nenhum vendedor além do modelo.' else k || ' vendedor(es):' || txt end;
+end $$;
+
+-- botão do painel: o vendedor logado carrega os planos padrão SÓ no próprio cadastro (não sobrescreve o que ele já tem)
+create or replace function public.carregar_meus_planos(p_vendedor uuid) returns text
+language plpgsql security definer set search_path = public as $$
+declare s text;
+begin
+  if not public.pode_gerir(p_vendedor) then raise exception 'Sem permissão para este vendedor'; end if;
+  select slug into s from public.vendedores where id = p_vendedor;
+  return public.carregar_planos_padrao(s, false);
+end $$;
+
+-- OPCIONAL: liga RLS nas tabelas filhas de moto que estiverem SEM proteção (para um vendedor não editar plano de outro)
+create or replace function public.proteger_tabelas_consorcio() returns text
+language plpgsql security definer set search_path = public as $$
+declare fk record; msg text := '';
+begin
+  for fk in
+    select cl.relname as tbl, a.attname::text as col, cl.relrowsecurity as rls
+      from pg_constraint c join pg_class cl on cl.oid = c.conrelid
+      join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+     where c.contype = 'f' and c.confrelid = 'public.motos'::regclass and array_length(c.conkey, 1) = 1
+       and cl.relnamespace = 'public'::regnamespace
+       and cl.relname <> all (array['leads','fichas','contratos','pedidos_chat'])
+  loop
+    if fk.rls then msg := msg || format('%s: já tinha RLS (não mexi). ', fk.tbl); continue; end if;
+    execute format('alter table public.%I enable row level security', fk.tbl);
+    execute format('create policy c_pub_sel on public.%I for select to anon, authenticated using (exists (select 1 from public.motos m where m.id = %I))', fk.tbl, fk.col);
+    execute format('create policy c_ger_ins on public.%I for insert to authenticated with check (exists (select 1 from public.motos m where m.id = %I and public.pode_gerir(m.vendedor_id)))', fk.tbl, fk.col);
+    execute format('create policy c_ger_upd on public.%I for update to authenticated using (exists (select 1 from public.motos m where m.id = %I and public.pode_gerir(m.vendedor_id))) with check (exists (select 1 from public.motos m where m.id = %I and public.pode_gerir(m.vendedor_id)))', fk.tbl, fk.col, fk.col);
+    execute format('create policy c_ger_del on public.%I for delete to authenticated using (exists (select 1 from public.motos m where m.id = %I and public.pode_gerir(m.vendedor_id)))', fk.tbl, fk.col);
+    msg := msg || format('%s: RLS ligado. ', fk.tbl);
+  end loop;
+  return coalesce(nullif(msg, ''), 'Nenhuma tabela filha de moto encontrada.');
+end $$;
+
+revoke all on function public.carregar_planos_padrao(text, boolean), public.carregar_planos_padrao_todos(),
+  public.proteger_tabelas_consorcio(), public.cols_copia(regclass, text[]) from public, anon, authenticated;
+revoke all on function public.carregar_meus_planos(uuid) from public, anon;
+grant execute on function public.carregar_meus_planos(uuid) to authenticated;
+
+-- =====================================================================================================
+--  PLANOS DE CONSÓRCIO PADRÃO — tabela de referência no banco + aplicação em todos os vendedores
+--  Fonte: lista de planos e preços informada (27 motos, 115 planos). Casa pela moto pelo NOME (ignora maiúsculas e
+--  textos entre parênteses, ex.: "(70% do valor)").
+--  Cada vendedor continua com as PRÓPRIAS linhas em "motos": editar no painel altera só o vendedor logado.
+--  Tabelas: planos_padrao (nova, invisível pela API) e motos (só planos/emplacamento).
+--  Funções novas: norm_moto, plano_igual_ou_subconjunto, aplicar_planos_padrao, aplicar_planos_padrao_todos.
+--  Função alterada: carregar_planos_padrao (agora aplica a tabela padrão primeiro).
+-- =====================================================================================================
+
+create or replace function public.norm_moto(t text) returns text language sql immutable as $$
+  select btrim(regexp_replace(regexp_replace(translate(upper(coalesce(t, '')), '×', 'X'), '\s*\([^)]*\)\s*', ' ', 'g'), '\s+', ' ', 'g')) $$;
+
+create table if not exists public.planos_padrao(
+  nome_norm text primary key,
+  nome text not null,
+  emplacamento text not null,
+  planos jsonb not null);
+alter table public.planos_padrao enable row level security;      -- sem policy: ninguém lê/escreve pela API; só as funções do sistema
+revoke all on public.planos_padrao from public, anon, authenticated;
+
+insert into public.planos_padrao(nome_norm, nome, emplacamento, planos) values
+  ('POP 110I ES +10%', 'POP 110i ES +10%', 'Com emplacamento', '[{"parcelas":80,"valor":216.59},{"parcelas":60,"valor":280.54},{"parcelas":48,"valor":345.55},{"parcelas":36,"valor":455.23},{"parcelas":24,"valor":669.58},{"parcelas":18,"valor":887.6},{"parcelas":12,"valor":1323.66}]'::jsonb),
+  ('BIZ 125 ES', 'BIZ 125 ES', 'Com emplacamento', '[{"parcelas":80,"valor":273.75},{"parcelas":60,"valor":354.56},{"parcelas":48,"valor":436.72},{"parcelas":36,"valor":575.35},{"parcelas":24,"valor":846.25},{"parcelas":18,"valor":1121.8},{"parcelas":12,"valor":1672.91}]'::jsonb),
+  ('ELITE 125', 'ELITE 125', 'Com emplacamento', '[{"parcelas":80,"valor":287.34},{"parcelas":60,"valor":372.16},{"parcelas":48,"valor":458.4},{"parcelas":36,"valor":603.92},{"parcelas":24,"valor":888.27},{"parcelas":18,"valor":1177.49},{"parcelas":12,"valor":1755.97}]'::jsonb),
+  ('BIZ 125 EX', 'BIZ 125 EX', 'Com emplacamento', '[{"parcelas":80,"valor":339.18},{"parcelas":60,"valor":439.31},{"parcelas":48,"valor":541.12},{"parcelas":36,"valor":712.89},{"parcelas":24,"valor":1048.54},{"parcelas":18,"valor":1389.96},{"parcelas":12,"valor":2072.81}]'::jsonb),
+  ('CG 160 START', 'CG 160 START', 'Com emplacamento', '[{"parcelas":80,"valor":349.24},{"parcelas":60,"valor":452.34},{"parcelas":48,"valor":557.16},{"parcelas":36,"valor":734.03},{"parcelas":24,"valor":1079.64},{"parcelas":18,"valor":1431.17},{"parcelas":12,"valor":2134.28}]'::jsonb),
+  ('PCX CBS', 'PCX CBS', 'Com emplacamento', '[{"parcelas":80,"valor":374.6},{"parcelas":60,"valor":485.19},{"parcelas":48,"valor":597.62},{"parcelas":36,"valor":787.33},{"parcelas":24,"valor":1158.04},{"parcelas":18,"valor":1535.11},{"parcelas":12,"valor":2289.27}]'::jsonb),
+  ('CG 160 FAN', 'CG 160 FAN', 'Com emplacamento', '[{"parcelas":80,"valor":381.06},{"parcelas":60,"valor":493.56},{"parcelas":48,"valor":607.93},{"parcelas":36,"valor":800.91},{"parcelas":24,"valor":1178.01},{"parcelas":18,"valor":1561.58},{"parcelas":12,"valor":2328.74}]'::jsonb),
+  ('CG 160 TITAN', 'CG 160 TITAN', 'Com emplacamento', '[{"parcelas":80,"valor":404.82},{"parcelas":60,"valor":524.33},{"parcelas":48,"valor":645.83},{"parcelas":36,"valor":850.85},{"parcelas":24,"valor":1251.46},{"parcelas":18,"valor":1658.94},{"parcelas":12,"valor":2473.95}]'::jsonb),
+  ('PCX ABS', 'PCX ABS', 'Com emplacamento', '[{"parcelas":80,"valor":410.87},{"parcelas":60,"valor":532.17},{"parcelas":48,"valor":655.49},{"parcelas":36,"valor":863.56},{"parcelas":24,"valor":1270.17}]'::jsonb),
+  ('NXR160 BROS CBS', 'NXR160 BROS CBS', 'Com emplacamento', '[{"parcelas":80,"valor":447.9},{"parcelas":60,"valor":580.12},{"parcelas":48,"valor":714.55},{"parcelas":36,"valor":941.38},{"parcelas":24,"valor":1384.62}]'::jsonb),
+  ('NXR160 BROS ABS', 'NXR160 BROS ABS', 'Com emplacamento', '[{"parcelas":80,"valor":469.53},{"parcelas":60,"valor":608.14},{"parcelas":48,"valor":749.07},{"parcelas":36,"valor":986.85},{"parcelas":24,"valor":1451.51}]'::jsonb),
+  ('CRF 300F', 'CRF 300F', 'Sem emplacamento', '[{"parcelas":80,"valor":439.74},{"parcelas":60,"valor":569.56},{"parcelas":48,"valor":701.54},{"parcelas":36,"valor":924.24},{"parcelas":24,"valor":1359.4}]'::jsonb),
+  ('XRE 190', 'XRE 190', 'Com emplacamento', '[{"parcelas":80,"valor":469.31},{"parcelas":60,"valor":607.86},{"parcelas":48,"valor":748.72},{"parcelas":36,"valor":986.4},{"parcelas":24,"valor":1450.83}]'::jsonb),
+  ('HONDA ADV', 'HONDA ADV', 'Com emplacamento', '[{"parcelas":80,"valor":504.99},{"parcelas":60,"valor":654.08},{"parcelas":48,"valor":805.64},{"parcelas":36,"valor":1061.39},{"parcelas":24,"valor":1561.13}]'::jsonb),
+  ('CB300F TWISTER ABS', 'CB300F TWISTER ABS', 'Com emplacamento', '[{"parcelas":80,"valor":512.68},{"parcelas":60,"valor":664.03},{"parcelas":48,"valor":817.9},{"parcelas":36,"valor":1077.53},{"parcelas":24,"valor":1584.88}]'::jsonb),
+  ('XR 300L TORNADO', 'XR 300L TORNADO', 'Com emplacamento', '[{"parcelas":80,"valor":602.02},{"parcelas":60,"valor":779.75},{"parcelas":48,"valor":960.44},{"parcelas":36,"valor":1265.32},{"parcelas":24,"valor":1861.08}]'::jsonb),
+  ('SAHARA 300', 'SAHARA 300', 'Com emplacamento', '[{"parcelas":80,"valor":618.12},{"parcelas":60,"valor":800.59},{"parcelas":48,"valor":986.11},{"parcelas":36,"valor":1299.14},{"parcelas":24,"valor":1910.83}]'::jsonb),
+  ('SAHARA 300 ADV', 'SAHARA 300 ADV', 'Com emplacamento', '[{"parcelas":80,"valor":638.8},{"parcelas":60,"valor":827.38},{"parcelas":48,"valor":1019.11},{"parcelas":36,"valor":1342.61},{"parcelas":24,"valor":1974.77}]'::jsonb),
+  ('CB 500 HORNET', 'CB 500 HORNET', 'Sem emplacamento', '[{"parcelas":72,"valor":779.89}]'::jsonb),
+  ('NX 500', 'NX 500', 'Sem emplacamento', '[{"parcelas":72,"valor":829.67}]'::jsonb),
+  ('CB1000 HORNET ABS', 'CB1000 HORNET ABS (70% do valor)', 'Sem emplacamento', '[{"parcelas":72,"valor":955.38}]'::jsonb),
+  ('CB 750 HORNET', 'CB 750 HORNET', 'Sem emplacamento', '[{"parcelas":72,"valor":961.23}]'::jsonb),
+  ('TRX 420FM', 'TRX 420FM (4×4)', 'Sem emplacamento', '[{"parcelas":72,"valor":998.13}]'::jsonb),
+  ('NC 750X ABS MT', 'NC 750X ABS MT', 'Sem emplacamento', '[{"parcelas":72,"valor":1014.82}]'::jsonb),
+  ('CB 650R E-CLUTCH', 'CB 650R E-CLUTCH', 'Sem emplacamento', '[{"parcelas":72,"valor":1065.03}]'::jsonb),
+  ('CRF 1100L AFRICA TWIN MT', 'CRF 1100L AFRICA TWIN MT (70% do valor)', 'Sem emplacamento', '[{"parcelas":72,"valor":1067.64}]'::jsonb),
+  ('XL 750 TRANSALP', 'XL 750 TRANSALP', 'Sem emplacamento', '[{"parcelas":72,"valor":1171.81}]'::jsonb)
+on conflict (nome_norm) do update set nome = excluded.nome, emplacamento = excluded.emplacamento, planos = excluded.planos;
+
+-- true se TODOS os planos atuais existem na tabela padrão (tolerância de 1 centavo): plano incompleto, nunca personalizado
+create or replace function public.plano_igual_ou_subconjunto(cur jsonb, pad jsonb) returns boolean language sql immutable as $$
+  select public.plano_qtd(cur) > 0 and not exists (
+    select 1 from jsonb_array_elements(cur) e
+     where not exists (select 1 from jsonb_array_elements(pad) s
+            where (s->>'parcelas')::numeric = (e->>'parcelas')::numeric
+              and abs((s->>'valor')::numeric - (e->>'valor')::numeric) <= 0.011)) $$;
+
+-- aplica a tabela padrão nas motos de UM vendedor.
+--   padrão: só preenche moto SEM plano.
+--   p_completar: também completa moto cujos planos são só um pedaço do padrão (use na carga inicial).
+--   p_substituir: sobrescreve tudo que casar (cuidado: apaga personalização).
+create or replace function public.aplicar_planos_padrao(p_slug text, p_substituir boolean default false, p_completar boolean default false) returns int
+language plpgsql security definer set search_path = public as $$
+declare did uuid; n int := 0;
+begin
+  select id into did from public.vendedores where slug = lower(btrim(p_slug));
+  if did is null then raise exception 'Slug "%" não existe.', p_slug; end if;
+  update public.motos t set
+         planos = p.planos,
+         emplacamento = case when p_substituir or coalesce(btrim(t.emplacamento), '') in ('', 'Com emplacamento', 'Sem emplacamento')
+                             then p.emplacamento else t.emplacamento end
+    from public.planos_padrao p
+   where t.vendedor_id = did and public.norm_moto(t.nome) = p.nome_norm
+     and (p_substituir or public.plano_qtd(t.planos) = 0
+          or (p_completar and public.plano_igual_ou_subconjunto(t.planos, p.planos)))
+     and (t.planos is distinct from p.planos or coalesce(t.emplacamento, '') is distinct from p.emplacamento);
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+-- todos os vendedores já criados (inclui o modelo)
+create or replace function public.aplicar_planos_padrao_todos(p_completar boolean default true) returns text
+language plpgsql security definer set search_path = public as $$
+declare r record; txt text := ''; k int := 0;
+begin
+  for r in select slug from public.vendedores order by created_at loop
+    txt := txt || E'\n' || r.slug || ': ' || public.aplicar_planos_padrao(r.slug, false, p_completar) || ' moto(s) atualizada(s)'; k := k + 1;
+  end loop;
+  return k || ' vendedor(es):' || txt;
+end $$;
+
+revoke all on function public.norm_moto(text), public.plano_igual_ou_subconjunto(jsonb, jsonb),
+  public.aplicar_planos_padrao(text, boolean, boolean), public.aplicar_planos_padrao_todos(boolean) from public, anon, authenticated;
+
+create or replace function public.copiar_catalogo(p_slug text, p_substituir boolean default false) returns text
+language plpgsql security definer set search_path = public as $$
+declare modelo text; mid uuid; did uuid; n_dest int; cols text; n int; extra text;
+begin
+  select valor into modelo from public.plataforma_config where chave = 'vendedor_modelo';
+  if modelo is null then return 'Sem vendedor modelo definido (use /modelo slug).'; end if;
+  select id into mid from public.vendedores where slug = modelo;
+  if mid is null then return format('O vendedor modelo "%s" não existe mais (use /modelo slug).', modelo); end if;
+  select id into did from public.vendedores where slug = lower(btrim(p_slug));
+  if did is null then raise exception 'Slug "%" não existe.', p_slug; end if;
+  if did = mid then return 'Esse é o próprio vendedor modelo.'; end if;
+  if not exists (select 1 from public.motos where vendedor_id = mid) then
+    return format('O vendedor modelo "%s" não tem nenhuma moto cadastrada (nada a copiar).', modelo); end if;
+  select count(*) into n_dest from public.motos where vendedor_id = did;
+  if n_dest > 0 and not p_substituir then
+    return format('Esse vendedor já tem %s motos (nada copiado). Para refazer do zero: /catalogo %s substituir', n_dest, lower(btrim(p_slug))); end if;
+  if p_substituir then delete from public.motos where vendedor_id = did; end if;
+  select string_agg(quote_ident(column_name), ', ' order by ordinal_position) into cols
+    from information_schema.columns where table_schema = 'public' and table_name = 'motos'
+     and column_name not in ('id', 'vendedor_id', 'created_at');
+  execute format('insert into public.motos(vendedor_id, %1$s) select $1, %1$s from public.motos where vendedor_id = $2', cols) using did, mid;
+  get diagnostics n = row_count;
+  -- planos de consórcio que ficam fora da linha da moto (tabelas filhas/de consórcio) + garantia dos planos da moto
+  begin extra := public.carregar_planos_padrao(p_slug, p_substituir);
+  exception when others then extra := 'planos extras: ERRO (' || sqlerrm || ')'; end;
+  return format('%s motos/motores copiados do modelo (%s). %s', n, modelo, extra);
+end $$;
+
+create or replace function public.definir_modelo(p_slug text) returns text
+language plpgsql security definer set search_path = public as $$
+declare s text := lower(btrim(p_slug)); n int;
+begin
+  if not exists (select 1 from public.vendedores where slug = s) then raise exception 'Slug "%" não existe.', s; end if;
+  insert into public.plataforma_config(chave, valor) values ('vendedor_modelo', s)
+    on conflict (chave) do update set valor = excluded.valor;
+  select count(*) into n from public.motos m join public.vendedores v on v.id = m.vendedor_id where v.slug = s;
+  return format('Modelo definido: %s (%s motos). Todo vendedor novo vai receber uma cópia desse catálogo.', s, n);
+end $$;
+
+
+-- v10: copia o catálogo modelo para TODOS os vendedores que estão sem nenhuma moto (quem já tem motos não é tocado)
+create or replace function public.copiar_catalogo_todos() returns text
+language plpgsql security definer set search_path = public as $$
+declare modelo text; r record; txt text := ''; n int := 0;
+begin
+  select valor into modelo from public.plataforma_config where chave = 'vendedor_modelo';
+  if modelo is null then return 'Sem vendedor modelo definido (use /modelo slug).'; end if;
+  for r in select v.slug from public.vendedores v
+           where v.slug <> modelo and not exists (select 1 from public.motos m where m.vendedor_id = v.id)
+           order by v.created_at loop
+    txt := txt || E'\n' || r.slug || ': ' || public.copiar_catalogo(r.slug); n := n + 1;
+  end loop;
+  if n = 0 then return 'Nenhum vendedor sem motos. Nada a copiar.'; end if;
+  return n || ' vendedor(es) atendidos:' || txt;
+end $$;
+
+-- se ainda não há modelo, usa o vendedor "shayron" (confira com /modelo; troque com /modelo slug)
+insert into public.plataforma_config(chave, valor)
+  select 'vendedor_modelo', slug from public.vendedores where slug ilike '%shayron%' order by created_at limit 1
+on conflict (chave) do nothing;
+
+-- ---------- contagem de dados de UM vendedor (só números, nunca o conteúdo) ----------
+create or replace function public.bot_contagem(p_vid uuid) returns text language sql stable security definer set search_path = public as $$
+  select format('motos %s · leads %s · fichas CDC %s · pré-contratos CNH %s · pedidos do chat %s',
+    (select count(*) from public.motos where vendedor_id = p_vid),
+    (select count(*) from public.leads where vendedor_id = p_vid),
+    (select count(*) from public.fichas where vendedor_id = p_vid),
+    (select count(*) from public.contratos where vendedor_id = p_vid),
+    (select count(*) from public.pedidos_chat where vendedor_id = p_vid)) $$;
+
+-- ---------- EXCLUIR UM VENDEDOR E TUDO DELE (atômico: ou apaga tudo, ou nada) ----------
+-- Só mexe em linhas com vendedor_id = esse vendedor. Outros vendedores não são tocados.
+create or replace function public.excluir_vendedor(p_slug text) returns text
+language plpgsql security definer set search_path = public, auth as $$
+declare v record; n_m int; n_l int; n_f int; n_c int; n_p int; n_media int; apagou_login boolean := false; txt text;
+begin
+  select id, user_id, nome, slug into v from public.vendedores where slug = lower(btrim(p_slug)) for update;
+  if not found then raise exception 'Slug "%" não existe.', p_slug; end if;
+
+  delete from public.motos        where vendedor_id = v.id; get diagnostics n_m = row_count;
+  delete from public.leads        where vendedor_id = v.id; get diagnostics n_l = row_count;
+  delete from public.fichas       where vendedor_id = v.id; get diagnostics n_f = row_count;
+  delete from public.contratos    where vendedor_id = v.id; get diagnostics n_c = row_count;
+  delete from public.pedidos_chat where vendedor_id = v.id; get diagnostics n_p = row_count;
+  delete from public.vendedor_segredos where vendedor_id = v.id;
+  delete from public.vendedores   where id = v.id;
+
+  -- apaga o login (só se não for dono da plataforma e não for usado por outro vendedor)
+  if not exists (select 1 from public.donos where user_id = v.user_id)
+     and not exists (select 1 from public.vendedores where user_id = v.user_id) then
+    delete from auth.identities where user_id = v.user_id;
+    delete from auth.users where id = v.user_id;
+    apagou_login := true;
+  end if;
+
+  -- mídia (fotos/vídeos): o SQL não consegue apagar os arquivos do Storage, só contar
+  begin
+    select count(*) into n_media from storage.objects where bucket_id = 'midia' and (storage.foldername(name))[1] = v.id::text;
+  exception when others then n_media := null; end;
+
+  txt := format(E'Vendedor %s (%s) excluído.\nApagado: %s motos, %s leads, %s fichas CDC, %s pré-contratos CNH, %s pedidos do chat e o Telegram dele.\n%s',
+    v.nome, v.slug, n_m, n_l, n_f, n_c, n_p,
+    case when apagou_login then 'Login apagado.' else 'Login mantido (é dono da plataforma).' end);
+  if coalesce(n_media, 0) > 0 then
+    txt := txt || format(E'\nAtenção: %s arquivo(s) de mídia continuam no Storage. Apague a pasta %s no bucket "midia" (Storage > midia).', n_media, v.id);
+  end if;
+  return txt;
+end $$;
+
+-- ---------- cérebro do bot: recebe o texto, devolve a resposta em HTML ----------
+create or replace function public.bot_processar(p_chat bigint, p_msg bigint, p_texto text)
+returns text language plpgsql security definer set search_path = public, extensions, auth as $$
+declare
+  t text := btrim(coalesce(p_texto, ''));
+  iscmd boolean := left(btrim(coalesce(p_texto, '')), 1) = '/';
+  cmd text := ''; arg text; argl text;
+  ajuda constant text := E'🤖 <b>Painel de vendedores</b>\n\n/cadastrar – cadastrar novo vendedor\n/equipe – listar vendedores\n/links slug – ver links de um vendedor\n/suspender slug – suspender site\n/reativar slug – reativar site\n/avisos slug TOKEN CHAT_ID – ligar avisos no Telegram do vendedor\n/trocarsenha email – gerar nova senha para um vendedor\n/excluir – listar vendedores e excluir um (apaga tudo dele)\n/catalogo slug – copiar o catálogo modelo para um vendedor\n/catalogotodos – copiar o catálogo modelo para todos os vendedores sem motos\n/modelo – ver ou definir o vendedor modelo\n/cancelar – cancelar o cadastro em andamento';
+  vid uuid; s public.bot_sessoes%rowtype; d jsonb; w text; sl text; p text; lista text; v_links jsonb; tk text; ch text;
+begin
+  if iscmd then cmd := lower(regexp_replace(substring(t from '^\S+'), '@.*$', '')); end if;
+  arg := coalesce(btrim(substring(t from '^\S+\s+(.*)$')), '');
+  argl := lower(arg);
+
+  if cmd in ('/start', '/ajuda') then return ajuda; end if;
+
+  if cmd = '/cancelar' then
+    delete from public.bot_sessoes where chat_id = p_chat;
+    return 'Cancelado. ✅';
+  end if;
+
+  if cmd = '/cadastrar' then
+    delete from public.bot_sessoes where atualizado < now() - interval '1 day';
+    insert into public.bot_sessoes(chat_id, etapa, dados, atualizado) values (p_chat, 'nome', '{}', now())
+      on conflict (chat_id) do update set etapa = 'nome', dados = '{}', atualizado = now();
+    return E'📝 <b>Novo vendedor</b>\n\n1/5 · Qual o <b>nome</b> do vendedor?\n(/cancelar para sair)';
+  end if;
+
+  if cmd = '/equipe' then
+    select string_agg(format(E'%s <b>%s</b> · <code>%s</code>\n%s\nmotos %s · pedidos %s · fichas %s · contratos %s',
+             case when q.suspenso then '⏸' else '🟢' end, public.bot_esc(q.nome), public.bot_esc(q.slug),
+             public.bot_esc(coalesce(q.email, '-')), q.motos, q.pedidos, q.fichas, q.contratos), E'\n\n' order by q.created_at)
+      into lista from (select * from public.equipe_vendedores limit 25) q;
+    return coalesce(lista, 'Nenhum vendedor cadastrado.');
+  end if;
+
+  if cmd = '/links' then
+    if argl = '' then return 'Use: /links slug-do-vendedor'; end if;
+    if not exists (select 1 from public.vendedores where slug = argl) then return 'Esse slug não existe. Veja /equipe.'; end if;
+    select string_agg(public.bot_esc(l.etiqueta) || ': ' || public.bot_esc(l.endereco), E'\n') into lista
+      from public.links_vendedor(argl) l;
+    return lista;
+  end if;
+
+  if cmd in ('/suspender', '/reativar') then
+    if argl = '' then return 'Use: ' || cmd || ' slug-do-vendedor'; end if;
+    return public.bot_esc(public.suspender_vendedor(argl, cmd = '/suspender'));
+  end if;
+
+  if cmd = '/modelo' then
+    if argl = '' then
+      select valor into sl from public.plataforma_config where chave = 'vendedor_modelo';
+      if sl is null then return 'Nenhum modelo definido. Use: /modelo slug-do-vendedor-com-as-motos-prontas'; end if;
+      return format(E'Vendedor modelo: <code>%s</code>\n%s\n\nPara trocar: /modelo slug', public.bot_esc(sl),
+        public.bot_contagem((select id from public.vendedores where slug = sl)));
+    end if;
+    return public.bot_esc(public.definir_modelo(argl));
+  end if;
+
+  if cmd = '/catalogo' then
+    sl := lower(split_part(arg, ' ', 1)); w := lower(split_part(arg, ' ', 2));
+    if sl = '' then return 'Use: /catalogo slug   (ou /catalogo slug substituir, para refazer do zero)'; end if;
+    return '📦 ' || public.bot_esc(public.copiar_catalogo(sl, w = 'substituir'));
+  end if;
+
+  if cmd = '/catalogotodos' then
+    return '📦 ' || public.bot_esc(public.copiar_catalogo_todos());
+  end if;
+
+  if cmd = '/excluir' then
+    if argl = '' then   -- lista todos os cadastros (só nomes e contagens)
+      select string_agg(format(E'%s <b>%s</b> · <code>%s</code>\n%s', case when q.suspenso then '⏸' else '🟢' end,
+               public.bot_esc(q.nome), public.bot_esc(q.slug), public.bot_contagem(q.vendedor_id)), E'\n\n' order by q.created_at)
+        into lista from (select * from public.equipe_vendedores limit 25) q;
+      return coalesce(lista || E'\n\nPara excluir um deles: /excluir slug', 'Nenhum vendedor cadastrado.');
+    end if;
+    select id into vid from public.vendedores where slug = argl;
+    if vid is null then return 'Esse slug não existe. Veja a lista em /excluir.'; end if;
+    insert into public.bot_sessoes(chat_id, etapa, dados, atualizado) values (p_chat, 'excluir', jsonb_build_object('slug', argl), now())
+      on conflict (chat_id) do update set etapa = 'excluir', dados = jsonb_build_object('slug', argl), atualizado = now();
+    return format(E'⚠️ <b>Excluir <code>%s</code>?</b>\n\nVai apagar PARA SEMPRE o login, as motos, leads, fichas CDC, pré-contratos CNH, pedidos do chat e o Telegram desse vendedor:\n%s\n\nNão dá para desfazer. Para confirmar, envie exatamente:\n<code>CONFIRMAR %s</code>\nou /cancelar.',
+      public.bot_esc(argl), public.bot_contagem(vid), public.bot_esc(argl));
+  end if;
+
+  if cmd = '/trocarsenha' then
+    if argl = '' then return 'Use: /trocarsenha email-do-vendedor'; end if;
+    p := public.bot_gerar_senha();
+    perform public.trocar_senha(argl, p);
+    return format(E'🔑 Nova senha de <code>%s</code>:\n<code>%s</code>', public.bot_esc(argl), public.bot_esc(p));
+  end if;
+
+  if cmd = '/avisos' then   -- liga os avisos de pedido/ficha/contrato no Telegram do vendedor
+    perform public.tg_api('deleteMessage', jsonb_build_object('chat_id', p_chat, 'message_id', p_msg));  -- some com o token
+    sl := lower(split_part(arg, ' ', 1)); tk := split_part(arg, ' ', 2); ch := split_part(arg, ' ', 3);
+    if sl = '' or tk = '' or ch = '' then return 'Use: /avisos slug TOKEN_DO_BOT_DELE CHAT_ID_DELE'; end if;
+    if not exists (select 1 from public.vendedores where slug = sl) then return 'Esse slug não existe. Veja /equipe.'; end if;
+    perform public.definir_telegram(sl, tk, ch);
+    return format('✅ Avisos ligados para <code>%s</code>. Apaguei a sua mensagem com o token. O vendedor precisa ter dado /start no bot dele.', public.bot_esc(sl));
+  end if;
+
+  if iscmd and cmd not in ('/ok', '/gerar', '/pular') then return E'Comando desconhecido.\n\n' || ajuda; end if;
+
+  -- ---------- conversa guiada do /cadastrar ----------
+  select * into s from public.bot_sessoes where chat_id = p_chat and atualizado > now() - interval '1 hour';
+  if not found then return ajuda; end if;
+  d := s.dados;
+
+  if s.etapa = 'excluir' then
+    if lower(t) <> 'confirmar ' || (d->>'slug') then
+      return format(E'Não confirmado. Envie exatamente <code>CONFIRMAR %s</code> ou /cancelar.', public.bot_esc(d->>'slug')); end if;
+    lista := public.excluir_vendedor(d->>'slug');
+    delete from public.bot_sessoes where chat_id = p_chat;
+    return '🗑 ' || public.bot_esc(lista);
+  end if;
+
+  if s.etapa = 'nome' then
+    if length(t) < 2 or iscmd then return 'Digite o nome do vendedor.'; end if;
+    d := d || jsonb_build_object('nome', left(t, 80));
+    update public.bot_sessoes set etapa = 'email', dados = d, atualizado = now() where chat_id = p_chat;
+    return E'2/5 · Qual o <b>e-mail</b> de login dele?';
+  end if;
+
+  if s.etapa = 'email' then
+    w := lower(t);
+    if w !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' then return 'E-mail inválido. Digite de novo.'; end if;
+    select v.slug into sl from public.vendedores v join auth.users u on u.id = v.user_id where lower(u.email) = w;
+    if sl is not null then
+      return format(E'Esse e-mail já pertence ao vendedor <code>%s</code>. Use outro e-mail, ou veja /links %s.', public.bot_esc(sl), public.bot_esc(sl));
+    end if;
+    d := d || jsonb_build_object('email', w);
+    update public.bot_sessoes set etapa = 'senha', dados = d, atualizado = now() where chat_id = p_chat;
+    return E'3/5 · Qual a <b>senha</b> do painel? (mínimo 8 caracteres)\nOu envie /gerar para eu criar uma forte.\n<i>Vou apagar a sua mensagem com a senha.</i>'
+      || case when exists (select 1 from auth.users where lower(email) = w)
+              then E'\n\n⚠️ Esse e-mail já tem login: a senha dele será redefinida.' else '' end;
+  end if;
+
+  if s.etapa = 'senha' then
+    if cmd = '/gerar' then p := public.bot_gerar_senha();
+    else
+      p := t;
+      perform public.tg_api('deleteMessage', jsonb_build_object('chat_id', p_chat, 'message_id', p_msg));
+    end if;
+    if length(p) < 8 then return 'A senha precisa ter pelo menos 8 caracteres. Tente de novo ou /gerar.'; end if;
+    d := d || jsonb_build_object('senha', p, 'sugestao', public.bot_slugify(d->>'nome'));
+    update public.bot_sessoes set etapa = 'slug', dados = d, atualizado = now() where chat_id = p_chat;
+    return format(E'4/5 · Qual o <b>slug</b> (endereço) dele? Só letras minúsculas, números e hífen.\nSugestão: <code>%s</code> — envie /ok para usar.',
+                  public.bot_esc(d->>'sugestao'));
+  end if;
+
+  if s.etapa = 'slug' then
+    sl := case when cmd = '/ok' then coalesce(d->>'sugestao', '') else public.bot_slugify(t) end;
+    if sl !~ '^[a-z0-9]+(-[a-z0-9]+)*$' or length(sl) not between 3 and 40 then
+      return 'Slug inválido (3 a 40 caracteres: letras, números e hífen). Tente outro.'; end if;
+    if exists (select 1 from public.vendedores where slug = sl) then
+      return format('O slug <code>%s</code> já existe. Envie outro.', public.bot_esc(sl)); end if;
+    d := d || jsonb_build_object('slug', sl);
+    update public.bot_sessoes set etapa = 'whatsapp', dados = d, atualizado = now() where chat_id = p_chat;
+    return E'5/5 · <b>WhatsApp</b> dele com DDD (ex: 68999990000) ou /pular.';
+  end if;
+
+  if s.etapa = 'whatsapp' then
+    if cmd = '/pular' then d := d - 'whatsapp';
+    else
+      w := regexp_replace(t, '\D', '', 'g');
+      if length(w) < 10 or length(w) > 13 then return 'Número inválido. Use DDD + número, ou /pular.'; end if;
+      d := d || jsonb_build_object('whatsapp', w);
+    end if;
+    update public.bot_sessoes set etapa = 'confirmar', dados = d, atualizado = now() where chat_id = p_chat;
+    return format(E'Confere?\n\n<b>Nome:</b> %s\n<b>E-mail:</b> %s\n<b>Slug:</b> %s\n<b>WhatsApp:</b> %s\n\nResponda <b>sim</b> para cadastrar ou /cancelar.',
+      public.bot_esc(d->>'nome'), public.bot_esc(d->>'email'), public.bot_esc(d->>'slug'), public.bot_esc(coalesce(d->>'whatsapp', '-')));
+  end if;
+
+  if s.etapa = 'confirmar' then
+    if lower(replace(t, '/', '')) not in ('sim', 's', 'confirmo', 'ok') then
+      return E'Responda <b>sim</b> para cadastrar ou /cancelar.'; end if;
+    begin
+      select jsonb_agg(jsonb_build_object('e', r.etiqueta, 'u', r.endereco)) into v_links
+        from public.novo_vendedor(p_nome => d->>'nome', p_email => d->>'email', p_senha => d->>'senha',
+                                  p_slug => d->>'slug', p_whatsapp => d->>'whatsapp', p_avisar => false) r;
+    exception when others then
+      return E'⚠️ Não consegui cadastrar:\n' || public.bot_esc(sqlerrm) || E'\n\nCorrija e rode /cadastrar de novo.';
+    end;
+    delete from public.bot_sessoes where chat_id = p_chat;   -- apaga a senha da sessão
+    select string_agg('<b>' || public.bot_esc(x->>'e') || E'</b>\n' || public.bot_esc(x->>'u'), E'\n\n') into lista
+      from jsonb_array_elements(v_links) x where x->>'e' not in ('Status', 'Login (e-mail)', 'Telegram', 'Catálogo');
+    return E'✅ <b>Vendedor cadastrado</b>\n\n<b>Nome:</b> ' || public.bot_esc(d->>'nome')
+      || E'\n<b>E-mail:</b> <code>' || public.bot_esc(d->>'email') || E'</code>\n<b>Senha:</b> <code>' || public.bot_esc(d->>'senha')
+      || E'</code>\n\n' || coalesce(lista, '')
+      || coalesce(E'\n\n📦 Catálogo: ' || (select public.bot_esc(x->>'u') from jsonb_array_elements(v_links) x where x->>'e' = 'Catálogo'), '')
+      || E'\n\n<i>Peça para ele trocar a senha no primeiro acesso. Para ligar os avisos dele no Telegram: /avisos ' || public.bot_esc(d->>'slug') || ' TOKEN CHAT_ID</i>';
+  end if;
+
+  return ajuda;
+exception when others then
+  return '⚠️ Erro: ' || public.bot_esc(sqlerrm);
+end $$;
+
+-- ---------- porta de entrada: valida segredo + dono, chama o cérebro, devolve o "method" para o Telegram ----------
+create or replace function public.telegram_processar(p_update jsonb, p_secret text) returns jsonb
+language plpgsql security definer set search_path = public, extensions as $$
+declare
+  esperado text; dono bigint; m jsonb := p_update->'message';
+  chat bigint; de bigint; txt text; mid bigint; cmd1 text;
+begin
+  select valor into esperado from public.plataforma_config where chave = 'bot_webhook_secret';
+  if esperado is null or p_secret is distinct from esperado then
+    insert into public.bot_log(resultado) values ('segredo_invalido');
+    return '{}'::jsonb;
+  end if;
+  if m is null or m->>'text' is null then return '{}'::jsonb; end if;
+
+  chat := (m->'chat'->>'id')::bigint;
+  de   := (m->'from'->>'id')::bigint;
+  mid  := (m->>'message_id')::bigint;
+  txt  := m->>'text';
+  cmd1 := case when left(txt, 1) = '/' then left(lower(split_part(split_part(txt, ' ', 1), '@', 1)), 30) else '(texto)' end;
+  delete from public.bot_log where ts < now() - interval '7 days';
+
+  begin select valor::bigint into dono from public.plataforma_config where chave = 'telegram_dono_chat';
+  exception when others then dono := null; end;
+
+  if dono is null or chat <> dono or de is distinct from dono then
+    insert into public.bot_log(chat_id, de_id, comando, resultado) values (chat, de, cmd1, 'nao_autorizado');
+    if cmd1 in ('/start', '/meuid') then
+      return public.bot_resposta(chat, E'🔒 Este bot é privado.\nSeu chat id: <code>' || chat || '</code>');
+    end if;
+    return '{}'::jsonb;   -- qualquer outra pessoa é ignorada em silêncio
+  end if;
+
+  insert into public.bot_log(chat_id, de_id, comando, resultado) values (chat, de, cmd1, 'ok');
+  return public.bot_resposta(chat, public.bot_processar(chat, mid, txt));
+exception when others then
+  insert into public.bot_log(chat_id, de_id, comando, resultado) values (chat, de, cmd1, left('erro: ' || sqlerrm, 300));
+  if chat is not null then return public.bot_resposta(chat, '⚠️ Erro: ' || public.bot_esc(sqlerrm)); end if;
+  return '{}'::jsonb;
+end $$;
+
+-- endpoint que o Telegram chama (PostgREST: parâmetro único sem nome = recebe o corpo JSON inteiro)
+create or replace function public.telegram_webhook(jsonb) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare h json;
+begin
+  begin h := nullif(current_setting('request.headers', true), '')::json; exception when others then h := null; end;
+  return public.telegram_processar($1, coalesce(h->>'x-telegram-bot-api-secret-token', ''));
+end $$;
+
+-- ---------- LIGAR O BOT: só token + chat id ----------
+create or replace function public.ativar_bot(
+  p_token text, p_chat text,
+  p_url  text default 'https://qrmwgqkiwoenlkfzjazs.supabase.co',
+  p_anon text default 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFybXdncWtpd29lbmxrZnpqYXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA4MDc3OTIsImV4cCI6MjEwNjM4Mzc5Mn0.lhgkQS_WcB55uG0SKk0ngQgpc9oruFRt2H2D8orjNnc',
+  p_modo text default 'direto')   -- 'direto' = Telegram -> banco | 'edge' = Telegram -> Edge Function telegram-bot -> banco
+returns text language plpgsql security definer set search_path = public, extensions as $$
+declare seg text; destino text; tk text := btrim(p_token); ch text := btrim(p_chat);
+begin
+  if not exists (select 1 from pg_extension where extname = 'pg_net') then
+    raise exception 'A extensão pg_net está desligada. Ative em Database > Extensions > pg_net e rode de novo.'; end if;
+  if tk !~ '^\d+:[A-Za-z0-9_-]{30,}$' then raise exception 'Token inválido (formato 123456:ABC...). Copie de novo do @BotFather.'; end if;
+  if ch !~ '^-?\d+$' then raise exception 'Chat ID inválido: só números (mande /start para o @userinfobot para descobrir o seu).'; end if;
+
+  seg := encode(gen_random_bytes(24), 'hex');
+  insert into public.plataforma_config(chave, valor)
+    values ('telegram_dono_token', tk), ('telegram_dono_chat', ch), ('bot_webhook_secret', seg)
+  on conflict (chave) do update set valor = excluded.valor;
+
+  destino := rtrim(p_url, '/') || case when p_modo = 'edge' then '/functions/v1/telegram-bot'
+                                       else '/rest/v1/rpc/telegram_webhook?apikey=' || p_anon end;
+  perform net.http_post(url := 'https://api.telegram.org/bot' || tk || '/setWebhook',
+    body := jsonb_build_object('url', destino, 'secret_token', seg,
+                               'allowed_updates', jsonb_build_array('message'), 'drop_pending_updates', true),
+    headers := '{"Content-Type":"application/json"}'::jsonb);
+  perform public.tg_dono('✅ Bot ativo. Envie /start para ver os comandos.');
+  return 'Webhook pedido ao Telegram (modo ' || p_modo || '). Em alguns segundos deve chegar uma mensagem de teste no seu Telegram. '
+      || 'Se não chegar: dê /start no bot, e confira em https://api.telegram.org/bot<SEU_TOKEN>/getWebhookInfo (campo last_error_message).';
+end $$;
+
+-- compatibilidade com a v5: mesmo efeito que ativar_bot
+create or replace function public.definir_telegram_dono(p_token text, p_chat text) returns text
+language sql security definer set search_path = public as $$ select public.ativar_bot(p_token, p_chat) $$;
+
+-- ---------- permissões ----------
+revoke all on function public.bot_esc(text), public.bot_slugify(text), public.bot_gerar_senha(), public.bot_resposta(bigint,text),
+  public.tg_api(text,jsonb), public.bot_processar(bigint,bigint,text), public.telegram_processar(jsonb,text),
+  public.telegram_webhook(jsonb), public.ativar_bot(text,text,text,text,text), public.definir_telegram_dono(text,text),
+  public.bot_contagem(uuid), public.excluir_vendedor(text), public.copiar_catalogo(text,boolean), public.definir_modelo(text)
+  from public, anon, authenticated;
+revoke all on function public.copiar_catalogo_todos() from public, anon, authenticated;
+grant execute on function public.telegram_webhook(jsonb) to anon, authenticated;            -- único ponto público (protegido pelo segredo do webhook)
+grant execute on function public.telegram_processar(jsonb,text) to service_role;           -- usado só se você optar pelo modo 'edge'
+
+-- =====================================================================
+--  PRONTO. Para ligar o bot (rode UMA vez, trocando só as duas coisas):
+--     select public.ativar_bot('123456:TOKEN_DO_BOTFATHER', '123456789');
+--  Diagnóstico:   select * from public.bot_log order by id desc limit 10;
+--     'ok' = respondeu | 'nao_autorizado' = chat id errado (veja chat_id/de_id) | 'segredo_invalido' = rode ativar_bot de novo
+--     tabela vazia  = o Telegram não está chegando no banco (veja getWebhookInfo ou use p_modo => 'edge')
+-- =====================================================================
+
+-- =====================================================================
+--  v10 — EXECUÇÃO FINAL: copia o catálogo modelo para quem está sem motos (ex.: gerson)
+--  Resultado esperado: "N motos/motores copiados do modelo (...)" por vendedor.
+-- =====================================================================
+select public.copiar_catalogo_todos() as resultado_copia;
+
+-- Conferência: cada vendedor deve mostrar a mesma quantidade de motos do modelo
+-- select slug, motos from public.equipe_vendedores;
+-- Refazer um vendedor do zero:  select public.copiar_catalogo('slug', true);
+-- Trocar o modelo:              select public.definir_modelo('slug');
