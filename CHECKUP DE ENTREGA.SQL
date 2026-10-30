@@ -1,9 +1,12 @@
 -- =====================================================================================================
 --  CHECKUP DE ENTREGA — reproduz DENTRO do seu banco o caminho de um cliente real (visitante anônimo) e mostra,
 --  etapa por etapa, o que funciona e o ERRO EXATO do que falhar. Os registros de teste são apagados no final.
---  Rode no SQL Editor (pode rodar sozinho, sem o resto):     select * from public.checkup_entrega('capelasso');
---  (troque capelasso pelo slug do vendedor que está sem receber pedidos)
+--  Rode no SQL Editor (pode rodar sozinho, sem o resto). Testa TODOS os vendedores de uma vez, inclusive os que forem cadastrados depois.
+--  Para ver as etapas de um vendedor só:   select * from public.checkup_entrega('slug-do-vendedor');
 -- =====================================================================================================
+-- registros de TESTE de entrega (nome __TESTE_ENTREGA__) nunca disparam aviso no Telegram de ninguém
+create or replace function public._eh_teste(t text) returns boolean language sql immutable as $$ select coalesce(t, '') like '\_\_TESTE\_ENTREGA\_\_%' escape '\' $$;
+
 create or replace function public.checkup_entrega(p_slug text default null) returns table(etapa text, resultado text, detalhe text)
 language plpgsql as $$
 declare
@@ -70,6 +73,18 @@ begin
       reset role; return query select '8. TESTE: cliente digitando (sem enviar)', 'ERRO', sqlerrm;
     end;
   end if;
+  -- C2) CHAT desde a 1ª resposta (cópia "em andamento" com origem chat)
+  if to_regprocedure('public.registrar_rascunho(jsonb)') is not null then
+    begin
+      perform set_config('request.headers', hdr, true); set local role anon;
+      perform public.registrar_rascunho(jsonb_build_object('id', gen_random_uuid(), 'origem', 'chat', 'nome', tag, 'dados', jsonb_build_object('nome', tag, 'etapa', 'nome')));
+      reset role;
+      execute 'select count(*) from public.rascunhos where nome = $1 and origem = ''chat'' and vendedor_id = $2' into n using tag, v.id;
+      return query select '8b. TESTE: chat salva desde a 1ª resposta', case when n = 1 then 'OK' else 'ERRO' end, case when n = 1 then 'ok' else 'não gravou: rode o SQL único atualizado (origem chat)' end;
+    exception when others then
+      reset role; return query select '8b. TESTE: chat salva desde a 1ª resposta', 'ERRO', sqlerrm;
+    end;
+  end if;
   -- D) PAINEL: o vendedor logado enxerga o que chegou?
   begin
     perform set_config('request.headers', hdr, true);
@@ -101,4 +116,27 @@ begin
 end $$;
 revoke all on function public.checkup_entrega(text) from public, anon, authenticated;
 
-select * from public.checkup_entrega('capelasso');   -- <<< troque pelo slug do vendedor
+
+-- Testa TODOS os vendedores de uma vez (cadastrados hoje e os que forem cadastrados depois): uma linha por vendedor.
+--     select * from public.checkup_entrega_todos();
+create or replace function public.checkup_entrega_todos() returns table(vendedor text, slug text, resultado text, detalhe text)
+language plpgsql as $$
+declare v record; r jsonb; falhas text;
+begin
+  for v in select vd.slug as s, vd.nome as nm, vd.suspenso as sus from public.vendedores vd order by vd.created_at, vd.slug loop
+    if v.sus then
+      return query select v.nm::text, v.s::text, 'SUSPENSO'::text, 'site suspenso de propósito: os formulários recusam tudo até reativar'::text; continue;
+    end if;
+    select coalesce(jsonb_agg(to_jsonb(c)), '[]'::jsonb) into r from public.checkup_entrega(v.s) c;
+    select string_agg((e->>'etapa') || ': ' || (e->>'detalhe'), ' | ') into falhas from jsonb_array_elements(r) e where e->>'resultado' in ('ERRO', 'FALTA');
+    if falhas is null then
+      return query select v.nm::text, v.s::text, 'OK'::text, 'todas as etapas passaram'::text;
+    else
+      return query select v.nm::text, v.s::text, 'ERRO'::text, falhas;
+    end if;
+  end loop;
+  if not found then return query select '(nenhum)'::text, ''::text, 'ERRO'::text, 'não há vendedores cadastrados'::text; end if;
+end $$;
+revoke all on function public.checkup_entrega_todos() from public, anon, authenticated;
+
+select * from public.checkup_entrega_todos();     -- <<< uma linha por vendedor (OK / ERRO / SUSPENSO)
