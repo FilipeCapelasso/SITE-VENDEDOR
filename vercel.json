@@ -1,0 +1,39 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "v",
+          "value": "(?<slug>[a-z0-9-]+)"
+        }
+      ],
+      "destination": "/:slug",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/:slug",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(WhatsApp|facebookexternalhit|Facebot|meta-externalagent|Twitterbot|TelegramBot|LinkedInBot|Slackbot|Discordbot|Pinterest|SkypeUriPreview|Googlebot|bingbot|Applebot|Embedly|redditbot|Iframely).*"
+        }
+      ],
+      "missing": [
+        {
+          "type": "query",
+          "key": "np"
+        }
+      ],
+      "destination": "/api/og?slug=:slug"
+    },
+    {
+      "source": "/:slug",
+      "destination": "/index.html"
+    }
+  ]
+}
